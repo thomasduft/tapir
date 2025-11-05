@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<IPersonRepository, PersonRepository>();
+builder.Services.AddSingleton<IUsersRepository, UsersRepository>();
 
 var app = builder.Build();
 
@@ -26,6 +26,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Map Endpoints
-app.MapPersonsEndpoints();
+app.MapUsersEndpoints();
 
 app.Run();

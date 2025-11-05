@@ -5,9 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 using static Bullseye.Targets;
 using static SimpleExec.Command;
 
-// TODO: define your project name below!
 const string projectName = "tapir";
-
 const string solution = $"{projectName}.sln";
 IList<string> packableProjects = [
   projectName

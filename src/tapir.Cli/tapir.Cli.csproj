@@ -27,8 +27,10 @@
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.9.0" />
     <PackageReference Include="Fluid.Core" Version="2.25.0" />
+    <PackageReference Include="JsonPath.Net" Version="2.1.1" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +39,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-    <_Parameter1>tapir.Tests</_Parameter1>
+    <_Parameter1>tomware.Tapir.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

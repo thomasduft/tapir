@@ -1,11 +1,16 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using tomware.Tapir.Cli;
+using tomware.Tapir.Cli.Domain;
 
 var services = new ServiceCollection()
-    .AddCliCommand<SampleCommand>()
+    .AddHttpClient()
+    .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
+    .AddCliCommand<RunCommand>()
     .AddSingleton<Cli>();
+
 var provider = services.BuildServiceProvider();
+var cli = provider.GetRequiredService<Cli>();
 
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) =>
@@ -14,7 +19,5 @@ Console.CancelKeyPress += (s, e) =>
     cts.Cancel();
     e.Cancel = true;
 };
-
-var cli = provider.GetRequiredService<Cli>();
 
 return await cli.ExecuteAsync(args, cts.Token);

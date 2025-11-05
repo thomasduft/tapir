@@ -22,7 +22,7 @@ public class PersonRepository : IPersonRepository
 
     public IEnumerable<Person> GetAll()
     {
-        return _persons.Values;
+        return _persons.Values.OrderBy(p => p.Name);
     }
 
     public Person GetById(Guid id)

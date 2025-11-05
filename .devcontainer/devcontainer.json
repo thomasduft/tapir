@@ -16,5 +16,8 @@
         "ryanluker.vscode-coverage-gutters"
       ]
     }
-  }
+  },
+  "forwardPorts": [
+    5001
+  ]
 }

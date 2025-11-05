@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/build/">
+    <Project Path="build/targets.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/tapir.Cli/tapir.Cli.csproj" />
+    <Project Path="src/tapir.DevHost/tapir.DevHost.csproj" />
+    <Project Path="src/tapir.Tests/tapir.Tests.csproj" />
+  </Folder>
+</Solution>

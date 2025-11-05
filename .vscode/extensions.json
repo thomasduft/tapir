@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "bierner.markdown-mermaid",
+    "editorconfig.editorconfig",
+    "github.vscode-pull-request-github",
+    "gruntfuggly.todo-tree",
+    "mikestead.dotenv",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "killalau.vscode-liquid-snippets",
+    "ryanluker.vscode-coverage-gutters"
+  ]
+}

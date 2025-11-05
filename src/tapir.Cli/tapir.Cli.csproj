@@ -2,23 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
 
     <AssemblyName>tomware.Tapir</AssemblyName>
     <RootNamespace>tomware.Tapir</RootNamespace>
 
     <Description>A command-line tool for managing and executing automated api test cases.</Description>
-    <Authors>Thomas Duft</Authors>
-    <Company>tomware SOLUTIONS</Company>
     <PackageTags>testing automation api test-case test-run</PackageTags>
-    <RepositoryUrl>https://github.com/thomasduft/tapir</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/thomasduft/tapir</PackageProjectUrl>
-
-    <AssemblyVersion>$(Version)</AssemblyVersion>
-    <FileVersion>$(Version)</FileVersion>
 
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

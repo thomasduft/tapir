@@ -10,9 +10,9 @@ var provider = services.BuildServiceProvider();
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) =>
 {
-  Console.WriteLine("Cancelling...");
-  cts.Cancel();
-  e.Cancel = true;
+    Console.WriteLine("Cancelling...");
+    cts.Cancel();
+    e.Cancel = true;
 };
 
 var cli = provider.GetRequiredService<Cli>();

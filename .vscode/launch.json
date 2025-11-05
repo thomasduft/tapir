@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "devhost",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-devhost",
+      "program": "${workspaceFolder}/src/tapir.DevHost/bin/Debug/net9.0/tapir.DevHost.dll",
+      "args": [
+        "--urls",
+        "https://localhost:5001",
+        "--launch-profile",
+        "https"
+      ],
+      "cwd": "${workspaceFolder}/src/tapir.DevHost",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}

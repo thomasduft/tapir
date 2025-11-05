@@ -1,0 +1,22 @@
+<Project>
+
+  <PropertyGroup>
+    <Authors>Thomas Duft</Authors>
+    <Company>tomware SOLUTIONS</Company>
+    <Copyright>2025 tomware SOLUTIONS</Copyright>
+    <RepositoryUrl>https://github.com/thomasduft/tapir</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/thomasduft/tapir</PackageProjectUrl>
+
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

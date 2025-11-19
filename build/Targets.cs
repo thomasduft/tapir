@@ -62,17 +62,17 @@ app.OnExecuteAsync(async _ =>
         Run("dotnet", $"clean {solution} -c Release -v m --nologo");
     });
 
-    Target(Build, DependsOn(Clean), () =>
+    Target(Build, [Clean], () =>
     {
         Run("dotnet", $"build {solution} -c Release --nologo");
     });
 
-    Target(Test, DependsOn(Build), () =>
+    Target(Test, [Build], () =>
     {
         Run("dotnet", $"test {solution} -c Release --no-build --nologo");
     });
 
-    Target(Release, DependsOn(Test), () =>
+    Target(Release, [Test], () =>
     {
         if (string.IsNullOrWhiteSpace(versionOption.Value()))
         {
@@ -109,7 +109,7 @@ app.OnExecuteAsync(async _ =>
         }
     });
 
-    Target(Pack, DependsOn(Build, CleanArtifacts), () =>
+    Target(Pack, [Build, CleanArtifacts], () =>
     {
         if (string.IsNullOrWhiteSpace(versionOption.Value()))
         {

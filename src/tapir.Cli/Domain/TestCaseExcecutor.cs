@@ -2,8 +2,9 @@ namespace tomware.Tapir.Cli.Domain;
 
 internal interface ITestCaseExecutor
 {
-  Task<IEnumerable<TestStepResult>> ExecuteAsync(
+  Task<TestCaseExecutionResult> ExecuteAsync(
     string domain,
+    IEnumerable<TestStepInstruction> instructions,
     CancellationToken cancellationToken
   );
 }
@@ -12,35 +13,39 @@ internal class TestCaseExecutor : ITestCaseExecutor
 {
   private readonly IHttpClientFactory _factory;
 
-  public TestCaseExecutor(IHttpClientFactory factory)
+  public TestCaseExecutor(
+    IHttpClientFactory factory
+  )
   {
     _factory = factory;
   }
 
-  public async Task<IEnumerable<TestStepResult>> ExecuteAsync(
+  public async Task<TestCaseExecutionResult> ExecuteAsync(
     string domain,
+    IEnumerable<TestStepInstruction> instructions,
     CancellationToken cancellationToken
   )
   {
     using var client = _factory.CreateClient();
 
-    // Arrange
+    var requestMessage = HttpRequestMessageBuilder
+      .Create(instructions)
+      .WithDomain(domain)
+      .Build();
 
-    // Add Headers
+    var response = await client.SendAsync(requestMessage, cancellationToken);
 
-    // Add Body
+    var testStepResults = HttpResponseMessageValidator
+      .Create(instructions)
+      .WithStatusCode(response.StatusCode)
+      .WithReasonPhrase(response.ReasonPhrase)
+      .WithContent(response.Content)
+      .WithHeaders(response.Headers)
+      .Validate();
 
-    // Create proper BaseAddress with all QueryParameters
-
-    client.BaseAddress = new Uri(domain);
-
-    // Act
-    // Send proper Method
-    var request = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-    var response = await client.SendAsync(request, cancellationToken);
-
-    // Assert
-
-    return Enumerable.Empty<TestStepResult>();
+    return new TestCaseExecutionResult(
+      testStepResults,
+      new Dictionary<string, string>()
+    );
   }
 }

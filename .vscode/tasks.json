@@ -16,6 +16,20 @@
         "kind": "build",
         "isDefault": false
       }
+    },
+    {
+      "label": "build-tapir",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/tapir.Cli/tapir.Cli.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }

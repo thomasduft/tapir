@@ -118,18 +118,20 @@ internal class RunCommand : CommandLineApplication
 
     ConsoleHelper.WriteLineYellow($"Running test case '{testCase.Title}' ({testCase.Id})");
 
-    // TODO: prepare Test Case instructions
+    var instructions = testCase.Steps
+      .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
+      .ToList();
 
-
-    var testStepResults = await _testCaseExecutor.ExecuteAsync(
+    var executionResult = await _testCaseExecutor.ExecuteAsync(
       domain,
+      instructions,
       cancellationToken
     );
 
-    var success = testStepResults.All(r => r.IsSuccess);
+    var success = executionResult.TestStepResults.All(r => r.IsSuccess);
     if (!success)
     {
-      foreach (var result in testStepResults.Where(r => !r.IsSuccess))
+      foreach (var result in executionResult.TestStepResults.Where(r => !r.IsSuccess))
       {
         ConsoleHelper.WriteLineError($"Test case step '{result.TestStepId}' failed with error: {result.Error}");
       }
@@ -143,7 +145,7 @@ internal class RunCommand : CommandLineApplication
     if (!string.IsNullOrWhiteSpace(outputDirectory))
     {
       // Store the Test Case run
-      var run = new TestCaseRun(testCase, testStepResults);
+      var run = new TestCaseRun(testCase, executionResult.TestStepResults);
       await run.SaveAsync(
         inputDirectory,
         outputDirectory,

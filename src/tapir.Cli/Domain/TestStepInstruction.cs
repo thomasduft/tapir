@@ -65,9 +65,9 @@ internal class TestStepInstruction
     Dictionary<string, string> variables
   )
   {
-    if (!value.StartsWith('@')) return value;
+    if (!value.Contains("@@")) return value;
 
-    var key = value.Replace("@", string.Empty);
+    var key = value.Replace("@@", string.Empty);
     return variables.TryGetValue(key, out var variableValue)
       ? variableValue
       : throw new InvalidOperationException($"Variable with key '{value}' could not be resolved!");

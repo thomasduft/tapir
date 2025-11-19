@@ -1,6 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Reflection.Metadata;
+using System.Text.Json.Nodes;
+
+using Json.Path;
 
 namespace tomware.Tapir.Cli.Domain;
 
@@ -60,7 +64,7 @@ internal class HttpResponseMessageValidator
 
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
-    // results.AddRange(CheckContent());
+    results.AddRange(CheckContent());
     // results.AddRange(CheckHeaders());
 
     return results;
@@ -101,6 +105,45 @@ internal class HttpResponseMessageValidator
       : [TestStepResult.Failed(
         reasonPhraseInstruction.TestStep,
         $"Expected reason phrase '{expectedReasonPhrase}' but was '{_reasonPhrase}'."
+      )];
+  }
+
+  private IEnumerable<TestStepResult> CheckContent()
+  {
+    var contentInstruction = _instructions
+      .FirstOrDefault(i => i.Action == Constants.Actions.CheckContent);
+    if (contentInstruction == null || _content == null)
+    {
+      return [];
+    }
+
+    var json = _content.ReadAsStringAsync()
+      .GetAwaiter()
+      .GetResult();
+
+    if (string.IsNullOrEmpty(json))
+    {
+      return [TestStepResult.Failed(
+        contentInstruction.TestStep,
+        "Response content is empty."
+      )];
+    }
+
+    // see https://docs.json-everything.net/path/basics/
+
+    var jsonNode = JsonNode.Parse(json);
+    var jsonPath = JsonPath.Parse(contentInstruction.Path);
+    var x = jsonPath.ToString();
+    var results = jsonPath.Evaluate(jsonNode);
+
+    var actualValue = results.Matches.FirstOrDefault()?.Value?.ToString();
+    var expectedValue = contentInstruction.Value;
+
+    return expectedValue == actualValue
+      ? [TestStepResult.Success(contentInstruction.TestStep)]
+      : [TestStepResult.Failed(
+        contentInstruction.TestStep,
+        $"Expected value '{expectedValue}' but was '{actualValue}'."
       )];
   }
 }

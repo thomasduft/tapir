@@ -1,7 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Reflection.Metadata;
 using System.Text.Json.Nodes;
 
 using Json.Path;
@@ -58,13 +56,13 @@ internal class HttpResponseMessageValidator
     return this;
   }
 
-  public IEnumerable<TestStepResult> Validate()
+  public async Task<IEnumerable<TestStepResult>> ValidateAsync(CancellationToken cancellationToken)
   {
     var results = new List<TestStepResult>();
 
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
-    results.AddRange(CheckContent());
+    results.AddRange(await CheckContentAsync(cancellationToken));
     // results.AddRange(CheckHeaders());
 
     return results;
@@ -108,7 +106,9 @@ internal class HttpResponseMessageValidator
       )];
   }
 
-  private IEnumerable<TestStepResult> CheckContent()
+  private async Task<IEnumerable<TestStepResult>> CheckContentAsync(
+    CancellationToken cancellationToken
+  )
   {
     var contentInstruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.CheckContent);
@@ -117,10 +117,7 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    var json = _content.ReadAsStringAsync()
-      .GetAwaiter()
-      .GetResult();
-
+    var json = await _content.ReadAsStringAsync(cancellationToken);
     if (string.IsNullOrEmpty(json))
     {
       return [TestStepResult.Failed(
@@ -133,10 +130,9 @@ internal class HttpResponseMessageValidator
 
     var jsonNode = JsonNode.Parse(json);
     var jsonPath = JsonPath.Parse(contentInstruction.Path);
-    var x = jsonPath.ToString();
     var results = jsonPath.Evaluate(jsonNode);
-
     var actualValue = results.Matches.FirstOrDefault()?.Value?.ToString();
+
     var expectedValue = contentInstruction.Value;
 
     return expectedValue == actualValue

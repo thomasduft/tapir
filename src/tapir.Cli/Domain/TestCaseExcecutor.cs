@@ -28,24 +28,30 @@ internal class TestCaseExecutor : ITestCaseExecutor
   {
     using var client = _factory.CreateClient();
 
-    var requestMessage = HttpRequestMessageBuilder
+    var requestMessage = await HttpRequestMessageBuilder
       .Create(instructions)
       .WithDomain(domain)
-      .Build();
+      .BuildAsync(cancellationToken);
 
-    var response = await client.SendAsync(requestMessage, cancellationToken);
+    var response = await client
+      .SendAsync(requestMessage, cancellationToken);
 
-    var testStepResults = HttpResponseMessageValidator
+    var testStepResults = await HttpResponseMessageValidator
       .Create(instructions)
       .WithStatusCode(response.StatusCode)
       .WithReasonPhrase(response.ReasonPhrase)
       .WithContent(response.Content)
       .WithHeaders(response.Headers)
-      .Validate();
+      .ValidateAsync(cancellationToken);
+
+    var variables = await VariableExtractor
+      .Create(instructions)
+      .FromContent(response.Content)
+      .ExtractAsync(cancellationToken);
 
     return new TestCaseExecutionResult(
       testStepResults,
-      new Dictionary<string, string>()
+      variables
     );
   }
 }

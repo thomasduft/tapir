@@ -25,12 +25,12 @@ internal class HttpRequestMessageBuilder
     return this;
   }
 
-  public HttpRequestMessage Build()
+  public async Task<HttpRequestMessage> BuildAsync(CancellationToken cancellationToken)
   {
     var request = new HttpRequestMessage();
 
     SetHeaders(request);
-    SetContent(request);
+    await SetContent(request, cancellationToken);
     SetMethod(request);
     SetBaseAddress(request);
 
@@ -54,7 +54,10 @@ internal class HttpRequestMessageBuilder
     }
   }
 
-  private void SetContent(HttpRequestMessage request)
+  private async Task SetContent(
+    HttpRequestMessage request,
+    CancellationToken cancellationToken
+  )
   {
     var instruction = _instructions
       .FirstOrDefault(i => i.Action == nameof(Constants.Actions.AddContent));
@@ -64,7 +67,7 @@ internal class HttpRequestMessageBuilder
     }
 
     var stringContent = !string.IsNullOrEmpty(instruction.File)
-      ? File.ReadAllText(instruction.File)
+      ? await File.ReadAllTextAsync(instruction.File, cancellationToken)
       : instruction.Value;
 
     request.Content = new StringContent(stringContent);

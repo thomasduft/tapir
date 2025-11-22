@@ -10,7 +10,9 @@
 
 ## Description
 
-Tests whether all users can be retrieved and Alice's ID can be extracted so that it can be used in subsequent steps.
+Tests the Users API by first retrieving all users, verifying the response contains Alice, and extracting her ID for subsequent operations.
+
+It then uses Alice's ID to fetch her individual user details and validates the returned data matches expected values (name: Alice, age: 20). This test demonstrates both list and detail API endpoints while showcasing variable extraction and reuse between test steps.
 
 ## Preconditions
 
@@ -24,7 +26,7 @@ Tests whether all users can be retrieved and Alice's ID can be extracted so that
 | 12 | Verify response code | Action=CheckStatusCode Value=200 | 200 | ✅ |
 | 13 | Inspect content | Action=VerifyContent File=users.json | Should be identical | ✅ |
 | 14 | Contains Alice | Action=CheckContent Path=$[?@.name=="Alice"].name Value=Alice | Content contains Alice | ✅ |
-| 15 | Get Alice ID | Action=StoreVariable Path=$[?@.name=="Alice"].id Name=AliceId | Returns Alice's ID | ✅ |
+| 15 | Retain ID of Alice ID | Action=StoreVariable Path=$[?@.name=="Alice"].id Name=AliceId | ID of Alice stored | ✅ |
 
 | Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |

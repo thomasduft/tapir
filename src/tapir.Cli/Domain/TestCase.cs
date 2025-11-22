@@ -9,7 +9,7 @@ internal class TestCase
   public string? Module { get; set; } = "Unkown";
   public string Type { get; set; } = string.Empty;
   public string Status { get; set; } = string.Empty;
-  public IEnumerable<TestStep> Steps { get; set; } = [];
+  public IEnumerable<Table> Tables { get; set; } = [];
   public string File { get; set; } = string.Empty;
   public bool IsDefinition => !string.IsNullOrEmpty(Type) && Type == Constants.TestCaseType.Definition;
   public string LinkedFile { get; set; } = string.Empty;
@@ -42,4 +42,19 @@ internal class TestCase
 
     return await parser.ToTestCaseAsync(cancellationToken);
   }
+
+  public void AddOrMergeVariables(IDictionary<string, string> variables)
+  {
+    if (variables == null) return;
+
+    foreach (var kvp in variables)
+    {
+      Variables[kvp.Key] = kvp.Value;
+    }
+  }
+}
+
+internal class Table
+{
+  public IEnumerable<TestStep> Steps { get; set; } = [];
 }

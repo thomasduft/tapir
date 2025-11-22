@@ -2,6 +2,8 @@ namespace tomware.Tapir.Cli.Domain;
 
 internal static class Constants
 {
+  public const string VariablePreAndSuffix = "@@";
+
   internal static class TestCaseType
   {
     public const string Definition = "Definition";
@@ -28,4 +30,5 @@ internal static class Constants
     public const string VerifyContent = "VerifyContent";
     public const string StoreVariable = "StoreVariable";
   }
+
 }

@@ -21,7 +21,7 @@ internal class TestCaseParser
     var status = FindTag(lines, "Status");
 
     var markdownContent = string.Join(Environment.NewLine, lines);
-    var steps = GetTestSteps(markdownContent);
+    var tables = GetTables(markdownContent);
 
     var link = FindTag(lines, "Link");
     var linkedFile = GetLinkedFile(_file, link);
@@ -33,7 +33,7 @@ internal class TestCaseParser
       Module = module,
       Type = type!,
       Status = status!,
-      Steps = steps,
+      Tables = tables,
       File = _file,
       LinkedFile = linkedFile!
     };
@@ -62,6 +62,29 @@ internal class TestCaseParser
     var splittedItems = line!.Split(':');
 
     return splittedItems[1].Trim();
+  }
+
+  private IEnumerable<Table> GetTables(string markdownContent)
+  {
+    var tables = new List<Table>();
+    var table = new MarkdownTable(markdownContent);
+    var allTableSections = table.ExtractAllTableSections();
+
+    foreach (var tableSection in allTableSections)
+    {
+      var sectionTable = new MarkdownTable(tableSection);
+      var testSteps = sectionTable.ParseTestSteps();
+
+      if (testSteps.Any())
+      {
+        tables.Add(new Table
+        {
+          Steps = testSteps
+        });
+      }
+    }
+
+    return tables;
   }
 
   private IEnumerable<TestStep> GetTestSteps(string markdownContent)

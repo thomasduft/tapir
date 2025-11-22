@@ -16,7 +16,7 @@ internal class MarkdownTable
   }
 
   /// <summary>
-  /// Parses test steps from markdown tables found between STEPS:BEGIN and STEPS:END comments.
+  /// Parses test steps from markdown tables.
   /// Expected table format:
   /// | Step ID | Description | Test Data | Expected Result | Actual Result |
   /// | -------:| ----------- | --------- | --------------- | ------------- |
@@ -48,6 +48,62 @@ internal class MarkdownTable
     return testSteps.OrderBy(ts => ts.Id);
   }
 
+
+  /// <summary>
+  /// Extracts all markdown tables from the content as separate sections
+  /// </summary>
+  /// <returns>Collection of markdown table sections, each containing one complete table</returns>
+  public IEnumerable<string> ExtractAllTableSections()
+  {
+    var tables = new List<string>();
+    var lines = _content.Split('\n');
+    var currentTable = new List<string>();
+    var inTable = false;
+
+    for (int i = 0; i < lines.Length; i++)
+    {
+      var line = lines[i].Trim();
+
+      // Check if this line looks like a table row
+      if (line.StartsWith("|") && line.EndsWith("|"))
+      {
+        if (!inTable)
+        {
+          // Check if this looks like our expected header
+          if (IsValidStepsTableHeader(line))
+          {
+            inTable = true;
+            currentTable.Clear();
+            currentTable.Add(line);
+          }
+        }
+        else
+        {
+          // We're already in a table, add this row
+          currentTable.Add(line);
+        }
+      }
+      else if (inTable)
+      {
+        // We were in a table but this line doesn't look like a table row
+        // End the current table and start a new one
+        if (currentTable.Count > 0)
+        {
+          tables.Add(string.Join("\n", currentTable));
+          currentTable.Clear();
+        }
+        inTable = false;
+      }
+    }
+
+    // Don't forget the last table if the content ends while still in a table
+    if (inTable && currentTable.Count > 0)
+    {
+      tables.Add(string.Join("\n", currentTable));
+    }
+
+    return tables;
+  }
 
   /// <summary>
   /// Updates the "Actual Result" column in test steps table with test execution results

@@ -65,13 +65,20 @@ internal class TestStepInstruction
     Dictionary<string, string> variables
   )
   {
-    if (!value.Contains("@@")) return value;
+    if (!value.Contains(Constants.VariablePreAndSuffix)) return value;
 
-    var key = value.Replace("@@", string.Empty);
-    return variables.TryGetValue(key, out var variableValue)
-      ? variableValue
-      : throw new InvalidOperationException($"Variable with key '{value}' could not be resolved!");
+    // Pattern to match variables like {@@VariableName@@}
+    var pattern = $@"\{{{Constants.VariablePreAndSuffix}(\w+){Constants.VariablePreAndSuffix}\}}";
+
+    return Regex.Replace(value, pattern, match =>
+    {
+      var key = match.Groups[1].Value; // Extract the variable name
+      return variables.TryGetValue(key, out var variableValue)
+        ? variableValue
+        : throw new InvalidOperationException($"Variable with key '{key}' could not be resolved!");
+    });
   }
+
 
   private static Dictionary<string, string> ParseTestData(
     string testData

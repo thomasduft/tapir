@@ -32,7 +32,8 @@
         "-tc",
         "TC-Users-001",
         "-o",
-        "../../samples/Users/Runs"
+        "../../samples/Users/Runs",
+        "--continue-on-failure"
       ],
       "cwd": "${workspaceFolder}/src/tapir.Cli",
       "stopAtEntry": false

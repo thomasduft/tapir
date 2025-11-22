@@ -118,34 +118,43 @@ internal class RunCommand : CommandLineApplication
 
     ConsoleHelper.WriteLineYellow($"Running test case '{testCase.Title}' ({testCase.Id})");
 
-    var instructions = testCase.Steps
-      .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
-      .ToList();
-
-    var executionResult = await _testCaseExecutor.ExecuteAsync(
-      domain,
-      instructions,
-      cancellationToken
-    );
-
-    var success = executionResult.TestStepResults.All(r => r.IsSuccess);
-    if (!success)
+    // for each table in the test case, execute the test steps
+    var results = new List<TestCaseExecutionResult>();
+    foreach (var table in testCase.Tables)
     {
-      foreach (var result in executionResult.TestStepResults.Where(r => !r.IsSuccess))
+      var instructions = table.Steps
+        .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
+        .ToList();
+
+      var executionResult = await _testCaseExecutor.ExecuteAsync(
+        domain,
+        instructions,
+        cancellationToken
+      );
+
+      var success = executionResult.TestStepResults.All(r => r.IsSuccess);
+      if (!success)
       {
-        ConsoleHelper.WriteLineError($"Test case step '{result.TestStepId}' failed with error: {result.Error}");
+        foreach (var result in executionResult.TestStepResults.Where(r => !r.IsSuccess))
+        {
+          ConsoleHelper.WriteLineError($"Test case step '{result.TestStepId}' failed with error: {result.Error}");
+        }
+
+        if (!_continueOnFailure.ParsedValue)
+        {
+          return await Task.FromResult(1);
+        }
       }
 
-      if (!_continueOnFailure.ParsedValue)
-      {
-        return await Task.FromResult(1);
-      }
+      testCase.AddOrMergeVariables(executionResult.Variables);
+
+      results.Add(executionResult);
     }
 
     if (!string.IsNullOrWhiteSpace(outputDirectory))
     {
       // Store the Test Case run
-      var run = new TestCaseRun(testCase, executionResult.TestStepResults);
+      var run = new TestCaseRun(testCase, results.SelectMany(r => r.TestStepResults).ToList());
       await run.SaveAsync(
         inputDirectory,
         outputDirectory,
@@ -153,7 +162,7 @@ internal class RunCommand : CommandLineApplication
       );
     }
 
-    if (success)
+    if (results.All(r => r.TestStepResults.All(tr => tr.IsSuccess)))
     {
       ConsoleHelper.WriteLineSuccess($"Test case '{testCase.Title}' ({testCase.Id}) executed successfully.");
     }

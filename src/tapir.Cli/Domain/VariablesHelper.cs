@@ -21,7 +21,7 @@ internal static class VariablesHelper
   internal static Dictionary<string, string> CreateDummyVariables(IEnumerable<TestStep> steps)
   {
     // For each test step data that contains a variable starting with an
-    // @ sign, create a dummy variable
+    // @@ sign, create a dummy variable
     var variables = new Dictionary<string, string>();
     foreach (var step in steps)
     {
@@ -30,7 +30,7 @@ internal static class VariablesHelper
         continue;
       }
 
-      var matches = Regex.Matches(step.TestData, @"@(\w+)");
+      var matches = Regex.Matches(step.TestData, $@"{Constants.VariablePreAndSuffix}(\w+)");
       foreach (Match match in matches)
       {
         if (!variables.ContainsKey(match.Groups[1].Value))

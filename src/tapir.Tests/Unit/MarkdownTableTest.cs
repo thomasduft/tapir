@@ -13,14 +13,13 @@ public class MarkdownTableTests
 
 ## Steps
 
-| Step ID | Description             | Test Data                                                             | Expected Result        | Actual Result |
-| ------: | ----------------------- | --------------------------------------------------------------------- | ---------------------- | ------------- |
-| 1       | Call api/users         | Step=Act    Action=Send Method=GET Value=api/users                     | 200 OK                 | -             |
-| 2       | Verify response code    | Step=Assert Action=CheckResponseCode Value=200                        | 200                    | -             |
-| 3       | Inspect content         | Step=Assert Action=VerifyContent File=users.json                      | Should be identical    | -             |
-| 4       | Contains Alice          | Step=Assert Action=CheckContent Value=\""$[?(@.name == 'Alice')]\""   | Content contains Alice | -             |
-| 5       | Get Alice ID            | Step=Assert Action=StoreVariable Value=\""$[?(@.name == 'Alice')].id\"" | Returns Alice's ID     | -             |
-
+| Step ID | Description             | Test Data                                                      | Expected Result                  | Actual Result |
+| ------: | ----------------------- | ---------------------------------------------------------------| -------------------------------- | ------------- |
+| 1       | Call users api          | Action=Send Method=GET Value=users                             | Request successful               | -             |
+| 2       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                              | -             |
+| 3       | Inspect content         | Action=VerifyContent File=users.json                           | Should be identical              | -             |
+| 4       | Contains Alice          | Action=CheckContent Path=\""$[?@.name==\""Alice\""].name\"" Value=Alice  | Content contains Alice | -             |
+| 5       | Get Alice ID            | Action=StoreVariable Path=\""$[?@.name==\""Alice\""].id\"" Name=AliceId  | Returns Alice's ID     | -             |
 
 ## Postcondition
 ";
@@ -35,8 +34,51 @@ public class MarkdownTableTests
 
     var firstStep = testSteps[0];
     Assert.Equal(1, firstStep.Id);
-    Assert.Equal("Call api/users", firstStep.Description);
-    Assert.Equal("Step=Act    Action=Send Method=GET Value=api/users", firstStep.TestData);
-    Assert.Equal("200 OK", firstStep.ExpectedResult);
+    Assert.Equal("Call users api", firstStep.Description);
+    Assert.Equal("Action=Send Method=GET Value=users", firstStep.TestData);
+    Assert.Equal("Request successful", firstStep.ExpectedResult);
+  }
+
+  [Fact]
+  public void ExtractAllTableSections_WithMultipleTables_ShouldReturnSeparateSections()
+  {
+    // Arrange
+    var markdown = @"
+# Test Case
+
+## Steps
+
+| Step ID | Description             | Test Data                                                      | Expected Result        | Actual Result |
+| ------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
+| 1       | Call users api          | Action=Send Method=GET Value=users                             | Request successful     | -             |
+| 2       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
+
+| Step ID | Description             | Test Data                                                      | Expected Result        | Actual Result |
+| ------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
+| 1       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId}                 | Request successful     | -             |
+| 2       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
+
+## Postcondition
+";
+
+    var table = new MarkdownTable(markdown);
+
+    // Act
+    var tableSections = table.ExtractAllTableSections().ToList();
+
+    // Assert
+    Assert.Equal(2, tableSections.Count);
+
+    // Verify first table
+    var firstTableSteps = new MarkdownTable(tableSections[0]).ParseTestSteps().ToList();
+    Assert.Equal(2, firstTableSteps.Count);
+    Assert.Equal("Call users api", firstTableSteps[0].Description);
+    Assert.Equal("Verify response code", firstTableSteps[1].Description);
+
+    // Verify second table
+    var secondTableSteps = new MarkdownTable(tableSections[1]).ParseTestSteps().ToList();
+    Assert.Equal(2, secondTableSteps.Count);
+    Assert.Equal("Get Alice Details", secondTableSteps[0].Description);
+    Assert.Equal("Verify response code", secondTableSteps[1].Description);
   }
 }

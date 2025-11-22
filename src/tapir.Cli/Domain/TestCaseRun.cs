@@ -25,6 +25,8 @@ internal class TestCaseRun
     var content = await File.ReadAllTextAsync(_testCase.File, cancellationToken);
 
     // Update test steps using MarkdownTable
+
+    // TODO: Refactor to respect all tables
     var table = new MarkdownTable(content);
     var updatedContent = table.UpdateTestStepsWithResults(_results);
 

@@ -110,9 +110,9 @@ internal class HttpResponseMessageValidator
     CancellationToken cancellationToken
   )
   {
-    var contentInstruction = _instructions
-      .FirstOrDefault(i => i.Action == Constants.Actions.CheckContent);
-    if (contentInstruction == null || _content == null)
+    var contentInstructions = _instructions
+      .Where(i => i.Action == Constants.Actions.CheckContent);
+    if (contentInstructions == null || _content == null)
     {
       return [];
     }
@@ -121,25 +121,32 @@ internal class HttpResponseMessageValidator
     if (string.IsNullOrEmpty(json))
     {
       return [TestStepResult.Failed(
-        contentInstruction.TestStep,
+        contentInstructions.First().TestStep,
         "Response content is empty."
       )];
     }
 
-    // see https://docs.json-everything.net/path/basics/
+    var results = new List<TestStepResult>();
+    foreach (var contentInstruction in contentInstructions)
+    {
+      // see https://docs.json-everything.net/path/basics/
+      var jsonNode = JsonNode.Parse(json);
+      var jsonPath = JsonPath.Parse(contentInstruction.Path);
+      var evaluationResults = jsonPath.Evaluate(jsonNode);
+      var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
 
-    var jsonNode = JsonNode.Parse(json);
-    var jsonPath = JsonPath.Parse(contentInstruction.Path);
-    var results = jsonPath.Evaluate(jsonNode);
-    var actualValue = results.Matches.FirstOrDefault()?.Value?.ToString();
+      var expectedValue = contentInstruction.Value;
 
-    var expectedValue = contentInstruction.Value;
+      results.Add(
+        expectedValue == actualValue
+          ? TestStepResult.Success(contentInstruction.TestStep)
+          : TestStepResult.Failed(
+            contentInstruction.TestStep,
+            $"Expected content value '{expectedValue}' but was '{actualValue}'."
+          )
+      );
+    }
 
-    return expectedValue == actualValue
-      ? [TestStepResult.Success(contentInstruction.TestStep)]
-      : [TestStepResult.Failed(
-        contentInstruction.TestStep,
-        $"Expected value '{expectedValue}' but was '{actualValue}'."
-      )];
+    return results;
   }
 }

@@ -13,19 +13,19 @@ echo Starting building version $1
 echo ----
 echo Cleaning up
 rm -r ./artifacts
-dotnet tool uninstall -g tomware.TestR
+dotnet tool uninstall -g tomware.Tapir
 
 echo ----
 echo Restore
-dotnet restore src/testr.Cli
+dotnet restore src/tapir.Cli
 
 echo ----
 echo Packaging with Version = $1
-dotnet pack src/testr.Cli -c Release -p:PackageVersion=$1 -p:Version=$1 -o ./artifacts/
+dotnet pack src/tapir.Cli -c Release -p:PackageVersion=$1 -p:Version=$1 -o ./artifacts/
 
 echo ----
-echo Installing testr globally with Version = $1
-dotnet tool install --global --add-source ./artifacts/ tomware.TestR
+echo Installing tapir globally with Version = $1
+dotnet tool install --global --add-source ./artifacts/ tomware.Tapir
 
 echo ----
 echo Done

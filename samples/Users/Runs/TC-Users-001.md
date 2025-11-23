@@ -1,6 +1,6 @@
 # TC-Users-001: List all Users
 
-- **Date**: 2025-11-22
+- **Date**: 2025-11-23
 - **Author**: thomasduft
 - **Test Priority**: Medium
 - **Module**: Users
@@ -30,11 +30,11 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 
 | Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
-| 21       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId@@}               | Request successful     | -             |
-| 22       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
-| 23       | Inspect content         | Action=VerifyContent File=alice.json                           | Should be identical    | -             |
-| 24       | Verify Name             | Action=CheckContent Path=$.name Value=Alice                    | Name is Alice          | -             |
-| 25       | Verify Age              | Action=CheckContent Path=$.age Value=20                        | Age is 20              | -             |
+| 21 | Get Alice Details | Action=Send Method=GET Value=users/{@@AliceId@@} | Request successful | ✅ |
+| 22 | Verify response code | Action=CheckStatusCode Value=200 | 200 | ✅ |
+| 23 | Inspect content | Action=VerifyContent File=alice.json | Should be identical | ✅ |
+| 24 | Verify Name | Action=CheckContent Path=$.name Value=Alice | Name is Alice | ✅ |
+| 25 | Verify Age | Action=CheckContent Path=$.age Value=20 | Age is 20 | ❌ Expected content value '20' but was '30'. |
 
 ## Postcondition
 

@@ -81,4 +81,81 @@ public class MarkdownTableTests
     Assert.Equal("Get Alice Details", secondTableSteps[0].Description);
     Assert.Equal("Verify response code", secondTableSteps[1].Description);
   }
+
+  [Fact]
+  public void UpdateTestStepsWithResults_WithMultipleTables_ShouldUpdateAllTables()
+  {
+    // Arrange
+    var markdown = @"# TC-Users-001: List all Users
+
+- **Date**: 2025-11-22
+- **Author**: thomasduft
+- **Test Priority**: Medium
+- **Module**: Users
+- **Type**: Run
+- **Status**: Failed
+- **Domain**: https://localhost:5001
+
+## Description
+
+Tests the Users API by first retrieving all users, verifying the response contains Alice, and extracting her ID for subsequent operations.
+
+## Steps
+
+| Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
+| -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
+| 11 | Call users api | Action=Send Method=GET Value=users | Request successful | - |
+| 12 | Verify response code | Action=CheckStatusCode Value=200 | 200 | - |
+| 13 | Inspect content | Action=VerifyContent File=users.json | Should be identical | - |
+| 14 | Contains Alice | Action=CheckContent Path=$[?@.name==\""Alice\""].name Value=Alice | Content contains Alice | - |
+| 15 | Retain ID of Alice ID | Action=StoreVariable Path=$[?@.name==\""Alice\""].id Name=AliceId | ID of Alice stored | - |
+
+| Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
+| -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
+| 21       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId@@}               | Request successful     | -             |
+| 22       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
+| 23       | Inspect content         | Action=VerifyContent File=alice.json                           | Should be identical    | -             |
+| 24       | Verify Name             | Action=CheckContent Path=$.name Value=Alice                    | Name is Alice          | -             |
+| 25       | Verify Age              | Action=CheckContent Path=$.age Value=20                        | Age is 20              | -             |
+
+## Postcondition
+
+- no post-conditions
+";
+
+    var table = new MarkdownTable(markdown);
+
+    // Create test results with some failures
+    var testResults = new List<TestStepResult>
+    {
+      TestStepResult.Success(new TestStep { Id = 11 }),
+      TestStepResult.Success(new TestStep { Id = 12 }),
+      TestStepResult.Success(new TestStep { Id = 13 }),
+      TestStepResult.Success(new TestStep { Id = 14 }),
+      TestStepResult.Success(new TestStep { Id = 15 }),
+      TestStepResult.Success(new TestStep { Id = 21 }),
+      TestStepResult.Failed(new TestStep { Id = 22 }, "Expected 200 but got 404"),
+      TestStepResult.Failed(new TestStep { Id = 23 }, "File not found"),
+      TestStepResult.Failed(new TestStep { Id = 24 }, "Name mismatch"),
+      TestStepResult.Failed(new TestStep { Id = 25 }, "Age mismatch")
+    };
+
+    // Act
+    var updatedMarkdown = table.UpdateTestStepsWithResults(testResults);
+
+    // Assert
+    // Verify first table is updated correctly (all success)
+    Assert.Contains("| 11 | Call users api | Action=Send Method=GET Value=users | Request successful | ✅ |", updatedMarkdown);
+    Assert.Contains("| 12 | Verify response code | Action=CheckStatusCode Value=200 | 200 | ✅ |", updatedMarkdown);
+    Assert.Contains("| 13 | Inspect content | Action=VerifyContent File=users.json | Should be identical | ✅ |", updatedMarkdown);
+    Assert.Contains("| 14 | Contains Alice |", updatedMarkdown);
+    Assert.Contains("| 15 | Retain ID of Alice ID |", updatedMarkdown);
+
+    // Verify second table is updated correctly (with failures)
+    Assert.Contains("| 21 | Get Alice Details | Action=Send Method=GET Value=users/{@@AliceId@@} | Request successful | ✅ |", updatedMarkdown);
+    Assert.Contains("| 22 | Verify response code | Action=CheckStatusCode Value=200 | 200 | ❌ Expected 200 but got 404 |", updatedMarkdown);
+    Assert.Contains("| 23 | Inspect content | Action=VerifyContent File=alice.json | Should be identical | ❌ File not found |", updatedMarkdown);
+    Assert.Contains("| 24 | Verify Name | Action=CheckContent Path=$.name Value=Alice | Name is Alice | ❌ Name mismatch |", updatedMarkdown);
+    Assert.Contains("| 25 | Verify Age | Action=CheckContent Path=$.age Value=20 | Age is 20 | ❌ Age mismatch |", updatedMarkdown);
+  }
 }

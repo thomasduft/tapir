@@ -80,9 +80,9 @@ Tests whether all users can be retrieved and Alice's ID can be extracted so that
       Assert.Equal("Verify response code", secondTableSteps[1].Description);
       Assert.Equal("Inspect content", secondTableSteps[2].Description);
 
-      // Verify aggregated Steps property returns all 6 steps
-      var allSteps = testCase.Steps.ToList();
-      Assert.Equal(6, allSteps.Count);
+      // Verify total steps across all tables is 6
+      var totalSteps = tables.SelectMany(t => t.Steps).Count();
+      Assert.Equal(6, totalSteps);
     }
     finally
     {

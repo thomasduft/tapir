@@ -109,13 +109,13 @@ internal class MarkdownTable
   /// Updates the "Actual Result" column in test steps table with test execution results
   /// </summary>
   /// <param name="testResults">Collection of test step results to apply</param>
-  /// <returns>Updated markdown content with results applied to the table</returns>
+  /// <returns>Updated markdown content with results applied to all tables</returns>
   public string UpdateTestStepsWithResults(IEnumerable<TestStepResult> testResults)
   {
     var lines = _content.Split('\n');
     var inTable = false;
 
-    // First pass: find the test steps table
+    // Process all tables in the document
     for (int i = 0; i < lines.Length; i++)
     {
       var line = lines[i].Trim();
@@ -135,8 +135,8 @@ internal class MarkdownTable
       }
       else if (inTable)
       {
-        // End of table
-        break;
+        // End of current table, continue looking for more tables
+        inTable = false;
       }
     }
 

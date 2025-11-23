@@ -8,6 +8,8 @@
     "**/.git/subtree-cache/**": true,
     "**/.hg/store/**": true,
     "**/node_modules/**": true,
+    "**/bin/**": true,
+    "**/obj/**": true
   },
   "dotnet.defaultSolution": "suite.slnx"
 }

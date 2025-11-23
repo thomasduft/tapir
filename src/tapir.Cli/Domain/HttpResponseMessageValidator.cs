@@ -62,25 +62,29 @@ internal class HttpResponseMessageValidator
 
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
+    results.AddRange(CheckHeaders());
+    results.AddRange(await VerifyContentAsync(cancellationToken));
     results.AddRange(await CheckContentAsync(cancellationToken));
 
     return results;
   }
 
-  private IEnumerable<TestStepResult> CheckStatusCode()
+  private List<TestStepResult> CheckStatusCode()
   {
     var results = new List<TestStepResult>();
+
+    var sendInstruction = _instructions
+      .FirstOrDefault(i => i.Action == Constants.Actions.Send)
+        ?? throw new InvalidOperationException("No Send instruction found to validate status code.");
+    results.Add(TestStepResult.Success(sendInstruction.TestStep));
 
     var statusCodeInstruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.CheckStatusCode);
     if (statusCodeInstruction == null)
     {
-      return [];
+      // It's okay if there's no status code to check
+      return results;
     }
-
-    // Add a success result for the send instruction
-    var sendInstruction = _instructions.First(i => i.Action == Constants.Actions.Send);
-    results.Add(TestStepResult.Success(sendInstruction.TestStep));
 
     // Now validate the status code
     var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);
@@ -94,12 +98,13 @@ internal class HttpResponseMessageValidator
     return results;
   }
 
-  private IEnumerable<TestStepResult> CheckReasonPhrase()
+  private List<TestStepResult> CheckReasonPhrase()
   {
     var reasonPhraseInstruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.CheckReasonPhrase);
     if (reasonPhraseInstruction == null)
     {
+      // It's okay if there's no reason phrase to check
       return [];
     }
 
@@ -113,7 +118,49 @@ internal class HttpResponseMessageValidator
       )];
   }
 
-  private async Task<IEnumerable<TestStepResult>> CheckContentAsync(
+  private List<TestStepResult> CheckHeaders()
+  {
+    var headerInstructions = _instructions
+      .Where(i => i.Action == Constants.Actions.CheckHeader);
+    if (headerInstructions == null || _headers == null)
+    {
+      // It's okay if there's no headers to check
+      return [];
+    }
+
+    var results = new List<TestStepResult>();
+
+    foreach (var headerInstruction in headerInstructions)
+    {
+      if (_headers.TryGetValues(headerInstruction.Name, out var values))
+      {
+        var actualValue = string.Join(",", values);
+        var expectedValue = headerInstruction.Value;
+
+        results.Add(
+          expectedValue == actualValue
+            ? TestStepResult.Success(headerInstruction.TestStep)
+            : TestStepResult.Failed(
+              headerInstruction.TestStep,
+              $"Expected header '{headerInstruction.Name}' value '{expectedValue}' but was '{actualValue}'."
+            )
+        );
+      }
+      else
+      {
+        results.Add(
+          TestStepResult.Failed(
+            headerInstruction.TestStep,
+            $"Expected header '{headerInstruction.Name}' was not found."
+          )
+        );
+      }
+    }
+
+    return results;
+  }
+
+  private async Task<List<TestStepResult>> CheckContentAsync(
     CancellationToken cancellationToken
   )
   {
@@ -121,6 +168,7 @@ internal class HttpResponseMessageValidator
       .Where(i => i.Action == Constants.Actions.CheckContent);
     if (contentInstructions == null || _content == null)
     {
+      // It's okay if there's no content to check
       return [];
     }
 
@@ -134,6 +182,7 @@ internal class HttpResponseMessageValidator
     }
 
     var results = new List<TestStepResult>();
+
     foreach (var contentInstruction in contentInstructions)
     {
       // see https://docs.json-everything.net/path/basics/
@@ -155,5 +204,68 @@ internal class HttpResponseMessageValidator
     }
 
     return results;
+  }
+
+  private async Task<IEnumerable<TestStepResult>> VerifyContentAsync(
+    CancellationToken cancellationToken
+  )
+  {
+    var contentInstructions = _instructions
+      .Where(i => i.Action == Constants.Actions.VerifyContent);
+    if (contentInstructions == null || _content == null)
+    {
+      // It's okay if there's no content to check
+      return [];
+    }
+
+    var json = await _content.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(json))
+    {
+      return [TestStepResult.Failed(
+        contentInstructions.First().TestStep,
+        "Response content is empty."
+      )];
+    }
+
+    var results = new List<TestStepResult>();
+
+    foreach (var contentInstruction in contentInstructions)
+    {
+      // if File is present load from File otherwise use Value
+      var expectedJson = !string.IsNullOrEmpty(contentInstruction.File)
+        && File.Exists(contentInstruction.File)
+        ? await File.ReadAllTextAsync(contentInstruction.File, cancellationToken)
+        : contentInstruction.Value
+          ?? string.Empty;
+
+      // Normalize both JSON strings by parsing and re-serializing without formatting
+      var normalizedActual = NormalizeJson(json);
+      var normalizedExpected = NormalizeJson(expectedJson);
+
+      results.Add(
+        normalizedActual == normalizedExpected
+          ? TestStepResult.Success(contentInstruction.TestStep)
+          : TestStepResult.Failed(
+            contentInstruction.TestStep,
+            "Response content does not match the expected content."
+          )
+      );
+    }
+
+    return results;
+  }
+
+  private static string NormalizeJson(string json)
+  {
+    try
+    {
+      var jsonNode = JsonNode.Parse(json);
+      return jsonNode?.ToJsonString() ?? json;
+    }
+    catch
+    {
+      // If parsing fails, return original string
+      return json;
+    }
   }
 }

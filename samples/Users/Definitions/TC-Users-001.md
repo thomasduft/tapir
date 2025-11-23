@@ -23,7 +23,7 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
 | 11       | Call users api          | Action=Send Method=GET Endpoint=users                          | Request successful     | -             |
 | 12       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
-| 13       | Inspect content         | Action=VerifyContent File=users.json                           | Should be identical    | -             |
+| 13       | Inspect content         | Action=VerifyContent File=../../samples/Users/Definitions/users.json                           | Should be identical    | -             |
 | 14       | Contains Alice          | Action=CheckContent Path=$[?@.name=="Alice"].name Value=Alice  | Content contains Alice | -             |
 | 15       | Retain ID of Alice      | Action=StoreVariable Path=$[?@.name=="Alice"].id Name=AliceId  | ID of Alice stored     | -             |
 

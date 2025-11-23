@@ -1,0 +1,17 @@
+[
+  {
+    "id": "4f4feb38-4398-4776-97c1-7fbf3db69e1f",
+    "name": "Alice",
+    "age": 30
+  },
+  {
+    "id": "d479b8bf-c895-4587-8658-81dcc8559f2f",
+    "name": "Bob",
+    "age": 25
+  },
+  {
+    "id": "e7a0ce49-8da6-435e-adfd-d0f8644b4299",
+    "name": "Charlie",
+    "age": 35
+  }
+]

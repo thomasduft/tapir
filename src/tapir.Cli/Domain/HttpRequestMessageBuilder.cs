@@ -41,7 +41,7 @@ internal class HttpRequestMessageBuilder
   {
     request.Headers.Clear();
     var headerInstructions = _instructions
-      .Where(i => i.Action == nameof(Constants.Actions.AddHeader))
+      .Where(i => i.Action == Constants.Actions.AddHeader)
       .ToList();
 
     foreach (var headerInstruction in headerInstructions)
@@ -60,7 +60,7 @@ internal class HttpRequestMessageBuilder
   )
   {
     var instruction = _instructions
-      .FirstOrDefault(i => i.Action == nameof(Constants.Actions.AddContent));
+      .FirstOrDefault(i => i.Action == Constants.Actions.AddContent);
     if (instruction == null)
     {
       return;
@@ -76,7 +76,7 @@ internal class HttpRequestMessageBuilder
   private void SetMethod(HttpRequestMessage request)
   {
     var instruction = _instructions
-      .FirstOrDefault(i => i.Action == nameof(Constants.Actions.Send))
+      .FirstOrDefault(i => i.Action == Constants.Actions.Send)
         ?? throw new InvalidOperationException("No Send instruction found to set HTTP Method.");
 
     request.Method = new HttpMethod(instruction.Method);
@@ -85,12 +85,12 @@ internal class HttpRequestMessageBuilder
   private void SetBaseAddress(HttpRequestMessage request)
   {
     var endpointInstruction = _instructions
-      .FirstOrDefault(i => i.Action == nameof(Constants.Actions.Send))
+      .FirstOrDefault(i => i.Action == Constants.Actions.Send)
         ?? throw new InvalidOperationException("No Send instruction found to set Endpoint.");
     var endpoint = endpointInstruction.Endpoint;
 
     var queryParameterInstructions = _instructions
-      .Where(i => i.Action == nameof(Constants.Actions.AddQueryParameter))
+      .Where(i => i.Action == Constants.Actions.AddQueryParameter)
       .ToList();
 
     var queryString = string.Join(

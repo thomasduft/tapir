@@ -17,3 +17,19 @@ jobs:
         dotnet-version: 9.0.x
     - name: Test
       run: ./build.sh test
+
+  e2e-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Build & Install
+      run: ./build.sh build
+    - name: Run TestHost
+      run: dotnet run --project src/tapir.DevHost/tapir.DevHost.csproj --urls "http://localhost:5000"
+    - name: Run test case TC-Documents-001
+      run: dotnet run -- project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-001 -i "samples/Users/Definitions" -o "samples/Users/Runs" --continue-on-failure

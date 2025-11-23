@@ -12,6 +12,7 @@ internal class TestStepInstruction
   public string File { get; set; } = string.Empty;
   public string Path { get; set; } = string.Empty;
   public string Method { get; set; } = "GET";
+  public string Endpoint { get; set; } = string.Empty;
 
   public TestStep TestStep => _step;
 
@@ -52,6 +53,9 @@ internal class TestStepInstruction
         case nameof(Method):
           instruction.Method = parameter.Value.ToUpperInvariant();
           break;
+        case nameof(Endpoint):
+          instruction.Endpoint = ReplaceVariables(parameter.Value, variables);
+          break;
         default:
           throw new InvalidDataException($"Unsupported parameter '{parameter.Key}' found in TestData of Test Step {step.Id}");
       }
@@ -67,8 +71,8 @@ internal class TestStepInstruction
   {
     if (!value.Contains(Constants.VariablePreAndSuffix)) return value;
 
-    // Pattern to match variables like {@@VariableName@@}
-    var pattern = $@"\{{{Constants.VariablePreAndSuffix}(\w+){Constants.VariablePreAndSuffix}\}}";
+    // Pattern: users/@@AliceId@@
+    var pattern = $@"\{Constants.VariablePreAndSuffix}([^@]+){Constants.VariablePreAndSuffix}";
 
     return Regex.Replace(value, pattern, match =>
     {
@@ -78,7 +82,6 @@ internal class TestStepInstruction
         : throw new InvalidOperationException($"Variable with key '{key}' could not be resolved!");
     });
   }
-
 
   private static Dictionary<string, string> ParseTestData(
     string testData

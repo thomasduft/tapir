@@ -63,13 +63,14 @@ internal class HttpResponseMessageValidator
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
     results.AddRange(await CheckContentAsync(cancellationToken));
-    // results.AddRange(CheckHeaders());
 
     return results;
   }
 
   private IEnumerable<TestStepResult> CheckStatusCode()
   {
+    var results = new List<TestStepResult>();
+
     var statusCodeInstruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.CheckStatusCode);
     if (statusCodeInstruction == null)
@@ -77,14 +78,20 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);
+    // Add a success result for the send instruction
+    var sendInstruction = _instructions.First(i => i.Action == Constants.Actions.Send);
+    results.Add(TestStepResult.Success(sendInstruction.TestStep));
 
-    return expectedStatusCode == _statusCode
-      ? [TestStepResult.Success(statusCodeInstruction.TestStep)]
-      : [TestStepResult.Failed(
+    // Now validate the status code
+    var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);
+    results.Add(expectedStatusCode == _statusCode
+      ? TestStepResult.Success(statusCodeInstruction.TestStep)
+      : TestStepResult.Failed(
         statusCodeInstruction.TestStep,
         $"Expected status code '{(int)expectedStatusCode}' but was '{(int)_statusCode}'."
-      )];
+      ));
+
+    return results;
   }
 
   private IEnumerable<TestStepResult> CheckReasonPhrase()

@@ -383,12 +383,20 @@ internal class MarkdownTable
       {
         // Find matching test result
         var testResult = testResults
-          .FirstOrDefault(r => r.TestStepId == stepId && !r.IsSuccess);
+          .FirstOrDefault(r => r.TestStepId == stepId);
 
-        // Update the Actual Result column (5th cell, index 4)
-        cells[4] = testResult != null
-          ? $" ❌ {testResult.Error} "
-          : " ✅ ";
+        if (testResult == null)
+        {
+          // No failure found, mark as success
+          cells[4] = " - ";
+        }
+        else
+        {
+          // Update the Actual Result column (5th cell, index 4)
+          cells[4] = testResult.IsSuccess
+            ? " ✅ "
+            : $" ❌ {testResult.Error} ";
+        }
       }
 
       // Reconstruct the row

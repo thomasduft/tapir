@@ -21,19 +21,19 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 
 | Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
-| 11       | Call users api          | Action=Send Method=GET Value=users                             | Request successful     | -             |
+| 11       | Call users api          | Action=Send Method=GET Endpoint=users                          | Request successful     | -             |
 | 12       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
 | 13       | Inspect content         | Action=VerifyContent File=users.json                           | Should be identical    | -             |
 | 14       | Contains Alice          | Action=CheckContent Path=$[?@.name=="Alice"].name Value=Alice  | Content contains Alice | -             |
-| 15       | Retain ID of Alice ID   | Action=StoreVariable Path=$[?@.name=="Alice"].id Name=AliceId  | ID of Alice stored     | -             |
+| 15       | Retain ID of Alice      | Action=StoreVariable Path=$[?@.name=="Alice"].id Name=AliceId  | ID of Alice stored     | -             |
 
 | Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
-| 21       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId@@}               | Request successful     | -             |
+| 21       | Get Alice details       | Action=Send Method=GET Endpoint=users/@@AliceId@@              | Request successful     | -             |
 | 22       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
 | 23       | Inspect content         | Action=VerifyContent File=alice.json                           | Should be identical    | -             |
-| 24       | Verify Name             | Action=CheckContent Path=$.name Value=Alice                    | Name is Alice          | -             |
-| 25       | Verify Age              | Action=CheckContent Path=$.age Value=20                        | Age is 20              | -             |
+| 24       | Verify name             | Action=CheckContent Path=$.name Value=Alice                    | Name is Alice          | -             |
+| 25       | Verify age              | Action=CheckContent Path=$.age Value=30                        | Age is 30              | -             |
 
 ## Postcondition
 

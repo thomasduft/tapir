@@ -30,7 +30,7 @@ internal class VariableExtractor
     return this;
   }
 
-  public async Task<Dictionary<string, string>> ExtractAsync(
+  public async Task<VariableExtractionResult> ExtractAsync(
     CancellationToken cancellationToken
   )
   {
@@ -38,7 +38,7 @@ internal class VariableExtractor
 
     if (_content == null)
     {
-      return variables;
+      return new VariableExtractionResult(variables, Enumerable.Empty<TestStepResult>());
     }
 
     var storeVariableInstructions = _instructions
@@ -46,8 +46,10 @@ internal class VariableExtractor
 
     if (!storeVariableInstructions.Any())
     {
-      return variables;
+      return new VariableExtractionResult(variables, Enumerable.Empty<TestStepResult>());
     }
+
+    var testStepResults = new List<TestStepResult>();
 
     var contentString = await _content.ReadAsStringAsync(cancellationToken);
     var jsonNode = JsonNode.Parse(contentString);
@@ -74,8 +76,14 @@ internal class VariableExtractor
       }
 
       variables[instruction.Name] = value;
+      testStepResults.Add(TestStepResult.Success(instruction.TestStep));
     }
 
-    return variables;
+    return new VariableExtractionResult(variables, testStepResults);
   }
 }
+
+internal record VariableExtractionResult(
+  Dictionary<string, string> Variables,
+  IEnumerable<TestStepResult> TestStepResults
+);

@@ -36,7 +36,7 @@ internal class TestCaseExecutor : ITestCaseExecutor
     var response = await client
       .SendAsync(requestMessage, cancellationToken);
 
-    var testStepResults = await HttpResponseMessageValidator
+    var responseValidationResult = await HttpResponseMessageValidator
       .Create(instructions)
       .WithStatusCode(response.StatusCode)
       .WithReasonPhrase(response.ReasonPhrase)
@@ -44,14 +44,14 @@ internal class TestCaseExecutor : ITestCaseExecutor
       .WithHeaders(response.Headers)
       .ValidateAsync(cancellationToken);
 
-    var variables = await VariableExtractor
+    var variableExtractionResult = await VariableExtractor
       .Create(instructions)
       .FromContent(response.Content)
       .ExtractAsync(cancellationToken);
 
     return new TestCaseExecutionResult(
-      testStepResults,
-      variables
+      responseValidationResult.Concat(variableExtractionResult.TestStepResults),
+      variableExtractionResult.Variables
     );
   }
 }

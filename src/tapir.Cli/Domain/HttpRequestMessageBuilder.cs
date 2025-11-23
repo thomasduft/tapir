@@ -87,7 +87,7 @@ internal class HttpRequestMessageBuilder
     var endpointInstruction = _instructions
       .FirstOrDefault(i => i.Action == nameof(Constants.Actions.Send))
         ?? throw new InvalidOperationException("No Send instruction found to set Endpoint.");
-    var endpoint = endpointInstruction.Value;
+    var endpoint = endpointInstruction.Endpoint;
 
     var queryParameterInstructions = _instructions
       .Where(i => i.Action == nameof(Constants.Actions.AddQueryParameter))

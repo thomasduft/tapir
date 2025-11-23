@@ -36,7 +36,7 @@ Tests whether all users can be retrieved and Alice's ID can be extracted so that
 
 | Step ID | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | ------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
-| 1       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId}                 | Request successful     | -             |
+| 1       | Get Alice Details       | Action=Send Method=GET Value=users/@@AliceId                   | Request successful     | -             |
 | 2       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
 | 3       | Inspect content         | Action=VerifyContent File=alice.json                           | Should be identical    | -             |
 

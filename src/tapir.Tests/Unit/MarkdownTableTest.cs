@@ -112,7 +112,7 @@ Tests the Users API by first retrieving all users, verifying the response contai
 
 | Step ID  | Description             | Test Data                                                      | Expected Result        | Actual Result |
 | -------: | ----------------------- | ---------------------------------------------------------------| ---------------------- | ------------- |
-| 21       | Get Alice Details       | Action=Send Method=GET Value=users/{@@AliceId@@}               | Request successful     | -             |
+| 21       | Get Alice Details       | Action=Send Method=GET Value=users/@@AliceId@@                 | Request successful     | -             |
 | 22       | Verify response code    | Action=CheckStatusCode Value=200                               | 200                    | -             |
 | 23       | Inspect content         | Action=VerifyContent File=alice.json                           | Should be identical    | -             |
 | 24       | Verify Name             | Action=CheckContent Path=$.name Value=Alice                    | Name is Alice          | -             |
@@ -152,7 +152,7 @@ Tests the Users API by first retrieving all users, verifying the response contai
     Assert.Contains("| 15 | Retain ID of Alice ID |", updatedMarkdown);
 
     // Verify second table is updated correctly (with failures)
-    Assert.Contains("| 21 | Get Alice Details | Action=Send Method=GET Value=users/{@@AliceId@@} | Request successful | ✅ |", updatedMarkdown);
+    Assert.Contains("| 21 | Get Alice Details | Action=Send Method=GET Value=users/@@AliceId@@ | Request successful | ✅ |", updatedMarkdown);
     Assert.Contains("| 22 | Verify response code | Action=CheckStatusCode Value=200 | 200 | ❌ Expected 200 but got 404 |", updatedMarkdown);
     Assert.Contains("| 23 | Inspect content | Action=VerifyContent File=alice.json | Should be identical | ❌ File not found |", updatedMarkdown);
     Assert.Contains("| 24 | Verify Name | Action=CheckContent Path=$.name Value=Alice | Name is Alice | ❌ Name mismatch |", updatedMarkdown);

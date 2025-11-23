@@ -6,12 +6,13 @@ using tomware.Tapir.Cli.Domain.Actions;
 
 var services = new ServiceCollection()
     .AddHttpClient()
-    .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
+    .AddCliCommand<TestCaseCommand>()
     .AddCliCommand<RunCommand>()
     .RegisterAction<AddHeader>()
     .RegisterAction<AddQueryParam>()
     .RegisterAction<AddBody>()
     .RegisterAction<Send>()
+    .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
     .AddSingleton<Cli>();
 
 var provider = services.BuildServiceProvider();

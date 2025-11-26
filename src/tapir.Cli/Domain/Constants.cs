@@ -21,8 +21,8 @@ internal static class Constants
   {
     public const string AddHeader = "AddHeader";
     public const string AddQueryParameter = "AddQueryParameter";
-    public const string Send = "Send";
     public const string AddContent = "AddContent";
+    public const string Send = "Send";
     public const string CheckStatusCode = "CheckStatusCode";
     public const string CheckReasonPhrase = "CheckReasonPhrase";
     public const string CheckContent = "CheckContent";

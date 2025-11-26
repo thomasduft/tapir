@@ -2,17 +2,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 using tomware.Tapir.Cli;
 using tomware.Tapir.Cli.Domain;
-using tomware.Tapir.Cli.Domain.Actions;
 
 var services = new ServiceCollection()
     .AddHttpClient()
     .AddCliCommand<NewTestCaseCommand>()
     .AddCliCommand<ValidateCommand>()
+      .WithValidation()
     .AddCliCommand<RunCommand>()
-    .RegisterAction<AddHeader>()
-    .RegisterAction<AddQueryParam>()
-    .RegisterAction<AddBody>()
-    .RegisterAction<Send>()
     .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
     .AddSingleton<Cli>();
 

@@ -232,9 +232,12 @@ internal class HttpResponseMessageValidator
     foreach (var contentInstruction in contentInstructions)
     {
       // if File is present load from File otherwise use Value
+
+      // Read the file relative to the execution directory
+      var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
       var expectedJson = !string.IsNullOrEmpty(contentInstruction.File)
-        && File.Exists(contentInstruction.File)
-        ? await File.ReadAllTextAsync(contentInstruction.File, cancellationToken)
+        && File.Exists(relativeFilePath)
+        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
         : contentInstruction.Value
           ?? string.Empty;
 

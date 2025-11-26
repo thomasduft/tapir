@@ -13,9 +13,9 @@ public interface IUsersRepository
 
 public class UsersRepository : IUsersRepository
 {
-  private readonly User _alice = new User(Guid.NewGuid(), "Alice", 30);
-  private readonly User _bob = new User(Guid.NewGuid(), "Bob", 25);
-  private readonly User _charlie = new User(Guid.NewGuid(), "Charlie", 35);
+  private readonly User _alice = new User(new Guid("4f4feb38-4398-4776-97c1-7fbf3db69e1f"), "Alice", 30);
+  private readonly User _bob = new User(new Guid("d479b8bf-c895-4587-8658-81dcc8559f2f"), "Bob", 25);
+  private readonly User _charlie = new User(new Guid("e7a0ce49-8da6-435e-adfd-d0f8644b4299"), "Charlie", 35);
 
   private readonly ConcurrentDictionary<Guid, User> _persons;
 

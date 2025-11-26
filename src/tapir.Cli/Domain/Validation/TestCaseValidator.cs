@@ -1,27 +1,37 @@
 namespace tomware.Tapir.Cli.Domain;
 
-internal class TestCaseValidator
+internal interface ITestCaseValidator
 {
-  private readonly TestCase _testCase;
+  public Task<TestCaseValidationResult> ValidateAsync(
+    TestCase testCase,
+    CancellationToken cancellationToken
+  );
+}
 
-  public string TestCaseId => _testCase.Id;
-  public string TestCaseTitle => _testCase.Title;
+internal class TestCaseValidator : ITestCaseValidator
+{
+  private readonly IEnumerable<IValidator> _validators;
 
-  public TestCaseValidator(TestCase testCase)
+  public TestCaseValidator(
+    IEnumerable<IValidator> validators
+  )
   {
-    _testCase = testCase;
+    _validators = validators;
   }
 
-  public TestCaseValidationResult Validate()
+  public async Task<TestCaseValidationResult> ValidateAsync(
+    TestCase testCase,
+    CancellationToken cancellationToken
+  )
   {
-    var result = new TestCaseValidationResult(TestCaseId, TestCaseTitle);
+    var result = new TestCaseValidationResult(testCase.Id, testCase.Title);
 
     // check property Type - can be Definition or Run
     var allowedTypes = new[] {
       Constants.TestCaseType.Definition,
       Constants.TestCaseType.Run
     };
-    if (!allowedTypes.Contains(_testCase.Type))
+    if (!allowedTypes.Contains(testCase.Type))
     {
       result.AddError("Type", $"Type must be '{Constants.TestCaseType.Definition}' or '{Constants.TestCaseType.Run}'.");
     }
@@ -32,30 +42,33 @@ internal class TestCaseValidator
       Constants.TestCaseStatus.Failed,
       Constants.TestCaseStatus.Unknown
     };
-    if (!allowedStatus.Contains(_testCase.Status))
+    if (!allowedStatus.Contains(testCase.Status))
     {
       result.AddError("Status", $"Status must be either '{Constants.TestCaseStatus.Passed}', '{Constants.TestCaseStatus.Failed}' or '{Constants.TestCaseStatus.Unknown}'.");
     }
 
     // check property Link if contains link should be a valid markdown link pointing to a file
     //       Format: [The administrator must be authenticated](TC-001-Login.md)
-    if (_testCase.HasLinkedFile && !File.Exists(_testCase.LinkedFile))
+    if (testCase.HasLinkedFile && !File.Exists(testCase.LinkedFile))
     {
-      result.AddError("Link", $"Linked file {_testCase.LinkedFile} does not exist.");
+      result.AddError("Link", $"Linked file {testCase.LinkedFile} does not exist.");
     }
 
-    foreach (var step in _testCase.Tables.SelectMany(t => t.Steps))
+    foreach (var step in testCase.Tables.SelectMany(t => t.Steps))
     {
       if (string.IsNullOrWhiteSpace(step.TestData))
         continue;
 
-      try
+      var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables);
+      var validationErrors = await _validators
+        .FirstOrDefault(v => v.Name == instruction.Action)!
+        .ValidateAsync(instruction, cancellationToken);
+      if (validationErrors != null)
       {
-        TestStepInstruction.FromTestStep(step, _testCase.Variables);
-      }
-      catch (Exception ex)
-      {
-        result.AddError(step.Id, ex.Message);
+        foreach (var validationError in validationErrors)
+        {
+          result.AddError(validationError);
+        }
       }
     }
 

@@ -4,7 +4,7 @@ internal interface IValidator
 {
   public string Name { get; }
 
-  public Task<IEnumerable<TestStepValidationResult>> ValidateAsync(
+  public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,
     CancellationToken cancellationToken
   );

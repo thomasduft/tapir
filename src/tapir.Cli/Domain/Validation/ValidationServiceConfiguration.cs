@@ -6,6 +6,7 @@ internal static class ValidationServiceConfiguration
 {
   internal static IServiceCollection WithValidation(this IServiceCollection services)
   {
+    services.AddSingleton<ITestCaseValidator, TestCaseValidator>();
     services
       .RegisterValidator<AddHeaderActionValidator>()
       .RegisterValidator<AddQueryParameterActionValidator>()

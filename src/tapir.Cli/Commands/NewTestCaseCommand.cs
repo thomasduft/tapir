@@ -6,7 +6,7 @@ using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli;
 
-public class NewTestCaseCommand : CommandLineApplication
+internal class NewTestCaseCommand : CommandLineApplication
 {
   private readonly CommandArgument<string> _testCaseId;
   private readonly CommandArgument<string> _title;

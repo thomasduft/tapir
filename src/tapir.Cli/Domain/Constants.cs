@@ -19,16 +19,16 @@ internal static class Constants
 
   internal static class Actions
   {
+    public const string AddContent = "AddContent";
     public const string AddHeader = "AddHeader";
     public const string AddQueryParameter = "AddQueryParameter";
-    public const string AddContent = "AddContent";
     public const string Send = "Send";
-    public const string CheckStatusCode = "CheckStatusCode";
-    public const string CheckReasonPhrase = "CheckReasonPhrase";
     public const string CheckContent = "CheckContent";
     public const string CheckHeader = "CheckHeader";
-    public const string VerifyContent = "VerifyContent";
+    public const string CheckReasonPhrase = "CheckReasonPhrase";
+    public const string CheckStatusCode = "CheckStatusCode";
     public const string StoreVariable = "StoreVariable";
+    public const string VerifyContent = "VerifyContent";
   }
 
 }

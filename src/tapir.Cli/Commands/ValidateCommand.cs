@@ -5,13 +5,18 @@ using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli;
 
-public class ValidateCommand : CommandLineApplication
+internal class ValidateCommand : CommandLineApplication
 {
   private readonly CommandArgument<string> _testCaseId;
   private readonly CommandOption<string> _inputDirectory;
+  private readonly ITestCaseValidator _testCaseValidator;
 
-  public ValidateCommand()
+  public ValidateCommand(
+    ITestCaseValidator testCaseValidator
+  )
   {
+    _testCaseValidator = testCaseValidator;
+
     Name = "validate";
     Description = "Validates a Test Case definition (i.e. TC-Audit-001).";
 
@@ -44,8 +49,7 @@ public class ValidateCommand : CommandLineApplication
     );
 
     // 3. Validate the Test Case definition
-    var testCaseValidator = new TestCaseValidator(testCase);
-    var validationResult = testCaseValidator.Validate();
+    var validationResult = await _testCaseValidator.ValidateAsync(testCase, cancellationToken);
     if (!validationResult.IsValid)
     {
       foreach (var error in validationResult.Errors)

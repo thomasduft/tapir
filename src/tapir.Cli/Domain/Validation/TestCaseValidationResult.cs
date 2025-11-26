@@ -39,8 +39,8 @@ internal record TestCaseValidationResult
     _testCaseValidationErrors.Add(new TestCaseValidationError(property, errorMessage));
   }
 
-  public void AddError(int stepId, string errorMessage)
+  public void AddError(TestStepValidationError error)
   {
-    _testStepsValidationErrors.Add(new TestStepValidationError(stepId, errorMessage));
+    _testStepsValidationErrors.Add(error);
   }
 }

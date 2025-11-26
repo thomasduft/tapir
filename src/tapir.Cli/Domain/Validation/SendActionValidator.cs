@@ -4,35 +4,31 @@ internal class SendActionValidator : IValidator
 {
   public string Name => Constants.Actions.Send;
 
-  public Task<IEnumerable<TestStepValidationResult>> ValidateAsync(
+  public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,
     CancellationToken cancellationToken
   )
   {
-    var results = new List<TestStepValidationResult>();
+    var results = new List<TestStepValidationError>();
 
     // Method is required
     if (string.IsNullOrEmpty(testStepInstruction.Method))
     {
       results.Add(
-        new TestStepValidationResult
-        {
-          IsValid = false,
-          Message = "HTTP Method must be provided."
-        }
-      );
+        new TestStepValidationError(
+          testStepInstruction.TestStep.Id,
+          "HTTP Method must be provided."
+      ));
     }
 
     // Value is required
     if (string.IsNullOrEmpty(testStepInstruction.Endpoint))
     {
       results.Add(
-        new TestStepValidationResult
-        {
-          IsValid = false,
-          Message = "Endpoint must be provided."
-        }
-      );
+        new TestStepValidationError(
+          testStepInstruction.TestStep.Id,
+          "Endpoint must be provided."
+      ));
     }
 
     // Method must be either GET, POST, PUT, DELETE, PATCH
@@ -41,24 +37,20 @@ internal class SendActionValidator : IValidator
       && !validMethods.Contains(testStepInstruction.Method.ToUpper()))
     {
       results.Add(
-        new TestStepValidationResult
-        {
-          IsValid = false,
-          Message = $"HTTP Method '{testStepInstruction.Method}' is not valid. Valid methods are: {string.Join(", ", validMethods)}."
-        }
-      );
+        new TestStepValidationError(
+          testStepInstruction.TestStep.Id,
+          $"HTTP Method '{testStepInstruction.Method}' is not valid. Valid methods are: {string.Join(", ", validMethods)}."
+      ));
     }
 
     // Value must not start with a /
     if (testStepInstruction.Endpoint.StartsWith('/'))
     {
       results.Add(
-        new TestStepValidationResult
-        {
-          IsValid = false,
-          Message = "Endpoint must not start with a '/'."
-        }
-      );
+        new TestStepValidationError(
+          testStepInstruction.TestStep.Id,
+          "Endpoint must not start with a '/'."
+      ));
     }
 
     return Task.FromResult(results.AsEnumerable());

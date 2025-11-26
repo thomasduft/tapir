@@ -165,8 +165,9 @@ internal class HttpResponseMessageValidator
   )
   {
     var contentInstructions = _instructions
-      .Where(i => i.Action == Constants.Actions.CheckContent);
-    if (contentInstructions == null || _content == null)
+      .Where(i => i.Action == Constants.Actions.CheckContent)
+      .ToList();
+    if (!contentInstructions.Any() || _content == null)
     {
       // It's okay if there's no content to check
       return [];
@@ -211,8 +212,9 @@ internal class HttpResponseMessageValidator
   )
   {
     var contentInstructions = _instructions
-      .Where(i => i.Action == Constants.Actions.VerifyContent);
-    if (contentInstructions == null || _content == null)
+      .Where(i => i.Action == Constants.Actions.VerifyContent)
+      .ToList();
+    if (!contentInstructions.Any() || _content == null)
     {
       // It's okay if there's no content to check
       return [];

@@ -60,7 +60,7 @@ internal class ValidateCommand : CommandLineApplication
       return await Task.FromResult(1);
     }
 
-    ConsoleHelper.WriteLineSuccess("Test Case is valid!");
+    ConsoleHelper.WriteLineSuccess($"Test Case '{testCase.Title} ({testCase.Id})' is valid!");
 
     return await Task.FromResult(0);
   }

@@ -3,6 +3,12 @@ namespace tomware.Tapir.Cli.Domain;
 internal class VerifyContentActionValidator : IValidator
 {
   public string Name => Constants.Actions.VerifyContent;
+  public string Description => "Verifies content in the HTTP response.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.File) + ": The file path to the content to verify",
+    nameof(TestStepInstruction.Value) + ": The content value to verify"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

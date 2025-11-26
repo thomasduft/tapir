@@ -56,12 +56,12 @@ internal class VariableExtractor
 
     foreach (var instruction in storeVariableInstructions)
     {
-      if (string.IsNullOrEmpty(instruction.Path) || string.IsNullOrEmpty(instruction.Name))
+      if (string.IsNullOrEmpty(instruction.JsonPath) || string.IsNullOrEmpty(instruction.Name))
       {
         continue;
       }
 
-      var jsonPath = JsonPath.Parse(instruction.Path);
+      var jsonPath = JsonPath.Parse(instruction.JsonPath);
       var result = jsonPath.Evaluate(jsonNode!);
       var matches = result.Matches?.ToList();
       if (matches == null || !matches.Any())

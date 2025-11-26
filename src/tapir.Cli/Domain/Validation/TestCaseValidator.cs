@@ -59,16 +59,27 @@ internal class TestCaseValidator : ITestCaseValidator
       if (string.IsNullOrWhiteSpace(step.TestData))
         continue;
 
-      var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables);
-      var validationErrors = await _validators
-        .FirstOrDefault(v => v.Name == instruction.Action)!
-        .ValidateAsync(instruction, cancellationToken);
-      if (validationErrors != null)
+      try
       {
-        foreach (var validationError in validationErrors)
+        var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables);
+        var validationErrors = await _validators
+          .FirstOrDefault(v => v.Name == instruction.Action)!
+          .ValidateAsync(instruction, cancellationToken);
+        if (validationErrors != null)
         {
-          result.AddError(validationError);
+          foreach (var validationError in validationErrors)
+          {
+            result.AddError(validationError);
+          }
         }
+      }
+      catch (Exception ex)
+      {
+        result.AddError(
+          new TestStepValidationError(
+            step.Id,
+            $"Exception during validation of Test Step {step.Id}: {ex.Message}"
+          ));
       }
     }
 

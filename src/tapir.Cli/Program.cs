@@ -5,6 +5,7 @@ using tomware.Tapir.Cli.Domain;
 
 var services = new ServiceCollection()
     .AddHttpClient()
+    .AddCliCommand<ManCommand>()
     .AddCliCommand<NewTestCaseCommand>()
     .AddCliCommand<ValidateCommand>().WithValidation()
     .AddCliCommand<RunCommand>()

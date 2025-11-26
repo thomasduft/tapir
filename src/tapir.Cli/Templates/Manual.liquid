@@ -1,0 +1,21 @@
+# TAPIR TEST-DATA Manual
+
+A command-line tool for managing and executing automated api test cases.
+
+## DESCRIPTION
+`tapir` is a command-line tool designed to simplify the management and execution of automated API test cases.
+With `tapir` you can create, organize, and run tests for your APIs, ensuring they function as expected.
+
+## ACTIONS
+`tapir` supports the following actions for Test Steps:
+
+{% for action in Actions %}
+### {{ action.Name }}
+
+{{ action.Description }}
+
+**Supported Properties:**
+{%- for property in action.SupportedProperties %}
+- {{ property }}
+{%- endfor %}
+{% endfor %}

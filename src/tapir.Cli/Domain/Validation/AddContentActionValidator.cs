@@ -3,6 +3,12 @@ namespace tomware.Tapir.Cli.Domain;
 internal class AddContentActionValidator : IValidator
 {
   public string Name => Constants.Actions.AddContent;
+  public string Description => "Adds content to the HTTP request.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.File) + ": Path to the content file",
+    nameof(TestStepInstruction.Value) + ": Direct content value"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

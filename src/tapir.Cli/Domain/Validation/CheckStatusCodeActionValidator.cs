@@ -3,6 +3,11 @@ namespace tomware.Tapir.Cli.Domain;
 internal class CheckStatusCodeActionValidator : IValidator
 {
   public string Name => Constants.Actions.CheckStatusCode;
+  public string Description => "Checks the status code in the HTTP response.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.Value) + ": The status code to check"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

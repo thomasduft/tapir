@@ -3,6 +3,12 @@ namespace tomware.Tapir.Cli.Domain;
 internal class CheckHeaderActionValidator : IValidator
 {
   public string Name => Constants.Actions.CheckHeader;
+  public string Description => "Checks headers in the HTTP response.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.Name) + ": The name of the header to check",
+    nameof(TestStepInstruction.Value) + ": The value of the header to check"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

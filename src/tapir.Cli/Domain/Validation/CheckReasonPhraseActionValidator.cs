@@ -3,6 +3,11 @@ namespace tomware.Tapir.Cli.Domain;
 internal class CheckReasonPhraseActionValidator : IValidator
 {
   public string Name => Constants.Actions.CheckReasonPhrase;
+  public string Description => "Checks the reason phrase in the HTTP response.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.Value) + ": The reason phrase to check"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

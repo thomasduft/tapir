@@ -164,7 +164,7 @@ internal class RunCommand : CommandLineApplication
 
     if (results.All(r => r.TestStepResults.All(tr => tr.IsSuccess)))
     {
-      ConsoleHelper.WriteLineSuccess($"Test case '{testCase.Title}' ({testCase.Id}) executed successfully.");
+      ConsoleHelper.WriteLineSuccess($"Test case '{testCase.Title} ({testCase.Id})' executed successfully.");
     }
 
     return await Task.FromResult(0);

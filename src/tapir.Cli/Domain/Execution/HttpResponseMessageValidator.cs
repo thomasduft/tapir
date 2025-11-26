@@ -187,7 +187,7 @@ internal class HttpResponseMessageValidator
     {
       // see https://docs.json-everything.net/path/basics/
       var jsonNode = JsonNode.Parse(json);
-      var jsonPath = JsonPath.Parse(contentInstruction.Path);
+      var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
       var evaluationResults = jsonPath.Evaluate(jsonNode);
       var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
 

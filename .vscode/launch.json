@@ -52,6 +52,18 @@
       ],
       "cwd": "${workspaceFolder}/src/tapir.Cli",
       "stopAtEntry": false
+    },
+    {
+      "name": "tapir:man",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-tapir",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "args": [
+        "man"
+      ],
+      "cwd": "${workspaceFolder}/src/tapir.Cli",
+      "stopAtEntry": false
     }
   ]
 }

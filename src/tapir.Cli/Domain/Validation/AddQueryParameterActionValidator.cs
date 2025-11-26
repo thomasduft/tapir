@@ -3,6 +3,12 @@ namespace tomware.Tapir.Cli.Domain;
 internal class AddQueryParameterActionValidator : IValidator
 {
   public string Name => Constants.Actions.AddQueryParameter;
+  public string Description => "Adds query parameters to the HTTP request.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.Name) + ": The name of the query parameter",
+    nameof(TestStepInstruction.Value) + ": The value of the query parameter"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

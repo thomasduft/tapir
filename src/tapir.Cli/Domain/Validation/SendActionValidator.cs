@@ -3,6 +3,12 @@ namespace tomware.Tapir.Cli.Domain;
 internal class SendActionValidator : IValidator
 {
   public string Name => Constants.Actions.Send;
+  public string Description => "Sends an HTTP request.";
+  public IEnumerable<string> SupportedProperties =>
+  [
+    nameof(TestStepInstruction.Method) + ": The HTTP method to use",
+    nameof(TestStepInstruction.Endpoint) + ": The endpoint to send the request to"
+  ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
     TestStepInstruction testStepInstruction,

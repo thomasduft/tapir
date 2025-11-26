@@ -48,7 +48,6 @@ internal class MarkdownTable
     return testSteps.OrderBy(ts => ts.Id);
   }
 
-
   /// <summary>
   /// Extracts all markdown tables from the content as separate sections
   /// </summary>
@@ -143,9 +142,6 @@ internal class MarkdownTable
     return string.Join('\n', lines);
   }
 
-  /// <summary>
-  /// Extracts test steps by finding markdown tables with the expected column structure
-  /// </summary>
   private string ExtractStepsSectionFromTables()
   {
     var lines = _content.Split('\n');
@@ -187,9 +183,6 @@ internal class MarkdownTable
     return foundValidHeader ? string.Join("\n", result) : string.Empty;
   }
 
-  /// <summary>
-  /// Checks if a table header row matches the expected structure for test steps
-  /// </summary>
   private static bool IsValidStepsTableHeader(string headerLine)
   {
     // Expected header should contain these key columns
@@ -200,10 +193,7 @@ internal class MarkdownTable
            (normalizedHeader.Contains("test data") || normalizedHeader.Contains("testdata"));
   }
 
-  /// <summary>
-  /// Extracts table rows from the steps section, excluding the header and separator rows
-  /// </summary>
-  private List<string> ExtractTableRows(string stepsSection)
+  private static List<string> ExtractTableRows(string stepsSection)
   {
     var lines = stepsSection.Split('\n', StringSplitOptions.RemoveEmptyEntries)
       .Select(line => line.Trim())
@@ -246,9 +236,6 @@ internal class MarkdownTable
     return tableRows;
   }
 
-  /// <summary>
-  /// Checks if a line is a markdown table separator row
-  /// </summary>
   private static bool IsSeparatorRow(string line)
   {
     // Remove outer pipes and check if content only contains allowed separator characters
@@ -256,10 +243,7 @@ internal class MarkdownTable
     return Regex.IsMatch(content, @"^[\s\-:|]+$");
   }
 
-  /// <summary>
-  /// Parses a single table row into a TestStep object
-  /// </summary>
-  private TestStep? ParseTableRow(string row)
+  private static TestStep? ParseTableRow(string row)
   {
     try
     {
@@ -310,10 +294,7 @@ internal class MarkdownTable
     }
   }
 
-  /// <summary>
-  /// Parses table cells from a row, handling escaped pipes within cell content
-  /// </summary>
-  private List<string> ParseTableCells(string row)
+  private static List<string> ParseTableCells(string row)
   {
     var cells = new List<string>();
     var currentCell = string.Empty;
@@ -362,11 +343,10 @@ internal class MarkdownTable
 
     return cells;
   }
-
-  /// <summary>
-  /// Updates a single table row with test execution results
-  /// </summary>
-  private string UpdateTableRowWithResults(string row, IEnumerable<TestStepResult> testResults)
+  private static string UpdateTableRowWithResults(
+    string row,
+    IEnumerable<TestStepResult> testResults
+  )
   {
     try
     {
@@ -409,9 +389,6 @@ internal class MarkdownTable
     }
   }
 
-  /// <summary>
-  /// Unescapes markdown content, particularly handling escaped quotes and special characters
-  /// </summary>
   private static string UnescapeMarkdown(string content)
   {
     if (string.IsNullOrEmpty(content))

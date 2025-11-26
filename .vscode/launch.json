@@ -19,7 +19,7 @@
       }
     },
     {
-      "name": "tc-users-001",
+      "name": "tc-users-001:run",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
@@ -34,6 +34,21 @@
         "-o",
         "../../samples/Users/Runs",
         "--continue-on-failure"
+      ],
+      "cwd": "${workspaceFolder}/src/tapir.Cli",
+      "stopAtEntry": false
+    },
+    {
+      "name": "tc-users-001:validate",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-tapir",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "args": [
+        "validate",
+        "TC-Users-001",
+        "-i",
+        "../../samples/Users/Definitions"
       ],
       "cwd": "${workspaceFolder}/src/tapir.Cli",
       "stopAtEntry": false

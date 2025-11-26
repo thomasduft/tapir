@@ -82,8 +82,3 @@ internal class VariableExtractor
     return new VariableExtractionResult(variables, testStepResults);
   }
 }
-
-internal record VariableExtractionResult(
-  Dictionary<string, string> Variables,
-  IEnumerable<TestStepResult> TestStepResults
-);

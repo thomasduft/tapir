@@ -6,7 +6,8 @@ using tomware.Tapir.Cli.Domain.Actions;
 
 var services = new ServiceCollection()
     .AddHttpClient()
-    .AddCliCommand<TestCaseCommand>()
+    .AddCliCommand<NewTestCaseCommand>()
+    .AddCliCommand<ValidateCommand>()
     .AddCliCommand<RunCommand>()
     .RegisterAction<AddHeader>()
     .RegisterAction<AddQueryParam>()

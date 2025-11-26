@@ -6,14 +6,14 @@ using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli;
 
-public class TestCaseCommand : CommandLineApplication
+public class NewTestCaseCommand : CommandLineApplication
 {
   private readonly CommandArgument<string> _testCaseId;
   private readonly CommandArgument<string> _title;
 
-  public TestCaseCommand()
+  public NewTestCaseCommand()
   {
-    Name = "test-case";
+    Name = "new";
     Description = "Creates a new Test Case definition (i.e. test-case TC-Audit-001 \"My TestCase Title\").";
 
     _testCaseId = Argument<string>(

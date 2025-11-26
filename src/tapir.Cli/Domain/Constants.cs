@@ -30,5 +30,4 @@ internal static class Constants
     public const string StoreVariable = "StoreVariable";
     public const string VerifyContent = "VerifyContent";
   }
-
 }

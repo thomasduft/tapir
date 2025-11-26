@@ -29,7 +29,7 @@ internal class ManCommand : CommandLineApplication
       Templates.Manual,
       new
       {
-        Actions =  _validators
+        Actions = _validators
                     .OrderBy(v => v.Name)
                     .ToArray()
       }

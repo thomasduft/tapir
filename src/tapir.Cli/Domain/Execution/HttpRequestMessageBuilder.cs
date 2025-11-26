@@ -1,4 +1,9 @@
 
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json.Nodes;
+
 namespace tomware.Tapir.Cli.Domain;
 
 internal class HttpRequestMessageBuilder
@@ -66,11 +71,32 @@ internal class HttpRequestMessageBuilder
       return;
     }
 
+    // Read the file relative to the execution directory
+    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
     var stringContent = !string.IsNullOrEmpty(instruction.File)
-      ? await File.ReadAllTextAsync(instruction.File, cancellationToken)
+      ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
       : instruction.Value;
 
-    request.Content = new StringContent(stringContent);
+    var contentType = instruction.ContentType;
+    if (contentType == Constants.ContentTypes.Json)
+    {
+      request.Content = JsonContent.Create(JsonNode.Parse(stringContent)!);
+      return;
+    }
+    if (contentType == Constants.ContentTypes.Xml)
+    {
+      request.Content = new StringContent(stringContent, Encoding.UTF8, "application/xml");
+      return;
+    }
+    if (contentType == Constants.ContentTypes.Text)
+    {
+      request.Content = new StringContent(stringContent, Encoding.UTF8, "text/plain");
+      return;
+    }
+
+    throw new InvalidOperationException(
+      $"Unsupported content type '{instruction.ContentType}' in AddContent action."
+    );
   }
 
   private void SetMethod(HttpRequestMessage request)

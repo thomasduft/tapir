@@ -30,4 +30,13 @@ internal static class Constants
     public const string StoreVariable = "StoreVariable";
     public const string VerifyContent = "VerifyContent";
   }
+
+  internal static class ContentTypes
+  {
+    public const string Json = "application/json";
+    public const string Xml = "application/xml";
+    public const string Text = "text/plain";
+    public const string ByteArrayContent = "application/octet-stream";
+    public const string FormUrlEncoded = "application/x-www-form-urlencoded";
+  }
 }

@@ -43,7 +43,7 @@ internal static class UsersHandlers
     var id = repository.Add(user);
 
     var createdUser = repository.GetById(id);
-    return Results.Created($"/users/{id}", createdUser);
+    return Results.Created($"/users/{id}", createdUser.Id);
   }
 
   public static IResult UpdateUser(

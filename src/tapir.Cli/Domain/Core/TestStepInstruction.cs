@@ -13,6 +13,7 @@ internal class TestStepInstruction
   public string JsonPath { get; set; } = string.Empty;
   public string Method { get; set; } = "GET";
   public string Endpoint { get; set; } = string.Empty;
+  public string ContentType { get; set; } = Constants.ContentTypes.Json;
 
   public TestStep TestStep => _step;
 
@@ -55,6 +56,9 @@ internal class TestStepInstruction
           break;
         case nameof(Endpoint):
           instruction.Endpoint = ReplaceVariables(parameter.Value, variables);
+          break;
+        case nameof(ContentType):
+          instruction.ContentType = parameter.Value;
           break;
         default:
           throw new InvalidDataException($"Unsupported parameter '{parameter.Key}' found in TestData of Test Step {step.Id}");

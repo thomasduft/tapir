@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
+using System.Xml;
 
 using Json.Path;
 
@@ -167,44 +168,150 @@ internal class HttpResponseMessageValidator
     var contentInstructions = _instructions
       .Where(i => i.Action == Constants.Actions.CheckContent)
       .ToList();
-    if (!contentInstructions.Any() || _content == null)
+    if (contentInstructions.Count == 0 || _content == null)
     {
       // It's okay if there's no content to check
       return [];
     }
 
-    var json = await _content.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(json))
-    {
-      return [TestStepResult.Failed(
-        contentInstructions.First().TestStep,
-        "Response content is empty."
-      )];
-    }
-
     var results = new List<TestStepResult>();
-
     foreach (var contentInstruction in contentInstructions)
     {
-      // see https://docs.json-everything.net/path/basics/
-      var jsonNode = JsonNode.Parse(json);
-      var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
-      var evaluationResults = jsonPath.Evaluate(jsonNode);
-      var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
-
-      var expectedValue = contentInstruction.Value;
-
-      results.Add(
-        expectedValue == actualValue
-          ? TestStepResult.Success(contentInstruction.TestStep)
-          : TestStepResult.Failed(
-            contentInstruction.TestStep,
-            $"Expected content value '{expectedValue}' but was '{actualValue}'."
-          )
-      );
+      if (contentInstruction.ContentType == Constants.ContentTypes.Json)
+      {
+        await CheckForJsonContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+      else if (contentInstruction.ContentType == Constants.ContentTypes.Xml)
+      {
+        await CheckForXmlContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+      else if (contentInstruction.ContentType == Constants.ContentTypes.Text)
+      {
+        await CheckForTextContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
     }
 
     return results;
+  }
+
+  private async Task CheckForJsonContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var json = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(json))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    // see https://docs.json-everything.net/path/basics/
+    var jsonNode = JsonNode.Parse(json);
+    var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
+    var evaluationResults = jsonPath.Evaluate(jsonNode);
+
+    var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
+    var expectedValue = contentInstruction.Value;
+
+    results.Add(
+      expectedValue == actualValue
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          $"Expected content value '{expectedValue}' but was '{actualValue}'."
+        )
+    );
+  }
+
+  private async Task CheckForXmlContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var xml = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(xml))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    var node = new XmlDocument();
+    node.LoadXml(xml);
+    var evaluatedNode = node.SelectSingleNode(contentInstruction.JsonPath)
+      ?? throw new InvalidOperationException("XML path did not return any node.");
+
+    var actualValue = evaluatedNode.InnerText;
+    var expectedValue = contentInstruction.Value;
+
+    results.Add(
+      expectedValue == actualValue
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          $"Expected content value '{expectedValue}' but was '{actualValue}'."
+        )
+    );
+  }
+
+  private async Task CheckForTextContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var text = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(text))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    var expectedValue = contentInstruction.Value;
+
+    results.Add(
+      expectedValue == text
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          $"Expected content value '{expectedValue}' but was '{text}'."
+        )
+    );
   }
 
   private async Task<IEnumerable<TestStepResult>> VerifyContentAsync(
@@ -220,44 +327,159 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    var json = await _content.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(json))
-    {
-      return [TestStepResult.Failed(
-        contentInstructions.First().TestStep,
-        "Response content is empty."
-      )];
-    }
-
     var results = new List<TestStepResult>();
-
     foreach (var contentInstruction in contentInstructions)
     {
-      // if File is present load from File otherwise use Value
+      if (contentInstruction.ContentType == Constants.ContentTypes.Json)
+      {
+        await VerifyForJsonContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+      else if (contentInstruction.ContentType == Constants.ContentTypes.Xml)
+      {
+        await VerifyForXmlContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+      else if (contentInstruction.ContentType == Constants.ContentTypes.Text)
+      {
+        await VerifyForTextContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+    }
 
-      // Read the file relative to the execution directory
-      var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
-      var expectedJson = !string.IsNullOrEmpty(contentInstruction.File)
-        && File.Exists(relativeFilePath)
+    return results;
+  }
+
+  private async Task VerifyForJsonContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var json = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(json))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    // if File is present load from File otherwise use Value
+
+    // Read the file relative to the execution directory
+    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
+    var expectedJson = !string.IsNullOrEmpty(contentInstruction.File)
+      && File.Exists(relativeFilePath)
+      ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
+      : contentInstruction.Value
+        ?? string.Empty;
+
+    // Normalize both JSON strings by parsing and re-serializing without formatting
+    var normalizedActual = NormalizeJson(json);
+    var normalizedExpected = NormalizeJson(expectedJson);
+
+    results.Add(
+      normalizedActual == normalizedExpected
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          "Response content does not match the expected content."
+        )
+    );
+  }
+
+  private async Task VerifyForXmlContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var xml = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(xml))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    // Read the file relative to the execution directory
+    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
+    var expectedXml = !string.IsNullOrEmpty(contentInstruction.File)
+      && File.Exists(relativeFilePath)
         ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
         : contentInstruction.Value
           ?? string.Empty;
 
-      // Normalize both JSON strings by parsing and re-serializing without formatting
-      var normalizedActual = NormalizeJson(json);
-      var normalizedExpected = NormalizeJson(expectedJson);
+    var normalizedActual = NormalizeXml(xml);
+    var normalizedExpected = NormalizeXml(expectedXml);
 
+    results.Add(
+      normalizedExpected == normalizedActual
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          "Response content does not match the expected content."
+        )
+    );
+  }
+
+  private async Task VerifyForTextContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var text = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(text))
+    {
       results.Add(
-        normalizedActual == normalizedExpected
-          ? TestStepResult.Success(contentInstruction.TestStep)
-          : TestStepResult.Failed(
-            contentInstruction.TestStep,
-            "Response content does not match the expected content."
-          )
-      );
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
     }
 
-    return results;
+    // Read the file relative to the execution directory
+    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
+    var expectedText = !string.IsNullOrEmpty(contentInstruction.File)
+      && File.Exists(relativeFilePath)
+        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
+        : contentInstruction.Value
+          ?? string.Empty;
+
+    results.Add(
+      expectedText == text
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          "Response content does not match the expected content."
+        )
+    );
   }
 
   private static string NormalizeJson(string json)
@@ -271,6 +493,28 @@ internal class HttpResponseMessageValidator
     {
       // If parsing fails, return original string
       return json;
+    }
+  }
+
+  private string NormalizeXml(string xml)
+  {
+    try
+    {
+      var xmlDoc = new XmlDocument();
+      xmlDoc.LoadXml(xml);
+      using var stringWriter = new StringWriter();
+      using var xmlTextWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings
+      {
+        OmitXmlDeclaration = true,
+        Indent = false
+      });
+      xmlDoc.Save(xmlTextWriter);
+      return stringWriter.ToString();
+    }
+    catch
+    {
+      // If parsing fails, return original string
+      return xml;
     }
   }
 }

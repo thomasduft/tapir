@@ -1,6 +1,6 @@
 # TC-Users-002: Create new User
 
-- **Date**: 2025-11-26
+- **Date**: 2025-12-03
 - **Author**: thomasduft
 - **Test Priority**: Medium
 - **Module**: Users

@@ -1,7 +1,7 @@
 // https://github.com/devcontainers/images/tree/main/src/dotnet
 {
   "name": "tapir",
-  "image": "mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/dotnet",
   "customizations": {
     "vscode": {
       "extensions": [

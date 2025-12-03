@@ -3,18 +3,18 @@
   "isRoot": true,
   "tools": {
     "dotnet-outdated-tool": {
-      "version": "4.6.8",
+      "version": "4.6.9",
       "commands": [
         "dotnet-outdated"
       ],
-      "rollForward": false
+      "rollForward": true
     },
     "tomware.releasy": {
-      "version": "0.12.1",
+      "version": "0.13.0",
       "commands": [
         "releasy"
       ],
-      "rollForward": false
+      "rollForward": true
     }
   }
 }

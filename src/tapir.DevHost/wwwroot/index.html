@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Document Upload Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { padding: 8px; margin: 5px 0; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; }
+        .error { border-color: #d32f2f; background-color: #ffebee; }
+        .success { border-color: #388e3c; background-color: #e8f5e8; }
+    </style>
+</head>
+<body>
+    <h1>PDF Document Upload Test</h1>
+
+    <h2>Upload New Document</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="file">PDF File:</label>
+            <input type="file" id="file" name="file" accept=".pdf" required>
+        </div>
+        <button type="submit">Upload Document</button>
+    </form>
+
+    <div id="result" class="result" style="display: none;"></div>
+
+    <h2>Documents List</h2>
+    <button onclick="loadDocuments()">Refresh Documents</button>
+    <div id="documents"></div>
+
+    <script>
+        const baseUrl = 'https://localhost:5001';
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('file', document.getElementById('file').files[0]);
+
+            try {
+                const response = await fetch(`${baseUrl}/documents`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+
+                if (response.ok) {
+                    const result = await response.json();
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `<strong>Success!</strong> Document uploaded with ID: ${result.id}`;
+                    document.getElementById('uploadForm').reset();
+                    loadDocuments(); // Refresh the list
+                } else {
+                    const error = await response.text();
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>Error:</strong> ${error}`;
+                }
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>Network Error:</strong> ${error.message}`;
+            }
+        });
+
+        async function loadDocuments() {
+            try {
+                const response = await fetch(`${baseUrl}/documents`);
+                if (response.ok) {
+                    const documents = await response.json();
+                    const documentsDiv = document.getElementById('documents');
+
+                    if (documents.length === 0) {
+                        documentsDiv.innerHTML = '<p>No documents found.</p>';
+                    } else {
+                        documentsDiv.innerHTML = `
+                            <table border="1" cellpadding="8" cellspacing="0" style="margin-top: 10px;">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>File Size</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                                ${documents.map(doc => `
+                                    <tr>
+                                        <td>${doc.id}</td>
+                                        <td>${doc.title}</td>
+                                        <td>${(doc.fileSize / 1024).toFixed(1)} KB</td>
+                                        <td>${new Date(doc.createdAt).toLocaleDateString()}</td>
+                                        <td>
+                                            <a href="${baseUrl}/documents/${doc.id}/download" target="_blank">Download</a>
+                                            <button onclick="deleteDocument('${doc.id}')" style="margin-left: 10px; background-color: #d32f2f;">Delete</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </table>
+                        `;
+                    }
+                } else {
+                    document.getElementById('documents').innerHTML = '<p>Error loading documents.</p>';
+                }
+            } catch (error) {
+                document.getElementById('documents').innerHTML = `<p>Network error: ${error.message}</p>`;
+            }
+        }
+
+        async function deleteDocument(id) {
+            if (confirm('Are you sure you want to delete this document?')) {
+                try {
+                    const response = await fetch(`${baseUrl}/documents/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        loadDocuments(); // Refresh the list
+                    } else {
+                        alert('Error deleting document');
+                    }
+                } catch (error) {
+                    alert('Network error: ' + error.message);
+                }
+            }
+        }
+
+        // Load documents on page load
+        loadDocuments();
+    </script>
+</body>
+</html>

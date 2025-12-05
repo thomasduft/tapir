@@ -13,9 +13,9 @@ public interface IUsersRepository
 
 public class UsersRepository : IUsersRepository
 {
-  private readonly User _alice = new User { Id = new Guid("4f4feb38-4398-4776-97c1-7fbf3db69e1f"), Name = "Alice", Age = 30 };
-  private readonly User _bob = new User { Id = new Guid("d479b8bf-c895-4587-8658-81dcc8559f2f"), Name = "Bob", Age = 25 };
-  private readonly User _charlie = new User { Id = new Guid("e7a0ce49-8da6-435e-adfd-d0f8644b4299"), Name = "Charlie", Age = 35 };
+  private readonly User _alice = new() { Id = new Guid("4f4feb38-4398-4776-97c1-7fbf3db69e1f"), Name = "Alice", Age = 30 };
+  private readonly User _bob = new() { Id = new Guid("d479b8bf-c895-4587-8658-81dcc8559f2f"), Name = "Bob", Age = 25 };
+  private readonly User _charlie = new() { Id = new Guid("e7a0ce49-8da6-435e-adfd-d0f8644b4299"), Name = "Charlie", Age = 35 };
 
   private readonly ConcurrentDictionary<Guid, User> _persons;
 

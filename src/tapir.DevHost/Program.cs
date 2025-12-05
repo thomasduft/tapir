@@ -1,6 +1,6 @@
 using Scalar.AspNetCore;
 
-using tomware.Tapir.DevHost.Persons;
+using tomware.Tapir.DevHost.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 

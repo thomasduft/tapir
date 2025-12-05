@@ -1,4 +1,4 @@
-namespace tomware.Tapir.DevHost.Persons;
+namespace tomware.Tapir.DevHost.Users;
 
 internal static class Endpoints
 {

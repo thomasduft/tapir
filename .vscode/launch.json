@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-devhost",
-      "program": "${workspaceFolder}/src/tapir.DevHost/bin/Debug/net9.0/tapir.DevHost.dll",
+      "program": "${workspaceFolder}/src/tapir.DevHost/bin/Debug/net10.0/tapir.DevHost.dll",
       "args": [
         "--urls",
         "https://localhost:5001",
@@ -23,7 +23,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
-      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
       "args": [
         "run",
         "https://localhost:5001",
@@ -43,7 +43,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
-      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
       "args": [
         "run",
         "https://localhost:5001",
@@ -63,7 +63,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
-      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
       "args": [
         "validate",
         "TC-Users-001",
@@ -78,7 +78,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
-      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net9.0/tomware.Tapir.dll",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
       "args": [
         "man"
       ],

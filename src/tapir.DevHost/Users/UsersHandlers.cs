@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace tomware.Tapir.DevHost.Persons;
+namespace tomware.Tapir.DevHost.Users;
 
 internal static class UsersHandlers
 {
@@ -39,7 +39,7 @@ internal static class UsersHandlers
       return Results.BadRequest("Age must be a positive number.");
     }
 
-    var user = new User(Guid.Empty, request.Name, request.Age);
+    var user = new User { Id = Guid.NewGuid(), Name = request.Name, Age = request.Age };
     var id = repository.Add(user);
 
     var createdUser = repository.GetById(id);

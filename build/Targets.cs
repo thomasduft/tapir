@@ -47,7 +47,7 @@ app.OnExecuteAsync(async _ =>
 
   Target(AddChangelog, () =>
   {
-    Run("dotnet", "tool run releasy add-changelog");
+    Run("dotnet", "tool run releasy add-changelog", "docs/changelogs");
   });
   #endregion
 
@@ -100,7 +100,8 @@ app.OnExecuteAsync(async _ =>
     Run("git", $"tag -a v{version} -m \"version '{version}'\"");
 
     // pushing
-    Run("git", $"push origin v{version}");
+    Run("git", "push"); // push the commit
+    Run("git", $"push origin v{version}"); // push the tag
   });
   #endregion
 

@@ -35,7 +35,7 @@ internal class TestCaseExecutor : ITestCaseExecutor
       .WithDomain(domain)
       .BuildAsync(cancellationToken);
 
-    ConsoleHelper.WriteLineYellow($"- sending request: {requestMessage.Method} {requestMessage.RequestUri}");
+    ConsoleHelper.WriteLineYellow($"- sending request: {requestMessage.RequestUri} ({requestMessage.Method})");
 
     var response = await client
       .SendAsync(requestMessage, cancellationToken);

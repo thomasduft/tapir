@@ -66,9 +66,8 @@ internal static class DocumentsHandlers
     };
 
     var id = repository.Add(document);
-    var createdDocument = repository.GetById(id);
 
-    return Results.Created($"/documents/{id}", createdDocument);
+    return Results.Created($"/documents/{id}", id);
   }
 
   public static async Task<IResult> UpdateDocument(

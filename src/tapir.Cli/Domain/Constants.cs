@@ -24,7 +24,7 @@ internal static class Constants
     public const string AddQueryParameter = "AddQueryParameter";
     public const string Send = "Send";
     public const string CheckContent = "CheckContent";
-    public const string CheckHeader = "CheckHeader";
+    public const string CheckContentHeader = "CheckContentHeader";
     public const string CheckReasonPhrase = "CheckReasonPhrase";
     public const string CheckStatusCode = "CheckStatusCode";
     public const string StoreVariable = "StoreVariable";
@@ -33,9 +33,9 @@ internal static class Constants
 
   internal static class ContentTypes
   {
-    public const string Json = "application/json";
-    public const string Xml = "application/xml";
     public const string Text = "text/plain";
+    public const string Json = "application/json";
+    public const string MultipartFormData = "multipart/form-data";
     public const string ByteArrayContent = "application/octet-stream";
     public const string FormUrlEncoded = "application/x-www-form-urlencoded";
   }

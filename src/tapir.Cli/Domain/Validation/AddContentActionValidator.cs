@@ -3,9 +3,9 @@ namespace tomware.Tapir.Cli.Domain;
 internal class AddContentActionValidator : IValidator
 {
   private readonly string[] _validContentTypes = [
+    Constants.ContentTypes.Text,
     Constants.ContentTypes.Json,
-    Constants.ContentTypes.Xml,
-    Constants.ContentTypes.Text
+    Constants.ContentTypes.MultipartFormData
   ];
 
   public string Name => Constants.Actions.AddContent;
@@ -47,18 +47,6 @@ internal class AddContentActionValidator : IValidator
       );
     }
 
-    // Either File must exist or Value must be present
-    if (string.IsNullOrEmpty(testStepInstruction.Value)
-      && string.IsNullOrEmpty(testStepInstruction.File))
-    {
-      results.Add(
-        new TestStepValidationError(
-          testStepInstruction.TestStep.Id,
-          "Either content File or Value must be provided."
-        )
-      );
-    }
-
     // If File is provided, it must exist and must not be empty
     if (!string.IsNullOrEmpty(testStepInstruction.File))
     {
@@ -95,6 +83,43 @@ internal class AddContentActionValidator : IValidator
           new TestStepValidationError(
             testStepInstruction.TestStep.Id,
             "Content Value must not be empty."
+          )
+        );
+      }
+    }
+
+    if (testStepInstruction.ContentType != Constants.ContentTypes.MultipartFormData)
+    {
+      // Either File must exist or Value must be present
+      if (string.IsNullOrEmpty(testStepInstruction.Value)
+        && string.IsNullOrEmpty(testStepInstruction.File))
+      {
+        results.Add(
+          new TestStepValidationError(
+            testStepInstruction.TestStep.Id,
+            "Either content File or Value must be provided."
+          )
+        );
+      }
+    }
+    else
+    {
+      // For MultipartFormData, Name and Value must be provided
+      if (string.IsNullOrEmpty(testStepInstruction.Name))
+      {
+        results.Add(
+          new TestStepValidationError(
+            testStepInstruction.TestStep.Id,
+            "For MultipartFormData content, Name must be provided."
+          )
+        );
+      }
+      if (string.IsNullOrEmpty(testStepInstruction.Value))
+      {
+        results.Add(
+          new TestStepValidationError(
+            testStepInstruction.TestStep.Id,
+            "For MultipartFormData content, Value must be provided."
           )
         );
       }

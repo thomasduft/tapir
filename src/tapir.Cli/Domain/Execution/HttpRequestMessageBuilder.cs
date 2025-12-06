@@ -4,6 +4,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json.Nodes;
 
+using tomware.Tapir.Cli.Utils;
+
 namespace tomware.Tapir.Cli.Domain;
 
 internal class HttpRequestMessageBuilder
@@ -64,39 +66,65 @@ internal class HttpRequestMessageBuilder
     CancellationToken cancellationToken
   )
   {
-    var instruction = _instructions
-      .FirstOrDefault(i => i.Action == Constants.Actions.AddContent);
-    if (instruction == null)
+    var instructions = _instructions
+      .Where(i => i.Action == Constants.Actions.AddContent);
+    if (instructions == null)
     {
       return;
     }
 
-    // Read the file relative to the execution directory
-    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
-    var stringContent = !string.IsNullOrEmpty(instruction.File)
-      ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
-      : instruction.Value;
+    foreach (var instruction in instructions)
+    {
+      var contentType = instruction.ContentType;
 
-    var contentType = instruction.ContentType;
-    if (contentType == Constants.ContentTypes.Json)
-    {
-      request.Content = JsonContent.Create(JsonNode.Parse(stringContent)!);
-      return;
-    }
-    if (contentType == Constants.ContentTypes.Xml)
-    {
-      request.Content = new StringContent(stringContent, Encoding.UTF8, "application/xml");
-      return;
-    }
-    if (contentType == Constants.ContentTypes.Text)
-    {
-      request.Content = new StringContent(stringContent, Encoding.UTF8, "text/plain");
-      return;
-    }
+      if (contentType == Constants.ContentTypes.Text)
+      {
+        // Read the file relative to the execution directory
+        var stringContent = !string.IsNullOrEmpty(instruction.File)
+          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), instruction.File), cancellationToken)
+          : instruction.Value;
+        request.Content = new StringContent(stringContent!, Encoding.UTF8, "text/plain");
+        return;
+      }
 
-    throw new InvalidOperationException(
-      $"Unsupported content type '{instruction.ContentType}' in AddContent action."
-    );
+      if (contentType == Constants.ContentTypes.Json)
+      {
+        // Read the file relative to the execution directory
+        var stringContent = !string.IsNullOrEmpty(instruction.File)
+          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), instruction.File), cancellationToken)
+          : instruction.Value;
+        request.Content = JsonContent.Create(JsonNode.Parse(stringContent!)!);
+        return;
+      }
+
+      if (contentType == Constants.ContentTypes.MultipartFormData)
+      {
+        request.Content ??= new MultipartFormDataContent();
+        var multipartContent = request.Content as MultipartFormDataContent;
+
+        if (!string.IsNullOrEmpty(instruction.File))
+        {
+          var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
+          var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(relativeFilePath, cancellationToken));
+          byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(relativeFilePath));
+          multipartContent?.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(relativeFilePath));
+
+          continue;
+        }
+
+        if (!string.IsNullOrEmpty(instruction.Name) && !string.IsNullOrEmpty(instruction.Value))
+        {
+          var stringContent = new StringContent(instruction.Value, Encoding.UTF8);
+          multipartContent?.Add(stringContent, instruction.Name);
+        }
+
+        continue;
+      }
+
+      throw new InvalidOperationException(
+        $"Unsupported content type '{instruction.ContentType}' in AddContent action."
+      );
+    }
   }
 
   private void SetMethod(HttpRequestMessage request)

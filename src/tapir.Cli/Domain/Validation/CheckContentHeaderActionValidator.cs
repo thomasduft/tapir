@@ -1,8 +1,8 @@
 namespace tomware.Tapir.Cli.Domain;
 
-internal class CheckHeaderActionValidator : IValidator
+internal class CheckContentHeaderActionValidator : IValidator
 {
-  public string Name => Constants.Actions.CheckHeader;
+  public string Name => Constants.Actions.CheckContentHeader;
   public string Description => "Checks headers in the HTTP response.";
   public IEnumerable<string> SupportedProperties =>
   [

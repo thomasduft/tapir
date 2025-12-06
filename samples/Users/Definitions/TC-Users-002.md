@@ -21,7 +21,7 @@ It verifies that the user creation is successful and extracts the newly created 
 
 | Step ID  | Description             | Test Data                                                       | Expected Result    | Actual Result |
 | -------: | ----------------------- | --------------------------------------------------------------- | ------------------ | ------------- |
-| 01       | Prepare Tom             | Action=AddContent File=../../samples/Users/Definitions/tom.json | User tom prepared  | -             |
+| 01       | Prepare Tom             | Action=AddContent File=samples/Users/Definitions/tom.json       | User tom prepared  | -             |
 | 02       | Add Test Header         | Action=AddHeader Name=X-Header-Test Value=test                  | Test Header Added  | -             |
 | 03       | Get Tom details         | Action=Send Method=POST Endpoint=users                          | Request successful | -             |
 | 04       | Verify response code    | Action=CheckStatusCode Value=201                                | 201                | -             |

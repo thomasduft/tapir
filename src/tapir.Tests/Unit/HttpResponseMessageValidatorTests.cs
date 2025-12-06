@@ -157,19 +157,19 @@ public class HttpResponseMessageValidatorTests
   #region CheckHeaders Tests
 
   [Fact]
-  public async Task ValidateAsync_WithMatchingHeader_ShouldReturnSuccessResult()
+  public async Task ValidateAsync_WithMatchingContentHeader_ShouldReturnSuccessResult()
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckHeader, name: "X-Custom-Header", value: "test-value");
+    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContentHeader, name: "X-Custom-Header", value: "test-value");
     var instructions = new[] { sendInstruction, headerInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
-    response.Headers.Add("X-Custom-Header", "test-value");
+    response.Content.Headers.Add("X-Custom-Header", "test-value");
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
-      .WithHeaders(response.Headers);
+      .WithContentHeaders(response.Content.Headers);
 
     // Act
     var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
@@ -181,19 +181,19 @@ public class HttpResponseMessageValidatorTests
   }
 
   [Fact]
-  public async Task ValidateAsync_WithNonMatchingHeaderValue_ShouldReturnFailedResult()
+  public async Task ValidateAsync_WithNonMatchingContentHeaderValue_ShouldReturnFailedResult()
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckHeader, name: "X-Custom-Header", value: "expected-value");
+    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContentHeader, name: "X-Custom-Header", value: "expected-value");
     var instructions = new[] { sendInstruction, headerInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
-    response.Headers.Add("X-Custom-Header", "actual-value");
+    response.Content.Headers.Add("X-Custom-Header", "actual-value");
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
-      .WithHeaders(response.Headers);
+      .WithContentHeaders(response.Content.Headers);
 
     // Act
     var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
@@ -206,18 +206,18 @@ public class HttpResponseMessageValidatorTests
   }
 
   [Fact]
-  public async Task ValidateAsync_WithMissingHeader_ShouldReturnFailedResult()
+  public async Task ValidateAsync_WithMissingContentHeader_ShouldReturnFailedResult()
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckHeader, name: "X-Custom-Header", value: "CustomValue");
+    var headerInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContentHeader, name: "X-Custom-Header", value: "CustomValue");
     var instructions = new[] { sendInstruction, headerInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
-      .WithHeaders(response.Headers);
+      .WithContentHeaders(response.Content.Headers);
 
     // Act
     var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
@@ -230,21 +230,21 @@ public class HttpResponseMessageValidatorTests
   }
 
   [Fact]
-  public async Task ValidateAsync_WithMultipleHeaders_ShouldCheckAllHeaders()
+  public async Task ValidateAsync_WithMultipleContentHeaders_ShouldCheckAllContentHeaders()
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var header1Instruction = CreateTestStepInstruction(2, Constants.Actions.CheckHeader, name: "X-Header-One", value: "value1");
-    var header2Instruction = CreateTestStepInstruction(3, Constants.Actions.CheckHeader, name: "X-Header-Two", value: "value2");
+    var header1Instruction = CreateTestStepInstruction(2, Constants.Actions.CheckContentHeader, name: "X-Header-One", value: "value1");
+    var header2Instruction = CreateTestStepInstruction(3, Constants.Actions.CheckContentHeader, name: "X-Header-Two", value: "value2");
     var instructions = new[] { sendInstruction, header1Instruction, header2Instruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
-    response.Headers.Add("X-Header-One", "value1");
-    response.Headers.Add("X-Header-Two", "value2");
+    response.Content.Headers.Add("X-Header-One", "value1");
+    response.Content.Headers.Add("X-Header-Two", "value2");
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
-      .WithHeaders(response.Headers);
+      .WithContentHeaders(response.Content.Headers);
 
     // Act
     var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
@@ -467,18 +467,18 @@ public class HttpResponseMessageValidatorTests
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
     var statusCodeInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckStatusCode, value: "200");
     var reasonPhraseInstruction = CreateTestStepInstruction(3, Constants.Actions.CheckReasonPhrase, value: "OK");
-    var headerInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckHeader, name: "X-API-Version", value: "v1");
+    var headerInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckContentHeader, name: "X-API-Version", value: "v1");
     var contentInstruction = CreateTestStepInstruction(5, Constants.Actions.CheckContent, value: "Alice", jsonPath: "$.name");
     var instructions = new[] { sendInstruction, statusCodeInstruction, reasonPhraseInstruction, headerInstruction, contentInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
-    response.Headers.Add("X-API-Version", "v1");
+    response.Content.Headers.Add("X-API-Version", "v1");
     var jsonContent = new StringContent("{\"name\":\"Alice\",\"age\":30}", Encoding.UTF8, "application/json");
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
       .WithReasonPhrase("OK")
-      .WithHeaders(response.Headers)
+      .WithContentHeaders(response.Content.Headers)
       .WithContent(jsonContent);
 
     // Act
@@ -495,7 +495,7 @@ public class HttpResponseMessageValidatorTests
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
     var statusCodeInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckStatusCode, value: "200");
-    var headerInstruction = CreateTestStepInstruction(3, Constants.Actions.CheckHeader, name: "X-Missing", value: "value");
+    var headerInstruction = CreateTestStepInstruction(3, Constants.Actions.CheckContentHeader, name: "X-Missing", value: "value");
     var contentInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckContent, value: "Bob", jsonPath: "$.name");
     var instructions = new[] { sendInstruction, statusCodeInstruction, headerInstruction, contentInstruction };
 
@@ -504,7 +504,7 @@ public class HttpResponseMessageValidatorTests
 
     var validator = HttpResponseMessageValidator.Create(instructions)
       .WithStatusCode(HttpStatusCode.OK)
-      .WithHeaders(response.Headers)
+      .WithContentHeaders(response.Content.Headers)
       .WithContent(jsonContent);
 
     // Act

@@ -3,9 +3,8 @@ namespace tomware.Tapir.Cli.Domain;
 internal class CheckContentActionValidator : IValidator
 {
   private readonly string[] _validContentTypes = [
-    Constants.ContentTypes.Json,
-      Constants.ContentTypes.Xml,
-      Constants.ContentTypes.Text
+    Constants.ContentTypes.Text,
+    Constants.ContentTypes.Json
   ];
 
   public string Name => Constants.Actions.CheckContent;

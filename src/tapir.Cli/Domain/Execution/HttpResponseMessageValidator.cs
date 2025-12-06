@@ -13,7 +13,7 @@ internal class HttpResponseMessageValidator
   private HttpStatusCode _statusCode;
   private string? _reasonPhrase;
   private HttpContent? _content;
-  private HttpResponseHeaders? _headers;
+  private HttpContentHeaders? _contentHeaders;
 
   private HttpResponseMessageValidator(
     IEnumerable<TestStepInstruction> instructions
@@ -50,9 +50,9 @@ internal class HttpResponseMessageValidator
     return this;
   }
 
-  public HttpResponseMessageValidator WithHeaders(HttpResponseHeaders headers)
+  public HttpResponseMessageValidator WithContentHeaders(HttpContentHeaders contentHeaders)
   {
-    _headers = headers;
+    _contentHeaders = contentHeaders;
 
     return this;
   }
@@ -63,7 +63,7 @@ internal class HttpResponseMessageValidator
 
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
-    results.AddRange(CheckHeaders());
+    results.AddRange(CheckContentHeaders());
     results.AddRange(await VerifyContentAsync(cancellationToken));
     results.AddRange(await CheckContentAsync(cancellationToken));
 
@@ -119,11 +119,11 @@ internal class HttpResponseMessageValidator
       )];
   }
 
-  private List<TestStepResult> CheckHeaders()
+  private List<TestStepResult> CheckContentHeaders()
   {
     var headerInstructions = _instructions
-      .Where(i => i.Action == Constants.Actions.CheckHeader);
-    if (headerInstructions == null || _headers == null)
+      .Where(i => i.Action == Constants.Actions.CheckContentHeader);
+    if (headerInstructions == null || _contentHeaders == null)
     {
       // It's okay if there's no headers to check
       return [];
@@ -133,7 +133,7 @@ internal class HttpResponseMessageValidator
 
     foreach (var headerInstruction in headerInstructions)
     {
-      if (_headers.TryGetValues(headerInstruction.Name, out var values))
+      if (_contentHeaders.TryGetValues(headerInstruction.Name, out var values))
       {
         var actualValue = string.Join(",", values);
         var expectedValue = headerInstruction.Value;
@@ -177,27 +177,18 @@ internal class HttpResponseMessageValidator
     var results = new List<TestStepResult>();
     foreach (var contentInstruction in contentInstructions)
     {
-      if (contentInstruction.ContentType == Constants.ContentTypes.Json)
-      {
-        await CheckForJsonContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
-      }
-      else if (contentInstruction.ContentType == Constants.ContentTypes.Xml)
-      {
-        await CheckForXmlContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
-      }
-      else if (contentInstruction.ContentType == Constants.ContentTypes.Text)
+      if (contentInstruction.ContentType == Constants.ContentTypes.Text)
       {
         await CheckForTextContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
+      else if (contentInstruction.ContentType == Constants.ContentTypes.Json)
+      {
+        await CheckForJsonContentAsync(
           contentInstructions,
           results,
           contentInstruction,
@@ -234,43 +225,6 @@ internal class HttpResponseMessageValidator
     var evaluationResults = jsonPath.Evaluate(jsonNode);
 
     var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
-    var expectedValue = contentInstruction.Value;
-
-    results.Add(
-      expectedValue == actualValue
-        ? TestStepResult.Success(contentInstruction.TestStep)
-        : TestStepResult.Failed(
-          contentInstruction.TestStep,
-          $"Expected content value '{expectedValue}' but was '{actualValue}'."
-        )
-    );
-  }
-
-  private async Task CheckForXmlContentAsync(
-    List<TestStepInstruction> contentInstructions,
-    List<TestStepResult> results,
-    TestStepInstruction contentInstruction,
-    CancellationToken cancellationToken
-  )
-  {
-    var xml = await _content!.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(xml))
-    {
-      results.Add(
-        TestStepResult.Failed(
-          contentInstructions.First().TestStep,
-          "Response content is empty."
-        ));
-
-      return;
-    }
-
-    var node = new XmlDocument();
-    node.LoadXml(xml);
-    var evaluatedNode = node.SelectSingleNode(contentInstruction.JsonPath)
-      ?? throw new InvalidOperationException("XML path did not return any node.");
-
-    var actualValue = evaluatedNode.InnerText;
     var expectedValue = contentInstruction.Value;
 
     results.Add(
@@ -330,6 +284,15 @@ internal class HttpResponseMessageValidator
     var results = new List<TestStepResult>();
     foreach (var contentInstruction in contentInstructions)
     {
+      if (contentInstruction.ContentType == Constants.ContentTypes.Text)
+      {
+        await VerifyForTextContentAsync(
+          contentInstructions,
+          results,
+          contentInstruction,
+          cancellationToken
+        );
+      }
       if (contentInstruction.ContentType == Constants.ContentTypes.Json)
       {
         await VerifyForJsonContentAsync(
@@ -339,27 +302,46 @@ internal class HttpResponseMessageValidator
           cancellationToken
         );
       }
-      else if (contentInstruction.ContentType == Constants.ContentTypes.Xml)
-      {
-        await VerifyForXmlContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
-      }
-      else if (contentInstruction.ContentType == Constants.ContentTypes.Text)
-      {
-        await VerifyForTextContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
-      }
     }
 
     return results;
+  }
+
+  private async Task VerifyForTextContentAsync(
+    List<TestStepInstruction> contentInstructions,
+    List<TestStepResult> results,
+    TestStepInstruction contentInstruction,
+    CancellationToken cancellationToken
+  )
+  {
+    var text = await _content!.ReadAsStringAsync(cancellationToken);
+    if (string.IsNullOrEmpty(text))
+    {
+      results.Add(
+        TestStepResult.Failed(
+          contentInstructions.First().TestStep,
+          "Response content is empty."
+        ));
+
+      return;
+    }
+
+    // Read the file relative to the execution directory
+    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
+    var expectedText = !string.IsNullOrEmpty(contentInstruction.File)
+      && File.Exists(relativeFilePath)
+        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
+        : contentInstruction.Value
+          ?? string.Empty;
+
+    results.Add(
+      expectedText == text
+        ? TestStepResult.Success(contentInstruction.TestStep)
+        : TestStepResult.Failed(
+          contentInstruction.TestStep,
+          "Response content does not match the expected content."
+        )
+    );
   }
 
   private async Task VerifyForJsonContentAsync(
@@ -397,83 +379,6 @@ internal class HttpResponseMessageValidator
 
     results.Add(
       normalizedActual == normalizedExpected
-        ? TestStepResult.Success(contentInstruction.TestStep)
-        : TestStepResult.Failed(
-          contentInstruction.TestStep,
-          "Response content does not match the expected content."
-        )
-    );
-  }
-
-  private async Task VerifyForXmlContentAsync(
-    List<TestStepInstruction> contentInstructions,
-    List<TestStepResult> results,
-    TestStepInstruction contentInstruction,
-    CancellationToken cancellationToken
-  )
-  {
-    var xml = await _content!.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(xml))
-    {
-      results.Add(
-        TestStepResult.Failed(
-          contentInstructions.First().TestStep,
-          "Response content is empty."
-        ));
-
-      return;
-    }
-
-    // Read the file relative to the execution directory
-    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
-    var expectedXml = !string.IsNullOrEmpty(contentInstruction.File)
-      && File.Exists(relativeFilePath)
-        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
-        : contentInstruction.Value
-          ?? string.Empty;
-
-    var normalizedActual = NormalizeXml(xml);
-    var normalizedExpected = NormalizeXml(expectedXml);
-
-    results.Add(
-      normalizedExpected == normalizedActual
-        ? TestStepResult.Success(contentInstruction.TestStep)
-        : TestStepResult.Failed(
-          contentInstruction.TestStep,
-          "Response content does not match the expected content."
-        )
-    );
-  }
-
-  private async Task VerifyForTextContentAsync(
-    List<TestStepInstruction> contentInstructions,
-    List<TestStepResult> results,
-    TestStepInstruction contentInstruction,
-    CancellationToken cancellationToken
-  )
-  {
-    var text = await _content!.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(text))
-    {
-      results.Add(
-        TestStepResult.Failed(
-          contentInstructions.First().TestStep,
-          "Response content is empty."
-        ));
-
-      return;
-    }
-
-    // Read the file relative to the execution directory
-    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
-    var expectedText = !string.IsNullOrEmpty(contentInstruction.File)
-      && File.Exists(relativeFilePath)
-        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
-        : contentInstruction.Value
-          ?? string.Empty;
-
-    results.Add(
-      expectedText == text
         ? TestStepResult.Success(contentInstruction.TestStep)
         : TestStepResult.Failed(
           contentInstruction.TestStep,

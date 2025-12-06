@@ -7,6 +7,7 @@ namespace tomware.Tapir.Cli;
 
 internal class RunCommand : CommandLineApplication
 {
+  private readonly ITestCaseValidator _testCaseValidator;
   private readonly ITestCaseExecutor _testCaseExecutor;
 
   private readonly CommandArgument<string> _domain;
@@ -16,12 +17,16 @@ internal class RunCommand : CommandLineApplication
   private readonly CommandOption<string> _variables;
   private readonly CommandOption<bool> _continueOnFailure;
 
-  public RunCommand(ITestCaseExecutor testCaseExecutor)
+  public RunCommand(
+    ITestCaseValidator testCaseValidator,
+    ITestCaseExecutor testCaseExecutor
+  )
   {
+    _testCaseValidator = testCaseValidator;
+    _testCaseExecutor = testCaseExecutor;
+
     Name = "run";
     Description = "Runs Test Case definition (i.e. \"https://localhost:5001\" -tc TC-Audit-001).";
-
-    _testCaseExecutor = testCaseExecutor;
 
     _domain = Argument<string>(
       "domain",
@@ -114,8 +119,21 @@ internal class RunCommand : CommandLineApplication
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
     testCase
       .WithDomain(domain)
-      .WithVariables(VariablesHelper.CreateVariables(_variables.Values));
+      .WithVariables(VariablesHelper.CreateDummyVariables(testCase.Tables.SelectMany(t => t.Steps)));
 
+    // Validate the Test Case definition
+    var validationResult = await _testCaseValidator.ValidateAsync(testCase, cancellationToken);
+    if (!validationResult.IsValid)
+    {
+      foreach (var error in validationResult.Errors)
+      {
+        ConsoleHelper.WriteLineError(error);
+      }
+
+      return await Task.FromResult(1);
+    }
+
+    // Run the Test Case
     ConsoleHelper.WriteLineYellow($"Running test case '{testCase.Title}' ({testCase.Id})");
 
     // for each table in the test case, execute the test steps

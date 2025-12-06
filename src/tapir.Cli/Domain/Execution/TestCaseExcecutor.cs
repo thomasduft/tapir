@@ -1,3 +1,5 @@
+using tomware.Tapir.Cli.Utils;
+
 namespace tomware.Tapir.Cli.Domain;
 
 internal interface ITestCaseExecutor
@@ -32,6 +34,8 @@ internal class TestCaseExecutor : ITestCaseExecutor
       .Create(instructions)
       .WithDomain(domain)
       .BuildAsync(cancellationToken);
+
+    ConsoleHelper.WriteLineYellow($"- sending request: {requestMessage.Method} {requestMessage.RequestUri}");
 
     var response = await client
       .SendAsync(requestMessage, cancellationToken);

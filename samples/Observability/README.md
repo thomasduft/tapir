@@ -28,4 +28,4 @@ Grafana Default credentials:
 
 ## Notes
 
-- topk(1, testr_test_case) by (...labels...)
+- topk(1, tapir_test_case) by (instance, job, domain, test_case_id, status, error_message, duration, timestamp)

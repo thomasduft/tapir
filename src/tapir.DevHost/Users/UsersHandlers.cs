@@ -6,7 +6,9 @@ internal static class UsersHandlers
 {
   public static IResult GetAllUsers(IUsersRepository repository)
   {
-    var persons = repository.GetAll();
+    var persons = repository.GetAll()
+      .OrderBy(p => p.Name)
+      .ToList();
     return Results.Ok(persons);
   }
 

@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -121,9 +121,14 @@
         },
         "frameIndex": 1,
         "showHeader": true,
-        "sortBy": []
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Recorded at"
+          }
+        ]
       },
-      "pluginVersion": "12.0.0",
+      "pluginVersion": "12.0.2",
       "targets": [
         {
           "datasource": {
@@ -131,7 +136,7 @@
             "uid": "941a9c31-eeb6-4585-b1f7-e73a21d28575"
           },
           "editorMode": "code",
-          "expr": "topk(1, testr_test_case) by (instance, job, test_case_id, status, duration, timestamp)",
+          "expr": "topk(1, tapir_test_case) by (instance, job, domain, test_case_id, status, error_message, duration, timestamp)",
           "interval": "",
           "legendFormat": "",
           "range": true,
@@ -155,7 +160,15 @@
                   "lastNotNull"
                 ]
               },
+              "domain": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
               "duration": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "error_message": {
                 "aggregations": [],
                 "operation": "groupby"
               },
@@ -194,15 +207,19 @@
             },
             "includeByName": {},
             "indexByName": {
-              "duration": 4,
+              "domain": 6,
+              "duration": 7,
+              "error_message": 5,
               "instance": 0,
               "module": 2,
-              "status": 5,
+              "status": 4,
               "test_case_id": 3,
               "timestamp": 1
             },
             "renameByName": {
+              "domain": "Domain",
               "duration": "Duration [ms]",
+              "error_message": "Error",
               "module": "Module",
               "status": "Status",
               "test_case_id": "Test Case",
@@ -229,5 +246,5 @@
   "timezone": "",
   "title": "Latest Test Results",
   "uid": "e40f8713-6740-44b1-bcaa-7ef69e496e90",
-  "version": 2
+  "version": 3
 }

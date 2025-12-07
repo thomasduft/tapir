@@ -2,8 +2,6 @@
 
 ## [0.0.2] - 2025-12-07
 
-## [0.0.2] - 2025-12-07
-
 ### Added
 
 - Support for OpenTelemetry

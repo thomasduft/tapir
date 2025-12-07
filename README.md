@@ -1,3 +1,6 @@
+![build](https://github.com/thomasduft/tapir/actions/workflows/build.yaml/badge.svg)
+![NuGet](https://img.shields.io/nuget/vpre/tomware.tapir.svg)
+
 # tapir
 
 A command-line tool for managing and executing automated API test cases.

@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
+
 using McMaster.Extensions.CommandLineUtils;
 
 using tomware.Tapir.Cli.Domain;
@@ -7,6 +10,13 @@ namespace tomware.Tapir.Cli;
 
 internal class RunCommand : CommandLineApplication
 {
+  private static readonly Meter TestCaseMeter
+    = new("tomware.Tapir.Cli.Metrics");
+  private static readonly Gauge<int> TestCaseGauge
+    = TestCaseMeter.CreateGauge<int>("tapir_test_case");
+
+  private readonly Stopwatch _stopwatch = new();
+
   private readonly ITestCaseValidator _testCaseValidator;
   private readonly ITestCaseExecutor _testCaseExecutor;
 
@@ -136,6 +146,8 @@ internal class RunCommand : CommandLineApplication
     // Run the Test Case
     ConsoleHelper.WriteLineYellow($"Running test case '{testCase.Title}' ({testCase.Id})");
 
+    _stopwatch.Start();
+
     // for each table in the test case, execute the test steps
     var results = new List<TestCaseExecutionResult>();
     foreach (var table in testCase.Tables)
@@ -160,7 +172,8 @@ internal class RunCommand : CommandLineApplication
 
         if (!_continueOnFailure.ParsedValue)
         {
-          return await Task.FromResult(1);
+          // abort further execution
+          break;
         }
       }
 
@@ -169,6 +182,26 @@ internal class RunCommand : CommandLineApplication
       results.Add(executionResult);
     }
 
+    _stopwatch.Stop();
+    var overallSuccess = results.All(r => r.TestStepResults.All(tr => tr.IsSuccess));
+
+    TestCaseGauge.Record(1, [
+      new("domain", domain),
+      new("test_case_id", testCase.Id),
+      new("module", testCase.Module),
+      new("status", overallSuccess
+        ? Constants.TestCaseStatus.Passed
+        : Constants.TestCaseStatus.Failed),
+      new("error_message", overallSuccess
+        ? string.Empty
+        : string.Join(',', results.SelectMany(r => r.TestStepResults)
+          .Where(r => !r.IsSuccess)
+          .Select(r => r.Error))),
+      new("duration", _stopwatch.ElapsedMilliseconds),
+      new("timestamp", DateTimeOffset.UtcNow)
+    ]);
+
+    // Saving Test Case Run results
     if (!string.IsNullOrWhiteSpace(outputDirectory))
     {
       // Store the Test Case run
@@ -180,11 +213,16 @@ internal class RunCommand : CommandLineApplication
       );
     }
 
-    if (results.All(r => r.TestStepResults.All(tr => tr.IsSuccess)))
+    var message = $"Test case '{testCase.Title} ({testCase.Id})'";
+    if (overallSuccess)
     {
-      ConsoleHelper.WriteLineSuccess($"Test case '{testCase.Title} ({testCase.Id})' executed successfully.");
+      ConsoleHelper.WriteLineSuccess($"{message} executed successfully.");
+    }
+    else
+    {
+      ConsoleHelper.WriteLineError($"{message} failed.");
     }
 
-    return await Task.FromResult(0);
+    return overallSuccess ? 0 : 1;
   }
 }

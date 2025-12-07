@@ -1,4 +1,5 @@
-[![build](https://github.com/thomasduft/tapir/actions/workflows/build.yml/badge.svg)](https://github.com/thomasduft/tapir/actions/workflows/build.yml) [![NuGet](https://img.shields.io/nuget/vpre/tomware.tapir.svg)](https://www.nuget.org/packages/tomware.tapir)
+[![build](https://github.com/thomasduft/tapir/actions/workflows/build.yml/badge.svg)](https://github.com/thomasduft/tapir/actions/workflows/build.yml)
+[![NuGet](https://img.shields.io/nuget/vpre/tomware.tapir.svg)](https://www.nuget.org/packages/tomware.tapir)
 
 # tapir
 

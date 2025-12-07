@@ -26,7 +26,6 @@ Traditional API testing tools like Postman and Insomnia are great, but they ofte
 - 🔍 **Smart Validation** - Verify status codes, response content, and JSON values using JsonPath expressions
 - 💾 **Variable Storage** - Extract and reuse data between test steps (e.g., retrieve an ID from one endpoint and use it in another)
 - 📊 **Clear Results** - Get detailed test execution reports showing exactly what passed or failed
-- 🚀 **Developer-Friendly** - Integrates seamlessly into your existing development workflow
 
 ## Maintainers
 

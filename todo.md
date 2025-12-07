@@ -7,4 +7,4 @@
   - application/text
   - application/json
   - multipart/form-data
-- [ ] improved docs / man
+- [x] improved docs / man

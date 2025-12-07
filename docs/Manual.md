@@ -139,13 +139,85 @@ tapir run https://api.example.com -tc TC-Example-001 --otel-endpoint http://loca
 ## Action Reference
 
 `tapir` supports the following actions for Test Steps:
-{% for action in Actions %}
-### {{ action.Name }}
 
-{{ action.Description }}
+### AddContent
+
+Adds content to the HTTP request.
 
 **Supported Properties:**
-{%- for property in action.SupportedProperties %}
-- {{ property }}
-{%- endfor %}
-{% endfor %}
+- ContentType: Content type (e.g., text/plain, application/json, multipart/form-data)
+- File: Path to the content file
+- Name: Name for multipart/form-data content
+- Value: Direct content value or corresponding value for multipart/form-data name (aka key)
+
+### AddHeader
+
+Adds headers to the HTTP request.
+
+**Supported Properties:**
+- Name: The name of the header
+- Value: The value of the header
+
+### AddQueryParameter
+
+Adds query parameters to the HTTP request.
+
+**Supported Properties:**
+- Name: The name of the query parameter
+- Value: The value of the query parameter
+
+### CheckContent
+
+Checks content in the HTTP response.
+
+**Supported Properties:**
+- ContentType: Content type (e.g., text/plain, application/json)
+- JsonPath: JSON path to the content to check
+- Value: The content value to check
+
+### CheckContentHeader
+
+Checks headers in the HTTP response.
+
+**Supported Properties:**
+- Name: The name of the header to check
+- Value: The value of the header to check
+
+### CheckReasonPhrase
+
+Checks the reason phrase in the HTTP response.
+
+**Supported Properties:**
+- Value: The reason phrase to check
+
+### CheckStatusCode
+
+Checks the status code in the HTTP response.
+
+**Supported Properties:**
+- Value: The status code to check
+
+### Send
+
+Sends an HTTP request.
+
+**Supported Properties:**
+- Method: The HTTP method to use (e.g. GET, POST, PUT, DELETE, PATCH)
+- Endpoint: The endpoint to send the request to
+
+### StoreVariable
+
+Stores a variable from the HTTP response. Enables request chaining.
+
+**Supported Properties:**
+- Name: The name of the variable to store
+- JsonPath: The JSON path to the variable to store
+- Value: The value of the variable to store
+
+### VerifyContent
+
+Verifies content in the HTTP response.
+
+**Supported Properties:**
+- File: The file path to the content to verify
+- Value: The content value to verify

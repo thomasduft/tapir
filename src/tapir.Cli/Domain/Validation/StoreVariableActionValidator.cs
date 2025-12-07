@@ -8,7 +8,6 @@ internal class StoreVariableActionValidator : IValidator
   [
     nameof(TestStepInstruction.Name) + ": The name of the variable to store",
     nameof(TestStepInstruction.JsonPath) + ": The JSON path to the variable to store",
-    nameof(TestStepInstruction.Value) + ": The value of the variable to store"
   ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
@@ -28,7 +27,7 @@ internal class StoreVariableActionValidator : IValidator
       ));
     }
 
-    // Either Path or Value is required
+    // Either JsonPath or Value is required
     if (string.IsNullOrEmpty(testStepInstruction.JsonPath)
       && string.IsNullOrEmpty(testStepInstruction.Value))
     {

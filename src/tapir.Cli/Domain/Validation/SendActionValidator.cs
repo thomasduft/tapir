@@ -2,11 +2,13 @@ namespace tomware.Tapir.Cli.Domain;
 
 internal class SendActionValidator : IValidator
 {
+  private readonly string[] _validMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+
   public string Name => Constants.Actions.Send;
   public string Description => "Sends an HTTP request.";
   public IEnumerable<string> SupportedProperties =>
   [
-    nameof(TestStepInstruction.Method) + ": The HTTP method to use",
+    nameof(TestStepInstruction.Method) + $": The HTTP method to use (e.g. {string.Join(", ", _validMethods)})",
     nameof(TestStepInstruction.Endpoint) + ": The endpoint to send the request to"
   ];
 
@@ -38,14 +40,13 @@ internal class SendActionValidator : IValidator
     }
 
     // Method must be either GET, POST, PUT, DELETE, PATCH
-    var validMethods = new[] { "GET", "POST", "PUT", "DELETE", "PATCH" };
     if (!string.IsNullOrEmpty(testStepInstruction.Method)
-      && !validMethods.Contains(testStepInstruction.Method.ToUpper()))
+      && !_validMethods.Contains(testStepInstruction.Method.ToUpper()))
     {
       results.Add(
         new TestStepValidationError(
           testStepInstruction.TestStep.Id,
-          $"HTTP Method '{testStepInstruction.Method}' is not valid. Valid methods are: {string.Join(", ", validMethods)}."
+          $"HTTP Method '{testStepInstruction.Method}' is not valid. Valid methods are: {string.Join(", ", _validMethods)}."
       ));
     }
 

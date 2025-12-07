@@ -14,7 +14,8 @@ internal class AddContentActionValidator : IValidator
   [
     nameof(TestStepInstruction.ContentType) + $": Content type (e.g., {string.Join(", ", _validContentTypes)})",
     nameof(TestStepInstruction.File) + ": Path to the content file",
-    nameof(TestStepInstruction.Value) + ": Direct content value"
+    nameof(TestStepInstruction.Name) + ": Name for multipart/form-data content",
+    nameof(TestStepInstruction.Value) + ": Direct content value or corresponding value for multipart/form-data name (aka key)"
   ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(

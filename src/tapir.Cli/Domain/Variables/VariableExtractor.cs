@@ -56,26 +56,35 @@ internal class VariableExtractor
 
     foreach (var instruction in storeVariableInstructions)
     {
-      if (string.IsNullOrEmpty(instruction.JsonPath) || string.IsNullOrEmpty(instruction.Name))
+      if (string.IsNullOrEmpty(instruction.Name))
       {
-        continue;
+        throw new InvalidOperationException($"Variable Name must be provided in order to store a variable (Step ID: '{instruction.TestStep.Id}').");
       }
 
-      var jsonPath = JsonPath.Parse(instruction.JsonPath);
-      var result = jsonPath.Evaluate(jsonNode!);
-      var matches = result.Matches?.ToList();
-      if (matches == null || !matches.Any())
+      if (!string.IsNullOrEmpty(instruction.Value))
       {
-        continue;
+        variables[instruction.Name] = instruction.Value;
       }
 
-      var value = matches.First().Value?.ToString();
-      if (value == null)
+      if (!string.IsNullOrEmpty(instruction.JsonPath))
       {
-        continue;
+        var jsonPath = JsonPath.Parse(instruction.JsonPath);
+        var result = jsonPath.Evaluate(jsonNode!);
+        var matches = result.Matches?.ToList();
+        if (matches == null || !matches.Any())
+        {
+          continue;
+        }
+
+        var value = matches.First().Value?.ToString();
+        if (value == null)
+        {
+          continue;
+        }
+
+        variables[instruction.Name] = value;
       }
 
-      variables[instruction.Name] = value;
       testStepResults.Add(TestStepResult.Success(instruction.TestStep));
     }
 

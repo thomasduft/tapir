@@ -22,7 +22,7 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 | Step ID  | Description             | Test Data                                                                                                                | Expected Result    | Actual Result |
 | -------: | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------ | ------------- |
 | 01       | Add Document            | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/empty.pdf | Document prepared  | -             |
-| 02       | Set Document Title      | Action=AddContent ContentType=multipart/form-data Name=title Value=Test Document                                         | Document prepared  | -             |
+| 02       | Set Document Title      | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                                       | Document prepared  | -             |
 | 03       | Upload Document         | Action=Send Method=POST Endpoint=documents                                                                               | Request successful | -             |
 | 04       | Verify response code    | Action=CheckStatusCode Value=201                                                                                         | 201                | -             |
 | 05       | Retain DocumentId       | Action=StoreVariable JsonPath=$ Name=DocumentId                                                                          | ID of new document | -             |

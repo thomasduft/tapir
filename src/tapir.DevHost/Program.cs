@@ -1,7 +1,7 @@
 using Scalar.AspNetCore;
 
-using tomware.Tapir.DevHost.Users;
 using tomware.Tapir.DevHost.Documents;
+using tomware.Tapir.DevHost.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,7 @@ builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 // Configure form options for file uploads
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+  options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
 });
 
 var app = builder.Build();

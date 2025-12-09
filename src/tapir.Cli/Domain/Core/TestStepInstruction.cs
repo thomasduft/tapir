@@ -95,14 +95,14 @@ internal class TestStepInstruction
     if (string.IsNullOrEmpty(testData))
       return result;
 
-    var pattern = @"(\w+)=(""[^""]*""|\S+)";
+    // The pattern should match key=value pairs, where value can be quoted or unquoted
+    var pattern = @"(\w+)=(""[^""]*""|[^\s""]\S*)";
     var matches = Regex.Matches(testData, pattern);
-
     foreach (Match match in matches)
     {
       var key = match.Groups[1].Value;
       var value = match.Groups[2].Value;
-      result[key] = value;
+      result[key] = value.Trim('"'); // Remove quotes if present
     }
 
     return result;

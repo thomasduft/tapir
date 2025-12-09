@@ -506,8 +506,7 @@ public class TestCaseValidatorTests
 
     // Assert
     Assert.False(result.IsValid);
-    Assert.Single(result.Errors);
-    Assert.Contains("Exception during validation", result.Errors.First());
+    Assert.Contains(result.Errors, e => e.Contains("Exception during validation of Test Step"));
   }
 
   [Fact]
@@ -613,6 +612,412 @@ public class TestCaseValidatorTests
 
     // Assert
     Assert.Equal("My Test Case Title", result.TestCaseTitle);
+  }
+
+  #endregion
+
+  #region ValidateAsync - Content Type Validation
+
+  [Fact]
+  public async Task ValidateAsync_WithSingleContentTypeInTable_ShouldReturnValidResult()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-021",
+      Title = "Test Case 21",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"name\":\"test\"}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add more JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"id\":123}",
+              ExpectedResult = "Content added"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddContent", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.True(result.IsValid);
+    Assert.Empty(result.Errors);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithMultipleContentTypesInSameTable_ShouldReturnError()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-022",
+      Title = "Test Case 22",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"name\":\"test\"}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add form data",
+              TestData = "Action=AddContent ContentType=application/x-www-form-urlencoded Name=username Value=admin",
+              ExpectedResult = "Content added"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddContent", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.False(result.IsValid);
+    Assert.Contains(result.Errors, e => e.Contains("Multiple content types found in request"));
+    var contentTypeError = result.Errors.First(e => e.Contains("Multiple content types"));
+    Assert.Contains("application/json", contentTypeError);
+    Assert.Contains("application/x-www-form-urlencoded", contentTypeError);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithMultipleContentTypesInSameTable_ShouldIncludeAffectedSteps()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-023",
+      Title = "Test Case 23",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"test\":true}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add text content",
+              TestData = "Action=AddContent ContentType=text/plain Value=Hello",
+              ExpectedResult = "Content added"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddContent", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.False(result.IsValid);
+    var contentTypeError = result.Errors.First(e => e.Contains("Multiple content types"));
+    Assert.Contains("Affected steps: 1, 2", contentTypeError);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithDifferentContentTypesInDifferentTables_ShouldReturnValidResult()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-024",
+      Title = "Test Case 24",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"name\":\"test\"}",
+              ExpectedResult = "Content added"
+            }
+          }
+        },
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add form data",
+              TestData = "Action=AddContent ContentType=application/x-www-form-urlencoded Name=username Value=admin",
+              ExpectedResult = "Content added"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddContent", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.True(result.IsValid);
+    Assert.Empty(result.Errors);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithNoAddContentActions_ShouldReturnValidResult()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-025",
+      Title = "Test Case 25",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Send request",
+              TestData = "Action=Send Method=GET Endpoint=api/users",
+              ExpectedResult = "Request sent"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Check status",
+              TestData = "Action=CheckStatusCode Value=200",
+              ExpectedResult = "Status is 200"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("Send", null),
+      new MockValidator("CheckStatusCode", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.True(result.IsValid);
+    Assert.Empty(result.Errors);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithThreeContentTypesInSameTable_ShouldReturnError()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-026",
+      Title = "Test Case 26",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"name\":\"test\"}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add text content",
+              TestData = "Action=AddContent ContentType=text/plain Value=Hello",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 3,
+              Description = "Add multipart content",
+              TestData = "Action=AddContent ContentType=multipart/form-data Name=file Value=data",
+              ExpectedResult = "Content added"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddContent", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.False(result.IsValid);
+    var contentTypeError = result.Errors.First(e => e.Contains("Multiple content types"));
+    Assert.Contains("application/json", contentTypeError);
+    Assert.Contains("text/plain", contentTypeError);
+    Assert.Contains("multipart/form-data", contentTypeError);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithMixedActionsAndSingleContentType_ShouldReturnValidResult()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-027",
+      Title = "Test Case 27",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>
+          {
+            new TestStep
+            {
+              Id = 1,
+              Description = "Add header",
+              TestData = "Action=AddHeader Name=Authorization Value=Bearer token",
+              ExpectedResult = "Header added"
+            },
+            new TestStep
+            {
+              Id = 2,
+              Description = "Add JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"id\":1}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 3,
+              Description = "Add more JSON content",
+              TestData = "Action=AddContent ContentType=application/json Value={\"name\":\"test\"}",
+              ExpectedResult = "Content added"
+            },
+            new TestStep
+            {
+              Id = 4,
+              Description = "Send request",
+              TestData = "Action=Send Method=POST Endpoint=api/data",
+              ExpectedResult = "Request sent"
+            }
+          }
+        }
+      }
+    };
+    var validators = new List<IValidator>
+    {
+      new MockValidator("AddHeader", null),
+      new MockValidator("AddContent", null),
+      new MockValidator("Send", null)
+    };
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.True(result.IsValid);
+    Assert.Empty(result.Errors);
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithEmptyStepsInTable_ShouldNotFailContentTypeValidation()
+  {
+    // Arrange
+    var testCase = new TestCase
+    {
+      Id = "TC-028",
+      Title = "Test Case 28",
+      Type = Constants.TestCaseType.Definition,
+      Status = Constants.TestCaseStatus.Unknown,
+      Tables = new List<Table>
+      {
+        new Table
+        {
+          Steps = new List<TestStep>()
+        }
+      }
+    };
+    var validators = new List<IValidator>();
+    var validator = new TestCaseValidator(validators);
+
+    // Act
+    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
+
+    // Assert
+    Assert.True(result.IsValid);
+    Assert.Empty(result.Errors);
   }
 
   #endregion

@@ -87,13 +87,6 @@ internal class TestCaseParser
     return tables;
   }
 
-  private IEnumerable<TestStep> GetTestSteps(string markdownContent)
-  {
-    var table = new MarkdownTable(markdownContent);
-
-    return table.ParseTestSteps();
-  }
-
   private string? GetLinkedFile(string file, string? link)
   {
     if (string.IsNullOrWhiteSpace(link)) return null;

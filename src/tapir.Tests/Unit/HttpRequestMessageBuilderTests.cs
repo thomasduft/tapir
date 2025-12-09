@@ -377,6 +377,524 @@ public class HttpRequestMessageBuilderTests
     Assert.Null(request.Content);
   }
 
+  [Fact]
+  public async Task BuildAsync_WithFormUrlEncodedSingleField_SetsFormUrlEncodedContent()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "username",
+        Value = "john_doe"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/login"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<FormUrlEncodedContent>(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Equal("username=john_doe", content);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithFormUrlEncodedMultipleFields_SetsAllFieldsInFormUrlEncodedContent()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "username",
+        Value = "john_doe"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "password",
+        Value = "secret123"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "remember_me",
+        Value = "true"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/login"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<FormUrlEncodedContent>(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Contains("username=john_doe", content);
+    Assert.Contains("password=secret123", content);
+    Assert.Contains("remember_me=true", content);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithFormUrlEncodedEmptyName_DoesNotAddField()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "",
+        Value = "some_value"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/login"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<FormUrlEncodedContent>(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Empty(content);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithFormUrlEncodedEmptyValue_DoesNotAddField()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.FormUrlEncoded,
+        Name = "username",
+        Value = ""
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/login"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<FormUrlEncodedContent>(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Empty(content);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataSingleFile_SetsMultipartFormDataContent()
+  {
+    // Arrange
+    var tempFile = Path.GetTempFileName();
+    var fileContent = "Test file content";
+    await File.WriteAllTextAsync(tempFile, fileContent);
+
+    try
+    {
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "document",
+          File = tempFile,
+          Value = "test.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/upload"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      Assert.IsType<MultipartFormDataContent>(request.Content);
+      var multipartContent = request.Content as MultipartFormDataContent;
+      Assert.NotNull(multipartContent);
+      Assert.Single(multipartContent);
+    }
+    finally
+    {
+      File.Delete(tempFile);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataMultipleFiles_SetsAllFilesInMultipartContent()
+  {
+    // Arrange
+    var tempFile1 = Path.GetTempFileName();
+    var tempFile2 = Path.GetTempFileName();
+    await File.WriteAllTextAsync(tempFile1, "File 1 content");
+    await File.WriteAllTextAsync(tempFile2, "File 2 content");
+
+    try
+    {
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "file1",
+          File = tempFile1,
+          Value = "document1.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "file2",
+          File = tempFile2,
+          Value = "document2.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/upload"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      Assert.IsType<MultipartFormDataContent>(request.Content);
+      var multipartContent = request.Content as MultipartFormDataContent;
+      Assert.NotNull(multipartContent);
+      Assert.Equal(2, multipartContent.Count());
+    }
+    finally
+    {
+      File.Delete(tempFile1);
+      File.Delete(tempFile2);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataStringField_AddsStringContentToMultipart()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.MultipartFormData,
+        Name = "description",
+        Value = "This is a test description"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/upload"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<MultipartFormDataContent>(request.Content);
+    var multipartContent = request.Content as MultipartFormDataContent;
+    Assert.NotNull(multipartContent);
+    Assert.Single(multipartContent);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataMixedContent_AddsBothFileAndStringFields()
+  {
+    // Arrange
+    var tempFile = Path.GetTempFileName();
+    await File.WriteAllTextAsync(tempFile, "File content");
+
+    try
+    {
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "title",
+          Value = "Document Title"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "document",
+          File = tempFile,
+          Value = "test.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "category",
+          Value = "reports"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/upload"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      Assert.IsType<MultipartFormDataContent>(request.Content);
+      var multipartContent = request.Content as MultipartFormDataContent;
+      Assert.NotNull(multipartContent);
+      Assert.Equal(3, multipartContent.Count());
+    }
+    finally
+    {
+      File.Delete(tempFile);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataFileUsingOriginalFilename_SetsFilenameCorrectly()
+  {
+    // Arrange
+    var tempFile = Path.Combine(Path.GetTempPath(), "testfile.txt");
+    await File.WriteAllTextAsync(tempFile, "Test content");
+
+    try
+    {
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.MultipartFormData,
+          Name = "document",
+          File = tempFile,
+          Value = Path.GetFileName(tempFile)
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/upload"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      Assert.IsType<MultipartFormDataContent>(request.Content);
+      var multipartContent = request.Content as MultipartFormDataContent;
+      Assert.NotNull(multipartContent);
+      Assert.Single(multipartContent);
+    }
+    finally
+    {
+      File.Delete(tempFile);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithMultipartFormDataEmptyNameAndValue_DoesNotAddField()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.MultipartFormData,
+        Name = "",
+        Value = ""
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/upload"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<MultipartFormDataContent>(request.Content);
+    var multipartContent = request.Content as MultipartFormDataContent;
+    Assert.NotNull(multipartContent);
+    Assert.Empty(multipartContent);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithTextContentType_SetsTextPlainContent()
+  {
+    // Arrange
+    var textContent = "Plain text content";
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.Text,
+        Value = textContent
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/text"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.IsType<StringContent>(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Equal(textContent, content);
+    Assert.Equal("text/plain", request.Content.Headers.ContentType?.MediaType);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithJsonContentType_SetsJsonContent()
+  {
+    // Arrange
+    var jsonContent = "{\"name\":\"Test\",\"value\":123}";
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.Json,
+        Value = jsonContent
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/json"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    var content = await request.Content.ReadAsStringAsync();
+    Assert.Equal(jsonContent, content);
+    Assert.Equal("application/json", request.Content.Headers.ContentType?.MediaType);
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithUnsupportedContentType_ThrowsInvalidOperationException()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = "application/xml",
+        Value = "<root>test</root>"
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/data"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act & Assert
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+      () => builder.BuildAsync(CancellationToken.None)
+    );
+    Assert.Contains("Unsupported content type", exception.Message);
+  }
+
   #endregion
 
   #region Query Parameter Tests

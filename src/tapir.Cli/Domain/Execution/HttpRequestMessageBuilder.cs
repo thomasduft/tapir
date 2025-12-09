@@ -1,4 +1,3 @@
-
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -73,57 +72,77 @@ internal class HttpRequestMessageBuilder
       return;
     }
 
-    foreach (var instruction in instructions)
+    // Group instructions by content type and validate only one type is used
+    var contentTypeGroups = instructions
+      .GroupBy(i => i.ContentType)
+      .ToList();
+
+    if (contentTypeGroups.Count > 1)
     {
-      var contentType = instruction.ContentType;
-
-      if (contentType == Constants.ContentTypes.Text)
-      {
-        // Read the file relative to the execution directory
-        var stringContent = !string.IsNullOrEmpty(instruction.File)
-          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), instruction.File), cancellationToken)
-          : instruction.Value;
-        request.Content = new StringContent(stringContent!, Encoding.UTF8, "text/plain");
-        return;
-      }
-
-      if (contentType == Constants.ContentTypes.Json)
-      {
-        // Read the file relative to the execution directory
-        var stringContent = !string.IsNullOrEmpty(instruction.File)
-          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), instruction.File), cancellationToken)
-          : instruction.Value;
-        request.Content = JsonContent.Create(JsonNode.Parse(stringContent!)!);
-        return;
-      }
-
-      if (contentType == Constants.ContentTypes.MultipartFormData)
-      {
-        request.Content ??= new MultipartFormDataContent();
-        var multipartContent = request.Content as MultipartFormDataContent;
-
-        if (!string.IsNullOrEmpty(instruction.File))
-        {
-          var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
-          var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(relativeFilePath, cancellationToken));
-          byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(relativeFilePath));
-          multipartContent?.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(relativeFilePath));
-
-          continue;
-        }
-
-        if (!string.IsNullOrEmpty(instruction.Name) && !string.IsNullOrEmpty(instruction.Value))
-        {
-          var stringContent = new StringContent(instruction.Value, Encoding.UTF8);
-          multipartContent?.Add(stringContent, instruction.Name);
-        }
-
-        continue;
-      }
-
+      var contentTypes = string.Join(", ", contentTypeGroups.Select(g => g.Key));
       throw new InvalidOperationException(
-        $"Unsupported content type '{instruction.ContentType}' in AddContent action."
+        $"Multiple content types found in request: {contentTypes}. Only one content type is allowed per request."
       );
+    }
+
+    if (contentTypeGroups.Count == 0)
+    {
+      return;
+    }
+
+    var contentType = contentTypeGroups[0].Key;
+    var contentInstructions = contentTypeGroups[0].ToList();
+
+    switch (contentType)
+    {
+      case Constants.ContentTypes.FormUrlEncoded:
+        var formData = contentInstructions
+          .Where(i => !string.IsNullOrEmpty(i.Name) && !string.IsNullOrEmpty(i.Value))
+          .Select(i => new KeyValuePair<string, string>(i.Name!, i.Value!))
+          .ToList();
+        request.Content = new FormUrlEncodedContent(formData);
+        break;
+
+      case Constants.ContentTypes.Text:
+        var textInstruction = contentInstructions.First();
+        var textContent = !string.IsNullOrEmpty(textInstruction.File)
+          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), textInstruction.File), cancellationToken)
+          : textInstruction.Value;
+        request.Content = new StringContent(textContent!, Encoding.UTF8, "text/plain");
+        break;
+
+      case Constants.ContentTypes.Json:
+        var jsonInstruction = contentInstructions.First();
+        var jsonContent = !string.IsNullOrEmpty(jsonInstruction.File)
+          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), jsonInstruction.File), cancellationToken)
+          : jsonInstruction.Value;
+        request.Content = JsonContent.Create(JsonNode.Parse(jsonContent!)!);
+        break;
+
+      case Constants.ContentTypes.MultipartFormData:
+        var multipartContent = new MultipartFormDataContent();
+        foreach (var instruction in contentInstructions)
+        {
+          if (!string.IsNullOrEmpty(instruction.File))
+          {
+            var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
+            var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(relativeFilePath, cancellationToken));
+            byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(relativeFilePath));
+            multipartContent.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(relativeFilePath));
+          }
+          else if (!string.IsNullOrEmpty(instruction.Name) && !string.IsNullOrEmpty(instruction.Value))
+          {
+            var stringContent = new StringContent(instruction.Value, Encoding.UTF8);
+            multipartContent.Add(stringContent, instruction.Name);
+          }
+        }
+        request.Content = multipartContent;
+        break;
+
+      default:
+        throw new InvalidOperationException(
+          $"Unsupported content type '{contentType}' in AddContent action."
+        );
     }
   }
 

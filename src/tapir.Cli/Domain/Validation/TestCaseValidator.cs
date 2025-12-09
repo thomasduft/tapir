@@ -83,6 +83,54 @@ internal class TestCaseValidator : ITestCaseValidator
       }
     }
 
+    // Validates that only one content type can be used per request meaning per table.
+    // Supported content types:
+    // - Text
+    // - Json
+    // - FormUrlEncoded
+    // - MultipartFormData
+    foreach (var table in testCase.Tables)
+    {
+      var addContentSteps = table.Steps
+        .Where(s => !string.IsNullOrWhiteSpace(s.TestData))
+        .ToList();
+
+      if (addContentSteps.Count == 0)
+        continue;
+
+      try
+      {
+        var instructions = addContentSteps
+          .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
+          .Where(i => i.Action == Constants.Actions.AddContent)
+          .ToList();
+
+        if (instructions.Count == 0)
+          continue;
+
+        var contentTypeGroups = instructions
+          .GroupBy(i => i.ContentType)
+          .ToList();
+
+        if (contentTypeGroups.Count > 1)
+        {
+          var contentTypes = string.Join(", ", contentTypeGroups.Select(g => g.Key));
+          var stepIds = string.Join(", ", instructions.Select(i => i.TestStep.Id));
+          result.AddError(
+            "ContentType",
+            $"Multiple content types found in request: {contentTypes}. Only one content type is allowed per request (table). Affected steps: {stepIds}."
+          );
+        }
+      }
+      catch (Exception ex)
+      {
+        result.AddError(
+          "ContentType",
+          $"Exception during content type validation: {ex.Message}"
+        );
+      }
+    }
+
     return result;
   }
 }

@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+
 using tomware.Tapir.Cli.Domain;
 
 namespace tomware.Tapir.Tests.Unit;

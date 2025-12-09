@@ -5,6 +5,7 @@ internal class AddContentActionValidator : IValidator
   private readonly string[] _validContentTypes = [
     Constants.ContentTypes.Text,
     Constants.ContentTypes.Json,
+    Constants.ContentTypes.FormUrlEncoded,
     Constants.ContentTypes.MultipartFormData
   ];
 
@@ -89,21 +90,31 @@ internal class AddContentActionValidator : IValidator
       }
     }
 
-    if (testStepInstruction.ContentType != Constants.ContentTypes.MultipartFormData)
+    if (testStepInstruction.ContentType == Constants.ContentTypes.FormUrlEncoded)
     {
-      // Either File must exist or Value must be present
-      if (string.IsNullOrEmpty(testStepInstruction.Value)
-        && string.IsNullOrEmpty(testStepInstruction.File))
+      // For FormUrlEncoded, Name and Value must be provided
+      if (string.IsNullOrEmpty(testStepInstruction.Name))
       {
         results.Add(
           new TestStepValidationError(
             testStepInstruction.TestStep.Id,
-            "Either content File or Value must be provided."
+            "For FormUrlEncoded content, Name must be provided."
+          )
+        );
+      }
+
+      if (string.IsNullOrEmpty(testStepInstruction.Value))
+      {
+        results.Add(
+          new TestStepValidationError(
+            testStepInstruction.TestStep.Id,
+            "For FormUrlEncoded content, Value must be provided."
           )
         );
       }
     }
-    else
+
+    if (testStepInstruction.ContentType == Constants.ContentTypes.MultipartFormData)
     {
       // For MultipartFormData, Name and Value must be provided
       if (string.IsNullOrEmpty(testStepInstruction.Name))
@@ -115,6 +126,7 @@ internal class AddContentActionValidator : IValidator
           )
         );
       }
+
       if (string.IsNullOrEmpty(testStepInstruction.Value))
       {
         results.Add(
@@ -125,6 +137,7 @@ internal class AddContentActionValidator : IValidator
         );
       }
     }
+
 
     return Task.FromResult(results.AsEnumerable());
   }

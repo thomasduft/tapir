@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.4] - 2025-12-10
+
+### Changed
+
+- Improved TestCaseCaseFileLocator to return only relevant TestCase files starting from a given directory.
+
 ## [0.0.3] - 2025-12-10
 
 ### Added

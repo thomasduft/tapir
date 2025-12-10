@@ -14,7 +14,11 @@ internal static class TestCaseFileLocator
       return [FindFile(directoryPath, testCaseId)];
     }
 
-    return Directory.GetFiles(directoryPath, "*.md", SearchOption.AllDirectories);
+    // TODO: Make sure that only Test Case files are returned
+    return Directory
+      .GetFiles(directoryPath, "*.md", SearchOption.AllDirectories)
+      .OrderBy(f => f)
+      .ToArray();
   }
 
   public static string FindFile(string directory, string testCaseId)

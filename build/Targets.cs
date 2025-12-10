@@ -75,7 +75,7 @@ app.OnExecuteAsync(async _ =>
       if (!project.Contains(".Tests"))
         continue;
 
-      Run("dotnet", $"test {project} -c Release --nologo /p:ParallelizeTestCollections=false /p:CollectCoverage=true /p:CoverletOutputFormat=\\\"opencover,cobertura\\\"");
+      Run("dotnet", $"test {project} -c Release --nologo /p:ParallelizeTestCollections=false /p:CollectCoverage=true /p:CoverletOutputFormat=\\\"opencover,cobertura\\\" /p:Include=\\\"[tomware.Tapir]*\\\"");
     }
     // Run("dotnet", $"test {solution} -c Release --no-build --nologo");
   });

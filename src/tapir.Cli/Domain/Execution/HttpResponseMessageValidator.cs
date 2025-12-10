@@ -89,7 +89,7 @@ internal class HttpResponseMessageValidator
       return results;
     }
 
-    Log.Logger.Verbose("- received status code is: {StatusCode}", (int)_statusCode);
+    Log.Logger.Information("- received status code is: {StatusCode}", (int)_statusCode);
 
     // Now validate the status code
     var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);

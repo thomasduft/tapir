@@ -44,9 +44,6 @@ internal class TestCaseExecutor : ITestCaseExecutor
     var response = await client
       .SendAsync(requestMessage, cancellationToken);
 
-    Log.Logger.Information("- received response: {StatusCode}",
-      (int)response.StatusCode);
-
     var responseValidationResult = await HttpResponseMessageValidator
       .Create(instructions)
       .WithStatusCode(response.StatusCode)

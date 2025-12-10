@@ -1,4 +1,4 @@
-# TC-Users-002: Create new User
+# TC-Users-002: Creates, retreives and deletes a User
 
 - **Date**: 2025-11-05
 - **Author**: thomasduft
@@ -13,26 +13,33 @@ Tests the Users API by creating a new user named Tom with age 45.
 
 It verifies that the user creation is successful and extracts the newly created user's ID for subsequent retrieval and validation of the user's details.
 
+In the end, it cleans up by deleting the created user.
+
 ## Preconditions
 
 - no pre-conditions
 
 ## Steps
 
-| Step ID  | Description             | Test Data                                                       | Expected Result    | Actual Result |
-| -------: | ----------------------- | --------------------------------------------------------------- | ------------------ | ------------- |
-| 01       | Prepare Tom             | Action=AddContent File=samples/Users/Definitions/tom.json       | User tom prepared  | -             |
-| 02       | Add Test Header         | Action=AddHeader Name=X-Header-Test Value=test                  | Test Header Added  | -             |
-| 03       | Get Tom details         | Action=Send Method=POST Endpoint=users                          | Request successful | -             |
-| 04       | Check response code     | Action=CheckStatusCode Value=201                                | 201                | -             |
-| 05       | Retain UserId           | Action=StoreVariable JsonPath=$ Name=UserId                     | ID of new user     | -             |
+| Step ID  | Description            | Test Data                                                 | Expected Result    | Actual Result |
+| -------: | ---------------------- | --------------------------------------------------------- | ------------------ | ------------- |
+| 01       | Prepare Tom            | Action=AddContent File=samples/Users/Definitions/tom.json | User tom prepared  | -             |
+| 02       | Add Test Header        | Action=AddHeader Name=X-Header-Test Value=test            | Test Header Added  | -             |
+| 03       | Get Tom details        | Action=Send Method=POST Endpoint=users                    | Request successful | -             |
+| 04       | Check response code    | Action=CheckStatusCode Value=201                          | 201                | -             |
+| 05       | Retain UserId          | Action=StoreVariable JsonPath=$ Name=UserId               | ID of new user     | -             |
 
-| Step ID  | Description             | Test Data                                         | Expected Result        | Actual Result |
-| -------: | ----------------------- | ------------------------------------------------- | ---------------------- | ------------- |
-| 11       | Retrieve the user       | Action=Send Method=GET Endpoint=users/@@UserId@@  | Request successful     | -             |
-| 12       | Check response code     | Action=CheckStatusCode Value=200                  | 200                    | -             |
-| 13       | Check Tom               | Action=CheckContent JsonPath=$.name Value=Tom     | Content contains Tom   | -             |
-| 14       | Check Tom's age is 45   | Action=CheckContent JsonPath=$.age Value=45       | Age is 45              | -             |
+| Step ID  | Description            | Test Data                                        | Expected Result      | Actual Result |
+| -------: | ---------------------- | ------------------------------------------------ | -------------------- | ------------- |
+| 11       | Retrieve the user      | Action=Send Method=GET Endpoint=users/@@UserId@@ | Request successful   | -             |
+| 12       | Check response code    | Action=CheckStatusCode Value=200                 | 200                  | -             |
+| 13       | Check Tom              | Action=CheckContent JsonPath=$.name Value=Tom    | Content contains Tom | -             |
+| 14       | Check Tom's age is 45  | Action=CheckContent JsonPath=$.age Value=45      | Age is 45            | -             |
+
+| Step ID  | Description            | Test Data                                           | Expected Result     | Actual Result |
+| -------: | ---------------------- | --------------------------------------------------- | ------------------- | ------------- |
+| 21       | Delete Tom             | Action=Send Method=DELETE Endpoint=users/@@UserId@@ | Request successful  | -             |
+| 22       | Check response code    | Action=CheckStatusCode Value=204                    | 204                 | -             |
 
 ## Postcondition
 

@@ -212,7 +212,6 @@ Stores a variable from the HTTP response. Enables request chaining.
 **Supported Properties:**
 - Name: The name of the variable to store
 - JsonPath: The JSON path to the variable to store
-- Value: The value of the variable to store
 
 ### VerifyContent
 

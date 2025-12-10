@@ -44,8 +44,8 @@ internal class TestCaseExecutor : ITestCaseExecutor
       .Create(instructions)
       .WithStatusCode(response.StatusCode)
       .WithReasonPhrase(response.ReasonPhrase)
-      .WithContent(response.Content)
       .WithContentHeaders(response.Content.Headers)
+      .WithContent(response.Content)
       .ValidateAsync(cancellationToken);
 
     var variableExtractionResult = await VariableExtractor

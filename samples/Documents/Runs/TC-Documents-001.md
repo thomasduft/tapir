@@ -1,6 +1,6 @@
 # TC-Documents-001: Upload and Retrieve Document
 
-- **Date**: 2025-12-09
+- **Date**: 2025-12-10
 - **Author**: thomasduft
 - **Test Priority**: Medium
 - **Module**: Documents
@@ -25,7 +25,7 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 | 01 | Add Document | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/empty.pdf | Document prepared | - |
 | 02 | Set Document Title | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document" | Document prepared | - |
 | 03 | Upload Document | Action=Send Method=POST Endpoint=documents | Request successful | ✅ |
-| 04 | Verify response code | Action=CheckStatusCode Value=201 | 201 | ✅ |
+| 04 | Check response code | Action=CheckStatusCode Value=201 | 201 | ✅ |
 | 05 | Retain DocumentId | Action=StoreVariable JsonPath=$ Name=DocumentId | ID of new document | ✅ |
 
 | Step ID  | Description             | Test Data                                                         | Expected Result        | Actual Result |
@@ -38,7 +38,7 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 | Step ID  | Description             | Test Data                                                         | Expected Result        | Actual Result |
 | -------: | ----------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
 | 21 | Retrieve the document | Action=Send Method=DELETE Endpoint=documents/@@DocumentId@@ | Request successful | ✅ |
-| 22 | Verify response code | Action=CheckStatusCode Value=204 | 204 | ✅ |
+| 22 | Check response code | Action=CheckStatusCode Value=204 | 204 | ✅ |
 
 ## Postcondition
 

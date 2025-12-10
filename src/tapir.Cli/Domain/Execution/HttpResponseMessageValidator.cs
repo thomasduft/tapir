@@ -1,9 +1,12 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Xml;
 
 using Json.Path;
+
+using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli.Domain;
 
@@ -87,6 +90,8 @@ internal class HttpResponseMessageValidator
       return results;
     }
 
+    ConsoleHelper.WriteLineYellow($"- received status code is: {(int)_statusCode}");
+
     // Now validate the status code
     var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);
     results.Add(expectedStatusCode == _statusCode
@@ -109,8 +114,9 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    var expectedReasonPhrase = reasonPhraseInstruction.Value;
+    ConsoleHelper.WriteLineYellow($"- received reason phrase is: {_reasonPhrase}");
 
+    var expectedReasonPhrase = reasonPhraseInstruction.Value;
     return expectedReasonPhrase == _reasonPhrase
       ? [TestStepResult.Success(reasonPhraseInstruction.TestStep)]
       : [TestStepResult.Failed(
@@ -129,8 +135,12 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    var results = new List<TestStepResult>();
+    foreach (var contentHeader in _contentHeaders)
+    {
+      ConsoleHelper.WriteLineYellow($"- received content header is: {contentHeader.Key}={string.Join(",", contentHeader.Value)}");
+    }
 
+    var results = new List<TestStepResult>();
     foreach (var headerInstruction in headerInstructions)
     {
       if (_contentHeaders.TryGetValues(headerInstruction.Name, out var values))
@@ -175,97 +185,105 @@ internal class HttpResponseMessageValidator
     }
 
     var results = new List<TestStepResult>();
-    foreach (var contentInstruction in contentInstructions)
+
+    // Group by ContentType since we can have only one content type per response
+    // and so we can check all instructions of the same content type in one go
+    var groupedByContentType = contentInstructions
+      .GroupBy(i => i.ContentType)
+      .ToList();
+
+    if (groupedByContentType.First().Key == Constants.ContentTypes.Text)
     {
-      if (contentInstruction.ContentType == Constants.ContentTypes.Text)
+      var text = await _content!.ReadAsStringAsync(cancellationToken);
+      if (string.IsNullOrEmpty(text))
       {
-        await CheckForTextContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
+        results.Add(
+          TestStepResult.Failed(
+            contentInstructions.First().TestStep,
+            "Response content is empty."
+          ));
+
+        return results;
       }
-      else if (contentInstruction.ContentType == Constants.ContentTypes.Json)
+
+      ConsoleHelper.WriteLineYellow($"- received content is: {text}");
+      foreach (var group in groupedByContentType)
       {
-        await CheckForJsonContentAsync(
-          contentInstructions,
-          results,
-          contentInstruction,
-          cancellationToken
-        );
+        CheckForTextContentAsync(group.ToList(), text, results);
+      }
+    }
+    else if (groupedByContentType.First().Key == Constants.ContentTypes.Json)
+    {
+      var json = await _content!.ReadAsStringAsync(cancellationToken);
+      if (string.IsNullOrEmpty(json))
+      {
+        results.Add(
+          TestStepResult.Failed(
+            contentInstructions.First().TestStep,
+            "Response content is empty."
+          ));
+
+        return results;
+      }
+
+      ConsoleHelper.WriteLineYellow($"- received content is: {NormalizeJson(json, true)}");
+
+      foreach (var group in groupedByContentType)
+      {
+        CheckForJsonContentAsync(group.ToList(), json, results);
       }
     }
 
     return results;
   }
 
-  private async Task CheckForJsonContentAsync(
+  private void CheckForTextContentAsync(
     List<TestStepInstruction> contentInstructions,
-    List<TestStepResult> results,
-    TestStepInstruction contentInstruction,
-    CancellationToken cancellationToken
+    string text,
+    List<TestStepResult> results
   )
   {
-    var json = await _content!.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(json))
+    foreach (var contentInstruction in contentInstructions)
     {
+      var expectedValue = contentInstruction.Value;
+
       results.Add(
-        TestStepResult.Failed(
-          contentInstructions.First().TestStep,
-          "Response content is empty."
-        ));
-
-      return;
+        expectedValue == text
+          ? TestStepResult.Success(contentInstruction.TestStep)
+          : TestStepResult.Failed(
+            contentInstruction.TestStep,
+            $"Expected content value '{expectedValue}' but was '{text}'."
+          )
+      );
     }
-
-    // see https://docs.json-everything.net/path/basics/
-    var jsonNode = JsonNode.Parse(json);
-    var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
-    var evaluationResults = jsonPath.Evaluate(jsonNode);
-
-    var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
-    var expectedValue = contentInstruction.Value;
-
-    results.Add(
-      expectedValue == actualValue
-        ? TestStepResult.Success(contentInstruction.TestStep)
-        : TestStepResult.Failed(
-          contentInstruction.TestStep,
-          $"Expected content value '{expectedValue}' but was '{actualValue}'."
-        )
-    );
   }
 
-  private async Task CheckForTextContentAsync(
+  private void CheckForJsonContentAsync(
     List<TestStepInstruction> contentInstructions,
-    List<TestStepResult> results,
-    TestStepInstruction contentInstruction,
-    CancellationToken cancellationToken
+    string json,
+    List<TestStepResult> results
   )
   {
-    var text = await _content!.ReadAsStringAsync(cancellationToken);
-    if (string.IsNullOrEmpty(text))
+    // see https://docs.json-everything.net/path/basics/
+    var jsonNode = JsonNode.Parse(json);
+
+    foreach (var contentInstruction in contentInstructions)
     {
+      var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
+      var evaluationResults = jsonPath.Evaluate(jsonNode);
+
+      var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();
+      var expectedValue = contentInstruction.Value;
+
       results.Add(
-        TestStepResult.Failed(
-          contentInstructions.First().TestStep,
-          "Response content is empty."
-        ));
-
-      return;
+        expectedValue == actualValue
+          ? TestStepResult.Success(contentInstruction.TestStep)
+          : TestStepResult.Failed(
+            contentInstruction.TestStep,
+            $"Expected content value '{expectedValue}' but was '{actualValue}'."
+          )
+      );
     }
-
-    var expectedValue = contentInstruction.Value;
-
-    results.Add(
-      expectedValue == text
-        ? TestStepResult.Success(contentInstruction.TestStep)
-        : TestStepResult.Failed(
-          contentInstruction.TestStep,
-          $"Expected content value '{expectedValue}' but was '{text}'."
-        )
-    );
   }
 
   private async Task<IEnumerable<TestStepResult>> VerifyContentAsync(
@@ -387,39 +405,17 @@ internal class HttpResponseMessageValidator
     );
   }
 
-  private static string NormalizeJson(string json)
+  private static string NormalizeJson(string json, bool writeIndented = false)
   {
     try
     {
       var jsonNode = JsonNode.Parse(json);
-      return jsonNode?.ToJsonString() ?? json;
+      return jsonNode?.ToJsonString(new JsonSerializerOptions { WriteIndented = writeIndented }) ?? json;
     }
     catch
     {
       // If parsing fails, return original string
       return json;
-    }
-  }
-
-  private string NormalizeXml(string xml)
-  {
-    try
-    {
-      var xmlDoc = new XmlDocument();
-      xmlDoc.LoadXml(xml);
-      using var stringWriter = new StringWriter();
-      using var xmlTextWriter = XmlWriter.Create(stringWriter, new XmlWriterSettings
-      {
-        OmitXmlDeclaration = true,
-        Indent = false
-      });
-      xmlDoc.Save(xmlTextWriter);
-      return stringWriter.ToString();
-    }
-    catch
-    {
-      // If parsing fails, return original string
-      return xml;
     }
   }
 }

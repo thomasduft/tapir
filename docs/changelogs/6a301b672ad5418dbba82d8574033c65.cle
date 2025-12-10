@@ -1,0 +1,9 @@
+{
+  "Id": "6a301b67-2ad5-418d-bba8-2d8574033c65",
+  "IssueId": "",
+  "Prefix": "Changed",
+  "Tag": "",
+  "Message": "Improved TestCaseCaseFileLocator to return only relevant TestCase files starting from a given directory.",
+  "CreatedAt": "2025-12-10T13:34:59.4216257+00:00",
+  "CreatedBy": "thomasduft"
+}

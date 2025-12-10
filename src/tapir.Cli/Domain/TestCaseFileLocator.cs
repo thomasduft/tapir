@@ -14,9 +14,9 @@ internal static class TestCaseFileLocator
       return [FindFile(directoryPath, testCaseId)];
     }
 
-    // TODO: Make sure that only Test Case files are returned
     return Directory
       .GetFiles(directoryPath, "*.md", SearchOption.AllDirectories)
+      .Where(f => IsValidTestCaseFile(f))
       .OrderBy(f => f)
       .ToArray();
   }
@@ -25,6 +25,11 @@ internal static class TestCaseFileLocator
   {
     foreach (var file in Directory.GetFiles(directory, "*.md", SearchOption.AllDirectories))
     {
+      if (!IsValidTestCaseFile(file))
+      {
+        continue;
+      }
+
       var splittedItems = File
         .ReadAllLines(file!)
         .FirstOrDefault()!
@@ -36,5 +41,34 @@ internal static class TestCaseFileLocator
     }
 
     throw new FileNotFoundException($"TestCase definition for '{testCaseId}' not found!");
+  }
+
+  private static bool IsValidTestCaseFile(string filePath)
+  {
+    try
+    {
+      if (!File.Exists(filePath)) return false;
+
+      var lines = File.ReadLines(filePath).Take(10).ToArray();
+      if (lines.Length < 5) return false;
+
+      // Check if first line contains a colon separator
+      var firstLine = lines[0];
+      if (!firstLine.Contains(':'))
+      {
+        return false;
+      }
+
+      // Check if file contains "**Type**: Definition"
+      var content = string.Join(Environment.NewLine, lines);
+      var hasType = content.Contains("**Type**:", StringComparison.Ordinal);
+      var isOfTypeDefinition = content.Contains("Definition", StringComparison.Ordinal);
+
+      return hasType && isOfTypeDefinition;
+    }
+    catch
+    {
+      return false;
+    }
   }
 }

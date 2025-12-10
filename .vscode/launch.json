@@ -19,7 +19,7 @@
       }
     },
     {
-      "name": "tapir:run:all-users",
+      "name": "tapir:run:all",
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build-tapir",
@@ -28,9 +28,8 @@
         "run",
         "https://localhost:5001",
         "-i",
-        "samples/Users/Definitions",
-        "-o",
-        "samples/Users/Runs",
+        "samples",
+        "--verbose",
         "--continue-on-failure",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"

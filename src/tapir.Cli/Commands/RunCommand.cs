@@ -3,6 +3,8 @@ using System.Diagnostics.Metrics;
 
 using McMaster.Extensions.CommandLineUtils;
 
+using Serilog;
+
 using tomware.Tapir.Cli.Domain;
 using tomware.Tapir.Cli.Utils;
 
@@ -137,14 +139,16 @@ internal class RunCommand : CommandLineApplication
     {
       foreach (var error in validationResult.Errors)
       {
-        ConsoleHelper.WriteLineError(error);
+        Log.Logger.Error("Validation error: {Error}", error);
       }
 
       return await Task.FromResult(1);
     }
 
     // Run the Test Case
-    ConsoleHelper.WriteLineYellow($"Running test case '{testCase.Title}' ({testCase.Id})");
+    Log.Logger.Information("Starting '{TestCaseTitle} ({TestCaseId})'",
+      testCase.Title,
+      testCase.Id);
 
     _stopwatch.Start();
 
@@ -167,7 +171,9 @@ internal class RunCommand : CommandLineApplication
       {
         foreach (var result in executionResult.TestStepResults.Where(r => !r.IsSuccess))
         {
-          ConsoleHelper.WriteLineError($"Test case step '{result.TestStepId}' failed with error: {result.Error}");
+          Log.Logger.Error("Test case step '{TestStepId}' failed with error: {Error}",
+            result.TestStepId,
+            result.Error);
         }
 
         if (!_continueOnFailure.ParsedValue)
@@ -213,14 +219,13 @@ internal class RunCommand : CommandLineApplication
       );
     }
 
-    var message = $"Test case '{testCase.Title} ({testCase.Id})'";
     if (overallSuccess)
     {
-      ConsoleHelper.WriteLineSuccess($"{message} executed successfully.");
+      Log.Logger.Information("'{Title} ({TestCaseId})' executed successfully.", testCase.Title, testCase.Id);
     }
     else
     {
-      ConsoleHelper.WriteLineError($"{message} failed.");
+      Log.Logger.Error("'{Title} ({TestCaseId})' failed.", testCase.Title, testCase.Id);
     }
 
     return overallSuccess ? 0 : 1;

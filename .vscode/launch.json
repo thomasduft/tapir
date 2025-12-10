@@ -53,6 +53,7 @@
         "TC-Users-001",
         "-o",
         "samples/Users/Runs",
+        "--log-verbose",
         "--continue-on-failure",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"
@@ -97,6 +98,7 @@
         "TC-Documents-001",
         "-o",
         "samples/Documents/Runs",
+        "--log-verbose",
         "--continue-on-failure",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"

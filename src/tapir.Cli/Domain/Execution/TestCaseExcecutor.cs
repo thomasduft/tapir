@@ -1,3 +1,5 @@
+using Serilog;
+
 using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli.Domain;
@@ -35,10 +37,15 @@ internal class TestCaseExecutor : ITestCaseExecutor
       .WithDomain(domain)
       .BuildAsync(cancellationToken);
 
-    ConsoleHelper.WriteLineYellow($"- sending request: {requestMessage.RequestUri} ({requestMessage.Method})");
+    Log.Logger.Information("- sending request: {RequestUri} ({Method})",
+      requestMessage.RequestUri,
+      requestMessage.Method);
 
     var response = await client
       .SendAsync(requestMessage, cancellationToken);
+
+    Log.Logger.Information("- received response: {StatusCode}",
+      (int)response.StatusCode);
 
     var responseValidationResult = await HttpResponseMessageValidator
       .Create(instructions)

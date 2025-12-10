@@ -1,7 +1,8 @@
 using McMaster.Extensions.CommandLineUtils;
 
+using Serilog;
+
 using tomware.Tapir.Cli.Domain;
-using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli;
 
@@ -54,13 +55,13 @@ internal class ValidateCommand : CommandLineApplication
     {
       foreach (var error in validationResult.Errors)
       {
-        ConsoleHelper.WriteLineError(error);
+        Log.Logger.Error("Validation error: {Error}", error);
       }
 
       return await Task.FromResult(1);
     }
 
-    ConsoleHelper.WriteLineSuccess($"Test Case '{testCase.Title} ({testCase.Id})' is valid!");
+    Log.Logger.Information("'{TestCaseTitle} ({TestCaseId})' is valid!", testCase.Title, testCase.Id);
 
     return await Task.FromResult(0);
   }

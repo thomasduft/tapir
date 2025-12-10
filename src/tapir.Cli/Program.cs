@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 
+using Serilog;
+
 using tomware.Tapir.Cli;
 using tomware.Tapir.Cli.Domain;
 using tomware.Tapir.Cli.Utils;
@@ -12,6 +14,8 @@ var services = new ServiceCollection()
     .AddCliCommand<RunCommand>()
     .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
     .AddSingleton<Cli>();
+
+Log.Logger = LogHelper.CreateLogger(ref args);
 
 var provider = services.BuildServiceProvider();
 var cli = provider.GetRequiredService<Cli>();

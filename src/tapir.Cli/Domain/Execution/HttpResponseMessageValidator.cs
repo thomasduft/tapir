@@ -2,11 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Xml;
 
 using Json.Path;
 
-using tomware.Tapir.Cli.Utils;
+using Serilog;
 
 namespace tomware.Tapir.Cli.Domain;
 
@@ -90,7 +89,7 @@ internal class HttpResponseMessageValidator
       return results;
     }
 
-    ConsoleHelper.WriteLineYellow($"- received status code is: {(int)_statusCode}");
+    Log.Logger.Verbose("- received status code is: {StatusCode}", (int)_statusCode);
 
     // Now validate the status code
     var expectedStatusCode = (HttpStatusCode)int.Parse(statusCodeInstruction.Value);
@@ -114,7 +113,7 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    ConsoleHelper.WriteLineYellow($"- received reason phrase is: {_reasonPhrase}");
+    Log.Logger.Verbose($"- received reason phrase is: {_reasonPhrase}");
 
     var expectedReasonPhrase = reasonPhraseInstruction.Value;
     return expectedReasonPhrase == _reasonPhrase
@@ -137,7 +136,9 @@ internal class HttpResponseMessageValidator
 
     foreach (var contentHeader in _contentHeaders)
     {
-      ConsoleHelper.WriteLineYellow($"- received content header is: {contentHeader.Key}={string.Join(",", contentHeader.Value)}");
+      Log.Logger.Verbose("- received content header is: {ContentHeaderKey}={ContentHeaderValue}",
+      contentHeader.Key,
+      string.Join(",", contentHeader.Value));
     }
 
     var results = new List<TestStepResult>();
@@ -206,7 +207,8 @@ internal class HttpResponseMessageValidator
         return results;
       }
 
-      ConsoleHelper.WriteLineYellow($"- received content is: {text}");
+      Log.Logger.Verbose("- received content is {Text}", text);
+
       foreach (var group in groupedByContentType)
       {
         CheckForTextContentAsync(group.ToList(), text, results);
@@ -226,7 +228,7 @@ internal class HttpResponseMessageValidator
         return results;
       }
 
-      ConsoleHelper.WriteLineYellow($"- received content is: {NormalizeJson(json, true)}");
+      Log.Logger.Verbose("- received content is: {@Json}", json);
 
       foreach (var group in groupedByContentType)
       {

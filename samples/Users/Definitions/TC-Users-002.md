@@ -39,7 +39,7 @@ In the end, it cleans up by deleting the created user.
 | Step ID  | Description            | Test Data                                           | Expected Result     | Actual Result |
 | -------: | ---------------------- | --------------------------------------------------- | ------------------- | ------------- |
 | 21       | Delete Tom             | Action=Send Method=DELETE Endpoint=users/@@UserId@@ | Request successful  | -             |
-| 22       | Check response code    | Action=CheckStatusCode Value=200                    | 204                 | -             |
+| 22       | Check response code    | Action=CheckStatusCode Value=204                    | 204                 | -             |
 
 ## Postcondition
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.5] - 2025-12-17
+
+### Fixed
+
+- Fixed evaluation of overall test case success status
+
 ## [0.0.4] - 2025-12-10
 
 ### Changed

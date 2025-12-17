@@ -34,8 +34,8 @@ jobs:
         dotnet run --project src/tapir.DevHost/tapir.DevHost.csproj --urls "http://localhost:5000" &
         sleep 10
     - name: Run test case TC-Users-001
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-001 -i "samples/Users/Definitions" -o "samples/Users/Runs"
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-001 -i "samples/Users/Definitions" -o "samples/Users/Runs" --verbose
     - name: Run test case TC-Users-002
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-002 -i "samples/Users/Definitions" -o "samples/Users/Runs"
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-002 -i "samples/Users/Definitions" -o "samples/Users/Runs" --verbose
     - name: Run test case TC-Documents-001
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Documents-001 -i "samples/Documents/Definitions" -o "samples/Documents/Runs"
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Documents-001 -i "samples/Documents/Definitions" -o "samples/Documents/Runs" --verbose

@@ -166,6 +166,8 @@ internal class RunCommand : CommandLineApplication
         cancellationToken
       );
 
+      results.Add(executionResult);
+
       var success = executionResult.TestStepResults.All(r => r.IsSuccess);
       if (!success)
       {
@@ -184,11 +186,10 @@ internal class RunCommand : CommandLineApplication
       }
 
       testCase.AddOrMergeVariables(executionResult.Variables);
-
-      results.Add(executionResult);
     }
 
     _stopwatch.Stop();
+
     var overallSuccess = results.All(r => r.TestStepResults.All(tr => tr.IsSuccess));
 
     TestCaseGauge.Record(1, [

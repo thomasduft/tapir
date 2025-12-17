@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed evaluation of overall test case success status
+- Correct evaluation of overall test case success status
 
 ## [0.0.4] - 2025-12-10
 

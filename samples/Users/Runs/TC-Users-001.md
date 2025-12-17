@@ -1,6 +1,6 @@
 # TC-Users-001: List all Users
 
-- **Date**: 2025-12-10
+- **Date**: 2025-12-17
 - **Author**: thomasduft
 - **Test Priority**: Medium
 - **Module**: Users
@@ -20,16 +20,16 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 
 ## Steps
 
-| Step ID  | Description             | Test Data                                                            | Expected Result        | Actual Result |
-| -------: | ----------------------- | -------------------------------------------------------------------- | ---------------------- | ------------- |
+| Step ID  | Description         | Test Data                                                         | Expected Result        | Actual Result |
+| -------: | ------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
 | 01 | Call users api | Action=Send Method=GET Endpoint=users | Request successful | ✅ |
 | 02 | Check response code | Action=CheckStatusCode Value=200 | 200 | ✅ |
 | 03 | Inspect content | Action=VerifyContent File=samples/Users/Definitions/users.json | Should be identical | ✅ |
 | 04 | Check Alice | Action=CheckContent JsonPath=$[?@.name=="Alice"].name Value=Alice | Content contains Alice | ✅ |
 | 05 | Retain ID of Alice | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | ID of Alice stored | ✅ |
 
-| Step ID  | Description             | Test Data                                                            | Expected Result        | Actual Result |
-| -------: | ----------------------- | -------------------------------------------------------------------- | ---------------------- | ------------- |
+| Step ID  | Description         | Test Data                                                         | Expected Result        | Actual Result |
+| -------: | ------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
 | 11 | Get Alice details | Action=Send Method=GET Endpoint=users/@@AliceId@@ | Request successful | ✅ |
 | 12 | Check response code | Action=CheckStatusCode Value=200 | 200 | ✅ |
 | 13 | Inspect content | Action=VerifyContent File=samples/Users/Definitions/alice.json | Should be identical | ✅ |

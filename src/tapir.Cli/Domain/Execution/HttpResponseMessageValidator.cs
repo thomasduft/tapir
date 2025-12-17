@@ -113,7 +113,7 @@ internal class HttpResponseMessageValidator
       return [];
     }
 
-    Log.Logger.Verbose($"- received reason phrase is: {_reasonPhrase}");
+    Log.Logger.Verbose($"  - received reason phrase is: {_reasonPhrase}");
 
     var expectedReasonPhrase = reasonPhraseInstruction.Value;
     return expectedReasonPhrase == _reasonPhrase
@@ -136,7 +136,7 @@ internal class HttpResponseMessageValidator
 
     foreach (var contentHeader in _contentHeaders)
     {
-      Log.Logger.Verbose("- received content header is: {ContentHeaderKey}={ContentHeaderValue}",
+      Log.Logger.Verbose("  - received content header is: {ContentHeaderKey}={ContentHeaderValue}",
       contentHeader.Key,
       string.Join(",", contentHeader.Value));
     }
@@ -207,7 +207,7 @@ internal class HttpResponseMessageValidator
         return results;
       }
 
-      Log.Logger.Verbose("- received content is {Text}", text);
+      Log.Logger.Verbose("  - received content is {Text}", text);
 
       foreach (var group in groupedByContentType)
       {
@@ -228,7 +228,7 @@ internal class HttpResponseMessageValidator
         return results;
       }
 
-      Log.Logger.Verbose("- received content is: {@Json}", json);
+      Log.Logger.Verbose("  - received content is: {@Json}", json);
 
       foreach (var group in groupedByContentType)
       {

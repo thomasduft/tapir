@@ -11,7 +11,7 @@ A command-line tool for managing and executing automated API test cases.
 
 ### Why tapir?
 
-Traditional API testing tools like Postman and Insomnia are great, but they often fall short when it comes to:
+Traditional API testing tools like [Postman](https://www.postman.com/) and [Insomnia](https://insomnia.rest/) are great, but they often fall short when it comes to:
 - **Integration with development workflows** - They're standalone applications that don't fit naturally into your CI/CD pipeline
 - **Complete test scenarios** - Most tools execute one request at a time, making it cumbersome to test multi-step workflows
 - **Version control & documentation** - Test collections aren't always easy to review, version, or document alongside your code
@@ -19,7 +19,7 @@ Traditional API testing tools like Postman and Insomnia are great, but they ofte
 `tapir` solves these problems by using **Markdown-based test cases** that are:
 - ✅ Human-readable and self-documenting
 - ✅ Easy to version control alongside your code
-- ✅ Simple to run from the command line or CI/CD pipelines
+- ✅ Simple to run from the command line or CI/CD pipelines => it's just a CLI - dotnet global - tool
 - ✅ Capable of executing complete multi-step test scenarios
 
 ### Key Features
@@ -29,10 +29,6 @@ Traditional API testing tools like Postman and Insomnia are great, but they ofte
 - 🔍 **Smart Validation** - Verify status codes, response content, and JSON values using JsonPath expressions
 - 💾 **Variable Storage** - Extract and reuse data between test steps (e.g., retrieve an ID from one endpoint and use it in another)
 - 📊 **Clear Results** - Get detailed test execution reports showing exactly what passed or failed
-
-## Maintainers
-
-- Thomas Duft
 
 ## Quick Example
 

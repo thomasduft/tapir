@@ -36,7 +36,7 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 
 | Step ID  | Description             | Test Data                                                         | Expected Result        | Actual Result |
 | -------: | ----------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
-| 21       | Retrieve the document   | Action=Send Method=DELETE Endpoint=documents/@@DocumentId@@       | Request successful     | -             |
+| 21       | Delete the document     | Action=Send Method=DELETE Endpoint=documents/@@DocumentId@@       | Request successful     | -             |
 | 22       | Check response code     | Action=CheckStatusCode Value=204                                  | 204                    | -             |
 
 ## Postcondition

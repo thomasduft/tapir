@@ -30,7 +30,7 @@ internal class TestCaseExecutor : ITestCaseExecutor
     CancellationToken cancellationToken
   )
   {
-    using var client = _factory.CreateClient();
+    using var client = _factory.CreateClient(Constants.HttpClientName);
 
     var requestMessage = await HttpRequestMessageBuilder
       .Create(instructions)

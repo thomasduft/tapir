@@ -3,6 +3,7 @@ namespace tomware.Tapir.Cli.Domain;
 internal static class Constants
 {
   public const string VariablePreAndSuffix = "@@";
+  public const string HttpClientName = "TapirHttpClient";
 
   internal static class TestCaseType
   {

@@ -7,11 +7,10 @@ using tomware.Tapir.Cli.Domain;
 using tomware.Tapir.Cli.Utils;
 
 var services = new ServiceCollection()
-    .AddHttpClient()
     .AddCliCommand<ManCommand>()
     .AddCliCommand<NewTestCaseCommand>()
     .AddCliCommand<ValidateCommand>().WithValidation()
-    .AddCliCommand<RunCommand>()
+    .AddCliCommand<RunCommand>().WithExecution()
     .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
     .AddSingleton<Cli>();
 

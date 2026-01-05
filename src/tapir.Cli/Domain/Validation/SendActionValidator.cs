@@ -9,6 +9,7 @@ internal class SendActionValidator : IValidator
   public IEnumerable<string> SupportedProperties =>
   [
     nameof(TestStepInstruction.Method) + $": The HTTP method to use (e.g. {string.Join(", ", _validMethods)})",
+    nameof(TestStepInstruction.Domain) + ": The domain to send the request to (will override the global domain and be prepended to the endpoint)",
     nameof(TestStepInstruction.Endpoint) + ": The endpoint to send the request to"
   ];
 

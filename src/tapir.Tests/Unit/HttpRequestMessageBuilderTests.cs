@@ -148,6 +148,30 @@ public class HttpRequestMessageBuilderTests
     Assert.Equal(new Uri("https://example.com/api/users"), request.RequestUri);
   }
 
+  [Fact]
+  public async Task BuildAsync_WithOverridenDomainAndEndpoint_SetsCorrectRequestUri()
+  {
+    // Arrange
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "GET",
+        Endpoint = "api/users",
+        Domain = "https://override.com"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.Equal(new Uri("https://override.com/api/users"), request.RequestUri);
+  }
+
   #endregion
 
   #region Header Tests

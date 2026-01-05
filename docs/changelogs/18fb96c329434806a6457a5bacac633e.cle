@@ -1,0 +1,9 @@
+{
+  "Id": "18fb96c3-2943-4806-a645-7a5bacac633e",
+  "IssueId": "",
+  "Prefix": "Added",
+  "Tag": "",
+  "Message": "Added support for overriding a Domain in \u0060Send\u0060-Action (use \u0060Domain\u0060-property)",
+  "CreatedAt": "2026-01-05T09:52:29.7290263+01:00",
+  "CreatedBy": "Thomas Duft"
+}

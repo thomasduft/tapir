@@ -13,6 +13,11 @@ internal class TestStepInstruction
   public string JsonPath { get; set; } = string.Empty;
   public string Method { get; set; } = "GET";
   public string Endpoint { get; set; } = string.Empty;
+
+  /// <summary>
+  /// The domain to send the request to. Will override the global domain and be prepended to the endpoint.
+  /// </summary>
+  public string Domain { get; set; } = string.Empty;
   public string ContentType { get; set; } = Constants.ContentTypes.Json;
 
   public TestStep TestStep => _step;
@@ -56,6 +61,9 @@ internal class TestStepInstruction
           break;
         case nameof(Endpoint):
           instruction.Endpoint = ReplaceVariables(parameter.Value, variables);
+          break;
+        case nameof(Domain):
+          instruction.Domain = parameter.Value;
           break;
         case nameof(ContentType):
           instruction.ContentType = parameter.Value;

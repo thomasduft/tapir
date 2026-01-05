@@ -23,6 +23,7 @@ public class TestStepInstructionTests
     Assert.Equal(string.Empty, instruction.JsonPath);
     Assert.Equal("GET", instruction.Method);
     Assert.Equal(string.Empty, instruction.Endpoint);
+    Assert.Equal(string.Empty, instruction.Domain);
     Assert.Equal(Constants.ContentTypes.Json, instruction.ContentType);
     Assert.Equal(step, instruction.TestStep);
   }
@@ -194,6 +195,24 @@ public class TestStepInstructionTests
 
     // Assert
     Assert.Equal("api/users", instruction.Endpoint);
+  }
+
+  [Fact]
+  public void FromTestStep_WithDomainParameter_ParsesDomainCorrectly()
+  {
+    // Arrange
+    var step = new TestStep
+    {
+      Id = 1,
+      TestData = "Action=Send Domain=https://example.com"
+    };
+    var variables = new Dictionary<string, string>();
+
+    // Act
+    var instruction = TestStepInstruction.FromTestStep(step, variables);
+
+    // Assert
+    Assert.Equal("https://example.com", instruction.Domain);
   }
 
   [Fact]

@@ -160,6 +160,10 @@ internal class HttpRequestMessageBuilder
     var endpointInstruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.Send)
         ?? throw new InvalidOperationException("No Send instruction found to set Endpoint.");
+
+    var domain = !string.IsNullOrEmpty(endpointInstruction.Domain)
+      ? endpointInstruction.Domain
+      : _domain;
     var endpoint = endpointInstruction.Endpoint;
 
     var queryParameterInstructions = _instructions
@@ -172,10 +176,10 @@ internal class HttpRequestMessageBuilder
         .Select(i => $"{Uri.EscapeDataString(i.Name!)}={Uri.EscapeDataString(i.Value!)}")
     );
 
-    var domain = !string.IsNullOrEmpty(queryString)
-      ? $"{_domain}/{endpoint}?{queryString}"
-      : $"{_domain}/{endpoint}";
+    var uriString = !string.IsNullOrEmpty(queryString)
+      ? $"{domain}/{endpoint}?{queryString}"
+      : $"{domain}/{endpoint}";
 
-    request.RequestUri = new Uri(domain);
+    request.RequestUri = new Uri(uriString);
   }
 }

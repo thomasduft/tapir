@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.7] - 2026-01-05
+
+### Removed
+
+- Removed unused dependencies
+
 ## [0.0.6] - 2026-01-05
 
 ### Added

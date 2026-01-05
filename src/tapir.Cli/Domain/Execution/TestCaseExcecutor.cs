@@ -1,7 +1,5 @@
 using Serilog;
 
-using tomware.Tapir.Cli.Utils;
-
 namespace tomware.Tapir.Cli.Domain;
 
 internal interface ITestCaseExecutor

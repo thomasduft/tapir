@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.6] - 2026-01-05
+
+### Added
+
+- Added support for overriding a Domain in `Send`-Action (use `Domain`-property)
+
 ## [0.0.5] - 2025-12-17
 
 ### Fixed

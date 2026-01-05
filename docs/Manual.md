@@ -42,6 +42,7 @@ Parsed representation of a test step's test data.
 - `Action`: The action to perform (Send, AddHeader, CheckContent, etc.)
 - `Method`: HTTP method (GET, POST, PUT, DELETE, PATCH)
 - `Endpoint`: API endpoint path
+- `Domain`: The domain to send the request to (will override the global domain and be prepended to the endpoint)
 - `Name`: Header/parameter name
 - `Value`: Header/parameter/content value
 - `File`: File path for content or verification
@@ -203,6 +204,7 @@ Sends an HTTP request.
 
 **Supported Properties:**
 - Method: The HTTP method to use (e.g. GET, POST, PUT, DELETE, PATCH)
+- Domain: The domain to send the request to (will override the global domain and be prepended to the endpoint)
 - Endpoint: The endpoint to send the request to
 
 ### StoreVariable

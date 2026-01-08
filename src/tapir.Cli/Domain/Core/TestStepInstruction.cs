@@ -63,7 +63,7 @@ internal class TestStepInstruction
           instruction.Endpoint = ReplaceVariables(parameter.Value, variables);
           break;
         case nameof(Domain):
-          instruction.Domain = parameter.Value;
+          instruction.Domain = ReplaceVariables(parameter.Value, variables);
           break;
         case nameof(ContentType):
           instruction.ContentType = parameter.Value;

@@ -322,6 +322,27 @@ public class TestStepInstructionTests
   }
 
   [Fact]
+  public void FromTestStep_WithVariableInDomain_ReplacesVariable()
+  {
+    // Arrange
+    var step = new TestStep
+    {
+      Id = 1,
+      TestData = "Action=Send Domain=@@DomainName@@"
+    };
+    var variables = new Dictionary<string, string>
+    {
+      { "DomainName", "https://example.com" }
+    };
+
+    // Act
+    var instruction = TestStepInstruction.FromTestStep(step, variables);
+
+    // Assert
+    Assert.Equal("https://example.com", instruction.Domain);
+  }
+
+  [Fact]
   public void FromTestStep_WithMultipleVariablesInValue_ReplacesAllVariables()
   {
     // Arrange

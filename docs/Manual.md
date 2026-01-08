@@ -90,6 +90,7 @@ Variables are replaced in:
 - `Value` fields
 - `Endpoint` fields
 - `JsonPath` expressions
+- `Domain` fields
 
 #### Variable Storage
 

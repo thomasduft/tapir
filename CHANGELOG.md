@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added support for variables on `Domain`-fields 
+- Added support for variables on `Domain`-fields
 
 ## [0.0.7] - 2026-01-05
 
@@ -28,7 +28,7 @@
 
 ### Changed
 
-- Improved TestCaseCaseFileLocator to return only relevant TestCase files starting from a given directory.
+- Improved TestCaseCaseFileLocator to return only relevant TestCase files starting from a given directory
 
 ## [0.0.3] - 2025-12-10
 

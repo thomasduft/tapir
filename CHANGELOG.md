@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.8] - 2026-01-21
+
+### Added
+
+- Added support for variables on `Domain`-fields 
+
 ## [0.0.7] - 2026-01-05
 
 ### Removed

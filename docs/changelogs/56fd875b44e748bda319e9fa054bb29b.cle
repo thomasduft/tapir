@@ -1,9 +1,0 @@
-{
-  "Id": "56fd875b-44e7-48bd-a319-e9fa054bb29b",
-  "IssueId": "",
-  "Prefix": "Added",
-  "Tag": "",
-  "Message": "Added support for variables on \u0060Domain\u0060-fields ",
-  "CreatedAt": "2026-01-08T09:19:03.6059764+01:00",
-  "CreatedBy": "Thomas Duft"
-}

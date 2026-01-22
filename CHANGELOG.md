@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.9] - 2026-01-22
+
+### Fixed
+
+- Properly passing variables from the command-line
+
 ## [0.0.8] - 2026-01-21
 
 ### Added

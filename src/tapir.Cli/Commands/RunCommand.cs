@@ -131,7 +131,7 @@ internal class RunCommand : CommandLineApplication
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
     testCase
       .WithDomain(domain)
-      .WithVariables(VariablesHelper.CreateDummyVariables(testCase.Tables.SelectMany(t => t.Steps)));
+      .WithVariables(VariablesHelper.CreateVariables(_variables.ParsedValues));
 
     // Validate the Test Case definition
     var validationResult = await _testCaseValidator.ValidateAsync(testCase, cancellationToken);

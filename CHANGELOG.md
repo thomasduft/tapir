@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.10] - 2026-01-22
+
+### Fixed
+
+- Validates the test case before running it and applies variables from the command-line correctly
+
 ## [0.0.9] - 2026-01-22
 
 ### Fixed

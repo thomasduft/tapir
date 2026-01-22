@@ -18,7 +18,7 @@ internal static class VariablesHelper
       .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim());
   }
 
-  internal static Dictionary<string, string> CreateDummyVariables(IEnumerable<TestStep> steps)
+  internal static Dictionary<string, string> AssignDummyVariables(IEnumerable<TestStep> steps)
   {
     // For each test step data that contains a variable starting with an
     // @@ sign, create a dummy variable

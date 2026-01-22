@@ -46,7 +46,7 @@ internal class ValidateCommand : CommandLineApplication
     // 2. Read the Test Case definition
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
     testCase.WithVariables(
-      VariablesHelper.CreateDummyVariables(testCase.Tables.SelectMany(t => t.Steps))
+      VariablesHelper.AssignDummyVariables(testCase.Tables.SelectMany(t => t.Steps))
     );
 
     // 3. Validate the Test Case definition

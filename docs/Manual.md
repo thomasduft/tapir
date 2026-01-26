@@ -14,6 +14,7 @@ With `tapir` you can create, organize, and run tests for your APIs, ensuring the
 Represents a complete test case with metadata and test steps.
 
 **Key Properties:**
+
 - `Id`: Unique identifier (e.g., TC-Users-001)
 - `Title`: Human-readable test case title
 - `Module`: Logical grouping/module name
@@ -28,6 +29,7 @@ Represents a complete test case with metadata and test steps.
 Represents a single step in a test case.
 
 **Key Properties:**
+
 - `Id`: Sequential step number
 - `Description`: Human-readable description
 - `TestData`: Configuration data (Action=Send Method=GET Endpoint=users)
@@ -39,6 +41,7 @@ Represents a single step in a test case.
 Parsed representation of a test step's test data.
 
 **Supported Parameters:**
+
 - `Action`: The action to perform (Send, AddHeader, CheckContent, etc.)
 - `Method`: HTTP method (GET, POST, PUT, DELETE, PATCH)
 - `Endpoint`: API endpoint path
@@ -52,21 +55,25 @@ Parsed representation of a test step's test data.
 ### Available Commands
 
 **1. new** - Create a new test case definition
+
 ```bash
 tapir new TC-Example-001 "My Test Title"
 ```
 
 **2. validate** - Validate test case syntax
+
 ```bash
 tapir validate TC-Example-001 -i ./tests
 ```
 
 **3. run** - Execute test cases
+
 ```bash
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
 **4. man** - Display action reference
+
 ```bash
 tapir man
 ```
@@ -87,6 +94,7 @@ Variables use the `@@VariableName@@` syntax:
 #### Variable Substitution
 
 Variables are replaced in:
+
 - `Value` fields
 - `Endpoint` fields
 - `JsonPath` expressions
@@ -95,6 +103,7 @@ Variables are replaced in:
 #### Variable Storage
 
 Variables are stored using the `StoreVariable` action:
+
 - Extract from JSON responses using JsonPath
 - Store with a named key
 - Available for all subsequent steps in the test case
@@ -134,6 +143,7 @@ Detailed description of what the test validates.
 tapir includes OpenTelemetry instrumentation for monitoring test execution.
 
 #### Enable OTLP Export
+
 ```bash
 tapir run https://api.example.com -tc TC-Example-001 --otel-endpoint http://localhost:4317
 ```
@@ -147,6 +157,7 @@ tapir run https://api.example.com -tc TC-Example-001 --otel-endpoint http://loca
 Adds content to the HTTP request.
 
 **Supported Properties:**
+
 - ContentType: Content type (e.g., text/plain, application/json, multipart/form-data)
 - File: Path to the content file
 - Name: Name for multipart/form-data content
@@ -157,6 +168,7 @@ Adds content to the HTTP request.
 Adds headers to the HTTP request.
 
 **Supported Properties:**
+
 - Name: The name of the header
 - Value: The value of the header
 
@@ -165,6 +177,7 @@ Adds headers to the HTTP request.
 Adds query parameters to the HTTP request.
 
 **Supported Properties:**
+
 - Name: The name of the query parameter
 - Value: The value of the query parameter
 
@@ -173,6 +186,7 @@ Adds query parameters to the HTTP request.
 Checks content in the HTTP response.
 
 **Supported Properties:**
+
 - ContentType: Content type (e.g., text/plain, application/json)
 - JsonPath: JSON path to the content to check
 - Value: The content value to check
@@ -182,6 +196,7 @@ Checks content in the HTTP response.
 Checks headers in the HTTP response.
 
 **Supported Properties:**
+
 - Name: The name of the header to check
 - Value: The value of the header to check
 
@@ -190,6 +205,7 @@ Checks headers in the HTTP response.
 Checks the reason phrase in the HTTP response.
 
 **Supported Properties:**
+
 - Value: The reason phrase to check
 
 ### CheckStatusCode
@@ -197,13 +213,19 @@ Checks the reason phrase in the HTTP response.
 Checks the status code in the HTTP response.
 
 **Supported Properties:**
+
 - Value: The status code to check
+
+### LogResponseContent
+
+Logs the HTTP response content.
 
 ### Send
 
 Sends an HTTP request.
 
 **Supported Properties:**
+
 - Method: The HTTP method to use (e.g. GET, POST, PUT, DELETE, PATCH)
 - Domain: The domain to send the request to (will override the global domain and be prepended to the endpoint)
 - Endpoint: The endpoint to send the request to
@@ -213,6 +235,7 @@ Sends an HTTP request.
 Stores a variable from the HTTP response. Enables request chaining.
 
 **Supported Properties:**
+
 - Name: The name of the variable to store
 - JsonPath: The JSON path to the variable to store
 
@@ -221,5 +244,6 @@ Stores a variable from the HTTP response. Enables request chaining.
 Verifies content in the HTTP response.
 
 **Supported Properties:**
+
 - File: The file path to the content to verify
 - Value: The content value to verify

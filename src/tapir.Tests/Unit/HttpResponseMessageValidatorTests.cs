@@ -256,6 +256,31 @@ public class HttpResponseMessageValidatorTests
 
   #endregion
 
+  #region LogResponseContent Tests
+
+  [Fact]
+  public async Task ValidateAsync_WithLogResponseContentInstruction_ShouldLogContentAndReturnSuccess()
+  {
+    // Arrange
+    var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+    var logContentInstruction = CreateTestStepInstruction(2, Constants.Actions.LogResponseContent);
+    var instructions = new[] { sendInstruction, logContentInstruction };
+    var jsonContent = new StringContent("{\"message\":\"Hello, World!\"}", Encoding.UTF8, "application/json");
+    var validator = HttpResponseMessageValidator.Create(instructions)
+      .WithStatusCode(HttpStatusCode.OK)
+      .WithContent(jsonContent);
+
+    // Act
+    var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+    // Assert
+    var logResult = results.FirstOrDefault(r => r.TestStepId == 2);
+    Assert.NotNull(logResult);
+    Assert.True(logResult.IsSuccess);
+  }
+
+  #endregion
+
   #region CheckContent Tests
 
   [Fact]

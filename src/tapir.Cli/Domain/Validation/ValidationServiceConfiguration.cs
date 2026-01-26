@@ -12,6 +12,7 @@ internal static class ValidationServiceConfiguration
       .RegisterValidator<AddQueryParameterActionValidator>()
       .RegisterValidator<AddContentActionValidator>()
       .RegisterValidator<SendActionValidator>()
+      .RegisterValidator<LogResponseContentValidator>()
       .RegisterValidator<CheckStatusCodeActionValidator>()
       .RegisterValidator<CheckReasonPhraseActionValidator>()
       .RegisterValidator<CheckContentActionValidator>()

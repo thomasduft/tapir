@@ -146,8 +146,9 @@ tapir run https://api.example.com -tc TC-Example-001 --otel-endpoint http://loca
 
 {{ action.Description }}
 
-**Supported Properties:**
+{% if action.SupportedProperties.size > 0 %}**Supported Properties:**
 {%- for property in action.SupportedProperties %}
 - {{ property }}
 {%- endfor %}
-{% endfor %}
+{% endif %}
+{%- endfor %}

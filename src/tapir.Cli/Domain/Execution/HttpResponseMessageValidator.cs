@@ -66,6 +66,7 @@ internal class HttpResponseMessageValidator
     results.AddRange(CheckStatusCode());
     results.AddRange(CheckReasonPhrase());
     results.AddRange(CheckContentHeaders());
+    results.AddRange(await LogResponseContentAsync(cancellationToken));
     results.AddRange(await VerifyContentAsync(cancellationToken));
     results.AddRange(await CheckContentAsync(cancellationToken));
 
@@ -286,6 +287,35 @@ internal class HttpResponseMessageValidator
           )
       );
     }
+  }
+
+  private async Task<IEnumerable<TestStepResult>> LogResponseContentAsync(
+    CancellationToken cancellationToken
+  )
+  {
+    var contentInstructions = _instructions
+      .Where(i => i.Action == Constants.Actions.LogResponseContent)
+      .ToList();
+    if (!contentInstructions.Any() || _content == null)
+    {
+      // It's okay if there's no content to check
+      return [];
+    }
+
+    var results = new List<TestStepResult>();
+    foreach (var contentInstruction in contentInstructions)
+    {
+      if (contentInstruction.ContentType == Constants.ContentTypes.Text
+        || contentInstruction.ContentType == Constants.ContentTypes.Json)
+      {
+        var contentString = await _content!.ReadAsStringAsync(cancellationToken);
+        Log.Logger.Information("  - received content: {ContentString}", contentString);
+
+        results.Add(TestStepResult.Success(contentInstruction.TestStep));
+      }
+    }
+
+    return results;
   }
 
   private async Task<IEnumerable<TestStepResult>> VerifyContentAsync(

@@ -309,7 +309,7 @@ internal class HttpResponseMessageValidator
         || contentInstruction.ContentType == Constants.ContentTypes.Json)
       {
         var contentString = await _content!.ReadAsStringAsync(cancellationToken);
-        Log.Logger.Information("  - received content: {ContentString}", contentString);
+        Log.Logger.Information("  - received content is: {ContentString}", contentString);
 
         results.Add(TestStepResult.Success(contentInstruction.TestStep));
       }

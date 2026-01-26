@@ -1,0 +1,9 @@
+{
+  "Id": "ee0719c4-c1d8-4229-80bb-684962ef6cd0",
+  "IssueId": "",
+  "Prefix": "Added",
+  "Tag": "",
+  "Message": "Supports logging the response content (see LogResponseContent action)",
+  "CreatedAt": "2026-01-26T12:06:29.9343979+01:00",
+  "CreatedBy": "Thomas Duft"
+}

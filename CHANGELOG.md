@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.11] - 2026-01-26
+
+### Added
+
+- Supports logging the response content (see LogResponseContent action)
+
 ## [0.0.10] - 2026-01-22
 
 ### Fixed

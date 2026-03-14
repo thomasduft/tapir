@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.12] - 2026-03-14
+
+### Changed
+
+- Runs now are stored beneath a subdirectory with the following naming convention `Runs/yyyy-MM-dd/...`
+
 ## [0.0.11] - 2026-01-26
 
 ### Added

@@ -19,25 +19,25 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 
 ## Steps
 
-| Step ID  | Description             | Test Data                                                                                                                | Expected Result    | Actual Result |
-| -------: | ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------ | ------------- |
-| 01       | Add Document            | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/empty.pdf | Document prepared  | -             |
-| 02       | Set Document Title      | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                                       | Document prepared  | -             |
-| 03       | Upload Document         | Action=Send Method=POST Endpoint=documents                                                                               | Request successful | -             |
-| 04       | Check response code     | Action=CheckStatusCode Value=201                                                                                         | 201                | -             |
-| 05       | Retain DocumentId       | Action=StoreVariable JsonPath=$ Name=DocumentId                                                                          | ID of new document | -             |
+| Step ID  | Description             | Expected Result    | Test Data                                                                                                                | Actual Result |
+| -------: | ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| 01       | Add Document            | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/empty.pdf | -             |
+| 02       | Set Document Title      | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                                       | -             |
+| 03       | Upload Document         | Request successful | Action=Send Method=POST Endpoint=documents                                                                               | -             |
+| 04       | Check response code     | 201                | Action=CheckStatusCode Value=201                                                                                         | -             |
+| 05       | Retain DocumentId       | ID of new document | Action=StoreVariable JsonPath=$ Name=DocumentId                                                                          | -             |
 
-| Step ID  | Description             | Test Data                                                         | Expected Result        | Actual Result |
-| -------: | ----------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
-| 11       | Retrieve the document   | Action=Send Method=GET Endpoint=documents/@@DocumentId@@/download | Request successful     | -             |
-| 12       | Verify response code    | Action=CheckStatusCode Value=200                                  | 200                    | -             |
-| 13       | Check Headers           | Action=CheckContentHeader Name=Content-Type Value=application/pdf | Header is present      | -             |
-| 14       | Check Headers           | Action=CheckContentHeader Name=Content-Length Value=12959         | Header is present      | -             |
+| Step ID  | Description             | Expected Result        | Test Data                                                         | Actual Result |
+| -------: | ----------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |
+| 11       | Retrieve the document   | Request successful     | Action=Send Method=GET Endpoint=documents/@@DocumentId@@/download | -             |
+| 12       | Verify response code    | 200                    | Action=CheckStatusCode Value=200                                  | -             |
+| 13       | Check Headers           | Header is present      | Action=CheckContentHeader Name=Content-Type Value=application/pdf | -             |
+| 14       | Check Headers           | Header is present      | Action=CheckContentHeader Name=Content-Length Value=12959         | -             |
 
-| Step ID  | Description             | Test Data                                                         | Expected Result        | Actual Result |
-| -------: | ----------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
-| 21       | Delete the document     | Action=Send Method=DELETE Endpoint=documents/@@DocumentId@@       | Request successful     | -             |
-| 22       | Check response code     | Action=CheckStatusCode Value=204                                  | 204                    | -             |
+| Step ID  | Description             | Expected Result        | Test Data                                                         | Actual Result |
+| -------: | ----------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |
+| 21       | Delete the document     | Request successful     | Action=Send Method=DELETE Endpoint=documents/@@DocumentId@@       | -             |
+| 22       | Check response code     | 204                    | Action=CheckStatusCode Value=204                                  | -             |
 
 ## Postcondition
 

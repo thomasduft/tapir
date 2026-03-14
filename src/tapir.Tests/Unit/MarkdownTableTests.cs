@@ -633,4 +633,60 @@ Some postcondition text.
     Assert.Single(tableSections);
     Assert.Contains("Last table", tableSections[0]);
   }
+
+  [Fact]
+  public void ParseTestSteps_WithReorderedColumns_TestDataAtLastPosition_ShouldParseCorrectly()
+  {
+    // Arrange – Test Data is the last column (after Actual Result)
+    var markdown = @"
+| Step ID | Description   | Expected Result | Actual Result | Test Data  |
+| ------: | ------------- | --------------- | ------------- | ---------- |
+| 1       | First step    | Expected 1      | -             | Data 1     |
+| 2       | Second step   | Expected 2      | ✅            | Data 2     |
+";
+    var table = new MarkdownTable(markdown);
+
+    // Act
+    var testSteps = table.ParseTestSteps().ToList();
+
+    // Assert
+    Assert.Equal(2, testSteps.Count);
+
+    Assert.Equal(1, testSteps[0].Id);
+    Assert.Equal("First step", testSteps[0].Description);
+    Assert.Equal("Data 1", testSteps[0].TestData);
+    Assert.Equal("Expected 1", testSteps[0].ExpectedResult);
+    Assert.False(testSteps[0].IsSuccess);
+
+    Assert.Equal(2, testSteps[1].Id);
+    Assert.Equal("Second step", testSteps[1].Description);
+    Assert.Equal("Data 2", testSteps[1].TestData);
+    Assert.Equal("Expected 2", testSteps[1].ExpectedResult);
+    Assert.True(testSteps[1].IsSuccess);
+  }
+
+  [Fact]
+  public void UpdateTestStepsWithResults_WithReorderedColumns_ShouldUpdateCorrectColumn()
+  {
+    // Arrange – Actual Result is between Expected Result and Test Data
+    var markdown = @"
+| Step ID | Description | Expected Result | Actual Result | Test Data |
+| ------: | ----------- | --------------- | ------------- | --------- |
+| 1       | Step one    | Result 1        | -             | Data 1    |
+| 2       | Step two    | Result 2        | -             | Data 2    |
+";
+    var table = new MarkdownTable(markdown);
+    var testResults = new List<TestStepResult>
+    {
+      TestStepResult.Success(new TestStep { Id = 1 }),
+      TestStepResult.Failed(new TestStep { Id = 2 }, "Mismatch")
+    };
+
+    // Act
+    var updatedMarkdown = table.UpdateTestStepsWithResults(testResults);
+
+    // Assert – Actual Result column (index 3) must be updated; Test Data (index 4) must be untouched
+    Assert.Contains("| 1 | Step one | Result 1 | ✅ | Data 1 |", updatedMarkdown);
+    Assert.Contains("| 2 | Step two | Result 2 | ❌ Mismatch | Data 2 |", updatedMarkdown);
+  }
 }

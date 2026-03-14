@@ -15,6 +15,16 @@ internal class MarkdownTable
     _content = content;
   }
 
+  // Holds the column index of each logical field as determined by the header row.
+  // ActualResult may be -1 if no "Actual Result" column exists in the header.
+  private record ColumnIndices(
+    int StepId,
+    int Description,
+    int TestData,
+    int ExpectedResult,
+    int ActualResult
+  );
+
   /// <summary>
   /// Parses test steps from markdown tables.
   /// Expected table format:
@@ -34,11 +44,22 @@ internal class MarkdownTable
       return testSteps;
     }
 
-    // Parse the table rows
+    // Determine column positions from the header row
+    var headerLine = stepsSection
+      .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+      .FirstOrDefault(l => l.Trim().StartsWith("|") && l.Trim().EndsWith("|"));
+    if (headerLine == null)
+      return testSteps;
+
+    var columnIndices = ParseColumnIndices(headerLine.Trim());
+    if (columnIndices == null)
+      return testSteps;
+
+    // Parse the table rows using detected column positions
     var tableRows = ExtractTableRows(stepsSection);
     foreach (var row in tableRows)
     {
-      var testStep = ParseTableRow(row);
+      var testStep = ParseTableRow(row, columnIndices);
       if (testStep != null)
       {
         testSteps.Add(testStep);
@@ -113,6 +134,7 @@ internal class MarkdownTable
   {
     var lines = _content.Split('\n');
     var inTable = false;
+    ColumnIndices? columnIndices = null;
 
     // Process all tables in the document
     for (int i = 0; i < lines.Length; i++)
@@ -124,11 +146,12 @@ internal class MarkdownTable
         if (!inTable && IsValidStepsTableHeader(line))
         {
           inTable = true;
+          columnIndices = ParseColumnIndices(line);
         }
-        else if (inTable && !IsSeparatorRow(line))
+        else if (inTable && !IsSeparatorRow(line) && columnIndices != null)
         {
           // This is a data row in our table
-          var updatedRow = UpdateTableRowWithResults(line, testResults);
+          var updatedRow = UpdateTableRowWithResults(line, testResults, columnIndices);
           lines[i] = updatedRow;
         }
       }
@@ -136,6 +159,7 @@ internal class MarkdownTable
       {
         // End of current table, continue looking for more tables
         inTable = false;
+        columnIndices = null;
       }
     }
 
@@ -193,6 +217,27 @@ internal class MarkdownTable
            (normalizedHeader.Contains("test data") || normalizedHeader.Contains("testdata"));
   }
 
+  private static ColumnIndices? ParseColumnIndices(string headerLine)
+  {
+    var cells = ParseTableCells(headerLine);
+    int stepId = -1, description = -1, testData = -1, expectedResult = -1, actualResult = -1;
+
+    for (int i = 0; i < cells.Count; i++)
+    {
+      var cell = cells[i].Trim().ToLowerInvariant();
+      if (cell.Contains("step")) stepId = i;
+      if (cell.Contains("description")) description = i;
+      if (cell.Contains("test data") || cell.Contains("testdata")) testData = i;
+      if (cell.Contains("expected")) expectedResult = i;
+      if (cell.Contains("actual")) actualResult = i;
+    }
+
+    if (stepId < 0 || description < 0 || testData < 0 || expectedResult < 0)
+      return null;
+
+    return new ColumnIndices(stepId, description, testData, expectedResult, actualResult);
+  }
+
   private static List<string> ExtractTableRows(string stepsSection)
   {
     var lines = stepsSection.Split('\n', StringSplitOptions.RemoveEmptyEntries)
@@ -243,15 +288,20 @@ internal class MarkdownTable
     return Regex.IsMatch(content, @"^[\s\-:|]+$");
   }
 
-  private static TestStep? ParseTableRow(string row)
+  private static TestStep? ParseTableRow(string row, ColumnIndices columnIndices)
   {
     try
     {
       var cells = ParseTableCells(row);
 
-      // Ensure we have at least 4 cells (Step ID, Description, Test Data, Expected Result)
-      // The 5th cell (Actual Result) is optional
-      if (cells.Count < 4)
+      var requiredCount = new[] {
+        columnIndices.StepId,
+        columnIndices.Description,
+        columnIndices.TestData,
+        columnIndices.ExpectedResult
+      }.Max() + 1;
+
+      if (cells.Count < requiredCount)
       {
         return null;
       }
@@ -259,7 +309,7 @@ internal class MarkdownTable
       var testStep = new TestStep();
 
       // Parse Step ID (first cell)
-      if (int.TryParse(cells[0].Trim(), out var stepId))
+      if (int.TryParse(cells[columnIndices.StepId].Trim(), out var stepId))
       {
         testStep.Id = stepId;
       }
@@ -269,19 +319,18 @@ internal class MarkdownTable
       }
 
       // Parse Description (second cell)
-      testStep.Description = UnescapeMarkdown(cells[1].Trim());
+      testStep.Description = UnescapeMarkdown(cells[columnIndices.Description].Trim());
 
       // Parse Test Data (third cell)
-      testStep.TestData = UnescapeMarkdown(cells[2].Trim());
+      testStep.TestData = UnescapeMarkdown(cells[columnIndices.TestData].Trim());
 
       // Parse Expected Result (fourth cell)
-      testStep.ExpectedResult = UnescapeMarkdown(cells[3].Trim());
+      testStep.ExpectedResult = UnescapeMarkdown(cells[columnIndices.ExpectedResult].Trim());
 
-      // Parse Actual Result (fifth cell, optional)
-      if (cells.Count > 4)
+      // Parse Actual Result (column position from header, optional)
+      if (columnIndices.ActualResult >= 0 && cells.Count > columnIndices.ActualResult)
       {
-        var actualResult = cells[4].Trim();
-        // Check for success/failure indicators
+        var actualResult = cells[columnIndices.ActualResult].Trim();
         testStep.IsSuccess = actualResult.Contains("✅");
       }
 
@@ -345,21 +394,32 @@ internal class MarkdownTable
   }
   private static string UpdateTableRowWithResults(
     string row,
-    IEnumerable<TestStepResult> testResults
+    IEnumerable<TestStepResult> testResults,
+    ColumnIndices columnIndices
   )
   {
     try
     {
       var cells = ParseTableCells(row);
 
-      // Ensure we have at least 5 cells (including Actual Result column)
-      while (cells.Count < 5)
+      // Determine where to write the Actual Result
+      var actualResultIndex = columnIndices.ActualResult >= 0
+        ? columnIndices.ActualResult
+        : new[] {
+            columnIndices.StepId,
+            columnIndices.Description,
+            columnIndices.TestData,
+            columnIndices.ExpectedResult
+          }.Max() + 1;
+
+      // Ensure enough cells exist up to the Actual Result column
+      while (cells.Count <= actualResultIndex)
       {
         cells.Add(" - ");
       }
 
       // Parse Step ID (first cell)
-      if (int.TryParse(cells[0].Trim(), out var stepId))
+      if (int.TryParse(cells[columnIndices.StepId].Trim(), out var stepId))
       {
         // Find matching test result
         var testResult = testResults
@@ -368,12 +428,12 @@ internal class MarkdownTable
         if (testResult == null)
         {
           // No failure found, mark as success
-          cells[4] = " - ";
+          cells[actualResultIndex] = " - ";
         }
         else
         {
           // Update the Actual Result column (5th cell, index 4)
-          cells[4] = testResult.IsSuccess
+          cells[actualResultIndex] = testResult.IsSuccess
             ? " ✅ "
             : $" ❌ {testResult.Error} ";
         }

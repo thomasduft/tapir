@@ -482,3 +482,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# ignore directories and subdirectories starting with Runs
+Runs*/

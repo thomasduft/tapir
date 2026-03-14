@@ -30,6 +30,50 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "dev:watch-devhost",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "--project",
+        "${workspaceFolder}/src/tapir.DevHost/tapir.DevHost.csproj",
+        "--environment",
+        "Development",
+        "--urls",
+        "https://localhost:5001"
+      ],
+      "problemMatcher": "$msCompile",
+      "options": {
+        "cwd": "${workspaceFolder}/src/tapir.DevHost/"
+      }
+    },
+    {
+      "label": "test:all-test-cases",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/src/tapir.Cli/tapir.Cli.csproj",
+        "--",
+        "run",
+        "https://localhost:5001",
+        "-i",
+        "samples/",
+        "-o",
+        "samples/Runs/"
+      ],
+      "problemMatcher": "$msCompile",
+      "options": {
+        "cwd": "${workspaceFolder}/"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }

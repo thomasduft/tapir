@@ -17,7 +17,6 @@ internal class TestCaseRun
   }
 
   internal async Task SaveAsync(
-    string inputDirectory,
     string outputDirectory,
     CancellationToken cancellationToken
   )
@@ -33,9 +32,12 @@ internal class TestCaseRun
     SetProperties(lines, _results.All(r => r.IsSuccess));
     if (_testCase.HasDomain) lines = AppendDomainProperty(lines, _testCase.Domain);
 
-    // Ensure directory structure based on the input directory
-    var relativePath = Path.GetRelativePath(inputDirectory, _testCase.File);
-    var outputDir = Path.Combine(outputDirectory, Path.GetDirectoryName(relativePath)!);
+    var outputDir = Path.Combine(
+      outputDirectory,
+      DateStringProvider.GetDateString(),
+      _testCase.Module ?? string.Empty
+    );
+
     if (!Directory.Exists(outputDir))
     {
       Directory.CreateDirectory(outputDir);

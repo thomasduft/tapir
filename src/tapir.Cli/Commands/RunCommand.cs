@@ -110,6 +110,7 @@ internal class RunCommand : CommandLineApplication
         file,
         cancellationToken
       );
+
       if (result != 0)
       {
         return result;
@@ -218,9 +219,12 @@ internal class RunCommand : CommandLineApplication
     if (!string.IsNullOrWhiteSpace(outputDirectory))
     {
       // Store the Test Case run
-      var run = new TestCaseRun(testCase, results.SelectMany(r => r.TestStepResults).ToList());
+      var run = new TestCaseRun(
+        testCase,
+        results.SelectMany(r => r.TestStepResults).ToList()
+      );
+
       await run.SaveAsync(
-        inputDirectory,
         outputDirectory,
         cancellationToken
       );
@@ -234,6 +238,8 @@ internal class RunCommand : CommandLineApplication
     {
       Log.Logger.Error("'{Title} ({TestCaseId})' failed.", testCase.Title, testCase.Id);
     }
+
+    Log.Logger.Information(string.Empty); // for better readability in the console output
 
     return overallSuccess ? 0 : 1;
   }

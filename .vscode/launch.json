@@ -31,6 +31,8 @@
         "samples",
         "--verbose",
         "--continue-on-failure",
+        "-o",
+        "samples/Runs",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"
       ],

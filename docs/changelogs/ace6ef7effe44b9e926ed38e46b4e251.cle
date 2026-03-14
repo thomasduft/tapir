@@ -1,0 +1,9 @@
+{
+  "Id": "ace6ef7e-ffe4-4b9e-926e-d38e46b4e251",
+  "IssueId": "",
+  "Prefix": "Added",
+  "Tag": "",
+  "Message": "Added the possibility to scaffold a simple Test Case (use the \u0060--use-simple-template\u0060-flag)",
+  "CreatedAt": "2026-03-14T17:46:31.5072561+00:00",
+  "CreatedBy": "thomasduft"
+}

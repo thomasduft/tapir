@@ -10,6 +10,7 @@ internal class NewTestCaseCommand : CommandLineApplication
 {
   private readonly CommandArgument<string> _testCaseId;
   private readonly CommandArgument<string> _title;
+  private readonly CommandOption<bool> _useSimpleTemplate;
 
   public NewTestCaseCommand()
   {
@@ -28,6 +29,14 @@ internal class NewTestCaseCommand : CommandLineApplication
       cfg => cfg.DefaultValue = "A TestCase Title"
     );
 
+    _useSimpleTemplate = Option<bool>(
+      "--use-simple-template",
+      "Uses the simple Test Case template.",
+      CommandOptionType.NoValue,
+      cfg => cfg.DefaultValue = false,
+      true
+    );
+
     OnExecuteAsync(ExecuteAsync);
   }
 
@@ -36,8 +45,12 @@ internal class NewTestCaseCommand : CommandLineApplication
     var testCaseId = _testCaseId.Value;
     var title = _title.Value;
 
+    var testCaseTemplate = _useSimpleTemplate.ParsedValue
+      ? Templates.TestCaseSimple
+      : Templates.TestCase;
+
     var content = await GetContent(
-      Templates.TestCase,
+      testCaseTemplate,
       new
       {
         TestCaseId = testCaseId,

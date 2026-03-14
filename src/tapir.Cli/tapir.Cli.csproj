@@ -40,6 +40,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Templates\Manual.liquid" />
     <EmbeddedResource Include="Templates\TestCase.liquid" />
+    <EmbeddedResource Include="Templates\TestCaseSimple.liquid" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.13] - 2026-03-14
+
+### Added
+
+- Added the possibility to scaffold a simple Test Case (use the `--use-simple-template`-flag)
+- Allow Test Data to be placed in any column index in markdown tables
+
 ## [0.0.12] - 2026-03-14
 
 ### Changed

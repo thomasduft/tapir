@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added `new-step` command
+- Added `new-step`-command
 
 ## [0.0.13] - 2026-03-14
 

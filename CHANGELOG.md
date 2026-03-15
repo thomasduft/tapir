@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.14] - 2026-03-15
+
+### Added
+
+- Added `new-step` command
+
 ## [0.0.13] - 2026-03-14
 
 ### Added

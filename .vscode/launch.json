@@ -138,6 +138,21 @@
       "stopAtEntry": false
     },
     {
+      "name": "tapir:new-step-for-tc-users-002",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-tapir",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
+      "args": [
+        "new-step",
+        "TC-Users-002",
+        "-i",
+        "samples/Users/Definitions"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    },
+    {
       "name": "tapir:man",
       "type": "coreclr",
       "request": "launch",

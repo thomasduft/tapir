@@ -7,6 +7,7 @@ internal static class Templates
   public const string Manual = "Manual";
   public const string TestCase = "TestCase";
   public const string TestCaseSimple = "TestCaseSimple";
+  public const string TestStep = "TestStep";
 }
 
 internal static class ResourceLoader

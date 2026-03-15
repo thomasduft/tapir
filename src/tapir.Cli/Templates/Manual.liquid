@@ -56,17 +56,22 @@ Parsed representation of a test step's test data.
 tapir new TC-Example-001 "My Test Title"
 ```
 
-**2. validate** - Validate test case syntax
+**2. new-step** - Appends a new test step to an existing test case definition
+```bash
+tapir new-step TC-Example-001
+```
+
+**3. validate** - Validate test case syntax
 ```bash
 tapir validate TC-Example-001 -i ./tests
 ```
 
-**3. run** - Execute test cases
+**4. run** - Execute test cases
 ```bash
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
-**4. man** - Display action reference
+**5. man** - Display action reference
 ```bash
 tapir man
 ```
@@ -80,8 +85,8 @@ Variables enable request chaining by storing values from responses and using the
 Variables use the `@@VariableName@@` syntax:
 
 ```markdown
-| 05 | Store Alice's ID | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | ID stored | - |
-| 06 | Get Alice details | Action=Send Method=GET Endpoint=users/@@AliceId@@ | Request sent | - |
+| 05 | Store Alice's ID  | ID stored    | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | - |
+| 06 | Get Alice details | Request sent | Action=Send Method=GET Endpoint=users/@@AliceId@@                 | - |
 ```
 
 #### Variable Substitution
@@ -121,9 +126,9 @@ Detailed description of what the test validates.
 
 ## Steps
 
-| Step ID | Description | Test Data | Expected Result | Actual Result |
-| ------: | ----------- | --------- | --------------- | ------------- |
-| 01 | Step description | Action=Send Method=GET Endpoint=api/endpoint | Expected | - |
+| Step ID | Description | Expected Result | Test Data | Actual Result |
+| ------: | ----------- | --------------- | --------- | ------------- |
+| 01 | Step description | Expected | Action=Send Method=GET Endpoint=api/endpoint | - |
 
 ## Postcondition
 - Any cleanup or final state

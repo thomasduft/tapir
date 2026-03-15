@@ -56,21 +56,21 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 
 ## Steps
 
-| Step ID  | Description         | Test Data                                                         | Expected Result        | Actual Result |
-| -------: | ------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
-| 01       | Call users api      | Action=Send Method=GET Endpoint=users                             | Request successful     | -             |
-| 02       | Check response code | Action=CheckStatusCode Value=200                                  | 200                    | -             |
-| 03       | Inspect content     | Action=VerifyContent File=samples/Users/Definitions/users.json    | Should be identical    | -             |
-| 04       | Check Alice         | Action=CheckContent JsonPath=$[?@.name=="Alice"].name Value=Alice | Content contains Alice | -             |
-| 05       | Retain ID of Alice  | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | ID of Alice stored     | -             |
+| Step ID  | Description         | Expected Result        | Test Data                                                         | Actual Result |
+| -------: | ------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |
+| 01       | Call users api      | Request successful     | Action=Send Method=GET Endpoint=users                             | -             |
+| 02       | Check response code | 200                    | Action=CheckStatusCode Value=200                                  | -             |
+| 03       | Inspect content     | Should be identical    | Action=VerifyContent File=samples/Users/Definitions/users.json    | -             |
+| 04       | Check Alice         | Content contains Alice | Action=CheckContent JsonPath=$[?@.name=="Alice"].name Value=Alice | -             |
+| 05       | Retain ID of Alice  | ID of Alice stored     | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | -             |
 
-| Step ID  | Description         | Test Data                                                         | Expected Result        | Actual Result |
-| -------: | ------------------- | ----------------------------------------------------------------- | ---------------------- | ------------- |
-| 11       | Get Alice details   | Action=Send Method=GET Endpoint=users/@@AliceId@@                 | Request successful     | -             |
-| 12       | Check response code | Action=CheckStatusCode Value=200                                  | 200                    | -             |
-| 13       | Inspect content     | Action=VerifyContent File=samples/Users/Definitions/alice.json    | Should be identical    | -             |
-| 14       | Check name          | Action=CheckContent JsonPath=$.name Value=Alice                   | Name is Alice          | -             |
-| 15       | Check age           | Action=CheckContent JsonPath=$.age Value=30                       | Age is 30              | -             |
+| Step ID  | Description         | Expected Result        | Test Data                                                         | Actual Result |
+| -------: | ------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |
+| 11       | Get Alice details   | Request successful     | Action=Send Method=GET Endpoint=users/@@AliceId@@                 | -             |
+| 12       | Check response code | 200                    | Action=CheckStatusCode Value=200                                  | -             |
+| 13       | Inspect content     | Should be identical    | Action=VerifyContent File=samples/Users/Definitions/alice.json    | -             |
+| 14       | Check name          | Name is Alice          | Action=CheckContent JsonPath=$.name Value=Alice                   | -             |
+| 15       | Check age           | Age is 30              | Action=CheckContent JsonPath=$.age Value=30                       | -             |
 
 ## Postcondition
 
@@ -100,6 +100,7 @@ Options:
 Commands:
   man           Displays a man page that helps writing the Test-Data syntax for a Test Case.
   new           Creates a new Test Case definition (i.e. test-case TC-Audit-001 "My TestCase Title").
+  new-step      Appends a new Test Step to an existing Test Case definition (i.e. new-step TC-Audit-001).
   run           Runs Test Case definition (i.e. "https://localhost:5001" -tc TC-Audit-001).
   validate      Validates a Test Case definition (i.e. TC-Audit-001).
 

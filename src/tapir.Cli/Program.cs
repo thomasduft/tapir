@@ -9,6 +9,7 @@ using tomware.Tapir.Cli.Utils;
 var services = new ServiceCollection()
     .AddCliCommand<ManCommand>()
     .AddCliCommand<NewTestCaseCommand>()
+    .AddCliCommand<NewTestStepCommand>()
     .AddCliCommand<ValidateCommand>().WithValidation()
     .AddCliCommand<RunCommand>().WithExecution()
     .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()

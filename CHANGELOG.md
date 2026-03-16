@@ -29,7 +29,7 @@
 
 ### Added
 
-- Supports logging the response content (see LogResponseContent action)
+- Supports logging the response content (see [LogResponseContent action](docs/Manual.md#logresponsecontent))
 
 ## [0.0.10] - 2026-01-22
 

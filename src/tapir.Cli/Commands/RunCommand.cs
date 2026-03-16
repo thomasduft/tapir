@@ -6,7 +6,6 @@ using McMaster.Extensions.CommandLineUtils;
 using Serilog;
 
 using tomware.Tapir.Cli.Domain;
-using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli;
 
@@ -105,7 +104,6 @@ internal class RunCommand : CommandLineApplication
     foreach (var file in files)
     {
       var result = await RunTestCaseAsync(
-        _inputDirectory.ParsedValue,
         outputDirectory,
         file,
         cancellationToken
@@ -121,7 +119,6 @@ internal class RunCommand : CommandLineApplication
   }
 
   private async Task<int> RunTestCaseAsync(
-    string inputDirectory,
     string? outputDirectory,
     string file,
     CancellationToken cancellationToken

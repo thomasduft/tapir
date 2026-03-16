@@ -132,30 +132,12 @@ internal class RunCommand : CommandLineApplication
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
     testCase
       .WithDomain(domain)
-      .WithVariables(VariablesHelper.AssignDummyVariables(testCase.Tables.SelectMany(t => t.Steps)));
-
-    // Validate the Test Case definition
-    var validationResult = await _testCaseValidator.ValidateAsync(testCase, cancellationToken);
-    if (!validationResult.IsValid)
-    {
-      foreach (var error in validationResult.Errors)
-      {
-        Log.Logger.Error("Validation error: {Error}", error);
-      }
-
-      return await Task.FromResult(1);
-    }
+      .WithVariables(VariablesHelper.CreateVariables(_variables.ParsedValues));
 
     // Run the Test Case
     Log.Logger.Information("Starting '{TestCaseTitle} ({TestCaseId})'",
       testCase.Title,
       testCase.Id);
-
-    // patching variables from command line
-    if (_variables.HasValue())
-    {
-      testCase.WithVariables(VariablesHelper.CreateVariables(_variables.ParsedValues));
-    }
 
     _stopwatch.Start();
 

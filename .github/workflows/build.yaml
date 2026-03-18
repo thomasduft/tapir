@@ -38,6 +38,6 @@ jobs:
     - name: Run test case TC-Users-002
       run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Users-002 -i "samples/Users/Definitions" -o "samples/Users/Runs" --verbose
     - name: Run test case TC-Documents-001
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Documents-001 -i "samples/Documents/Definitions" -o "samples/Documents/Runs" --verbose
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Documents-001 -i "samples/Documents/Definitions" -o "samples/Documents/Runs" -v FileName=empty --verbose
     - name: Run all test cases
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -i "samples/"
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -i "samples/" -v FileName=empty

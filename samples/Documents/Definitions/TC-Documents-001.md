@@ -15,13 +15,14 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 
 ## Preconditions
 
-- no pre-conditions
+- The following Test Case variables must be set:
+  - `@@FileName@@` must be set to a valid PDF file name (e.g., "empty.pdf") that exists in the specified input directory.
 
 ## Steps
 
 | Step ID  | Description             | Expected Result    | Test Data                                                                                                                | Actual Result |
 | -------: | ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| 01       | Add Document            | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/empty.pdf | -             |
+| 01       | Add Document            | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/@@FileName@@.pdf | -             |
 | 02       | Set Document Title      | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                                       | -             |
 | 03       | Upload Document         | Request successful | Action=Send Method=POST Endpoint=documents                                                                               | -             |
 | 04       | Check response code     | 201                | Action=CheckStatusCode Value=201                                                                                         | -             |

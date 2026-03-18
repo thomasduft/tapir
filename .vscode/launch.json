@@ -99,6 +99,8 @@
         "TC-Documents-001",
         "-o",
         "samples/Documents/Runs",
+        "-v",
+        "FileName=empty",
         "--verbose",
         "--continue-on-failure",
         "--otlp",
@@ -117,7 +119,9 @@
         "validate",
         "TC-Users-001",
         "-i",
-        "samples/Users/Definitions"
+        "samples/Users/Definitions",
+        "-v",
+        "AliceId=12345"
       ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false
@@ -132,7 +136,11 @@
         "validate",
         "TC-Documents-001",
         "-i",
-        "samples/Documents/Definitions"
+        "samples/Documents/Definitions",
+        "-v",
+        "FileName=empty",
+        "-v",
+        "DocumentId=12345",
       ],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false

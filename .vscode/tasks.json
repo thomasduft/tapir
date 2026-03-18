@@ -64,7 +64,9 @@
         "-i",
         "samples/",
         "-o",
-        "samples/Runs/"
+        "samples/Runs/",
+        "-v",
+        "FileName=empty"
       ],
       "problemMatcher": "$msCompile",
       "options": {

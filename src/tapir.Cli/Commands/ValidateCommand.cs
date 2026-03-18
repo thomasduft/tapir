@@ -10,6 +10,7 @@ internal class ValidateCommand : CommandLineApplication
 {
   private readonly CommandArgument<string> _testCaseId;
   private readonly CommandOption<string> _inputDirectory;
+  private readonly CommandOption<string> _variables;
   private readonly ITestCaseValidator _testCaseValidator;
 
   public ValidateCommand(
@@ -35,6 +36,14 @@ internal class ValidateCommand : CommandLineApplication
       true
     );
 
+    _variables = Option<string>(
+      "-v|--variable",
+      "Key-Value based variable used for replacing property values in a Test Step data configuration.",
+      CommandOptionType.MultipleValue,
+      cfg => cfg.DefaultValue = null,
+      true
+    );
+
     OnExecuteAsync(ExecuteAsync);
   }
 
@@ -45,9 +54,8 @@ internal class ValidateCommand : CommandLineApplication
 
     // 2. Read the Test Case definition
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
-    testCase.WithVariables(
-      VariablesHelper.AssignDummyVariables(testCase.Tables.SelectMany(t => t.Steps))
-    );
+    testCase
+      .WithVariables(VariablesHelper.CreateVariables(_variables.ParsedValues));
 
     // 3. Validate the Test Case definition
     var validationResult = await _testCaseValidator.ValidateAsync(testCase, cancellationToken);

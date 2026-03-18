@@ -51,7 +51,7 @@ internal class TestStepInstruction
           instruction.Value = ReplaceVariables(parameter.Value, variables);
           break;
         case nameof(File):
-          instruction.File = parameter.Value;
+          instruction.File = ReplaceVariables(parameter.Value, variables);
           break;
         case nameof(JsonPath):
           instruction.JsonPath = ReplaceVariables(parameter.Value, variables);

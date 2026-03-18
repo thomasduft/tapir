@@ -93,6 +93,7 @@ Variables use the `@@VariableName@@` syntax:
 
 Variables are replaced in:
 - `Value` fields
+- `File` fields
 - `JsonPath` expressions
 - `Endpoint` fields
 - `Domain` fields

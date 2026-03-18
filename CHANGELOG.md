@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added variable support for File field
+- Added variable support for File field
 
 ## [0.0.15] - 2026-03-16
 

@@ -96,6 +96,8 @@ Usage: tapir [command] [options]
 
 Options:
   -?|-h|--help  Show help information.
+  --otlp        Enable OpenTelemetry metrics export to the specified OTLP endpoint (e.g., http://localhost:4318/v1/metrics).
+  --verbose     Enable verbose logging.
 
 Commands:
   man           Displays a man page that helps writing the Test-Data syntax for a Test Case.

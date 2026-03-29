@@ -4,7 +4,7 @@ namespace tomware.Tapir.Cli.Utils;
 
 internal static class LogHelper
 {
-  private const string VerboseOption = "--verbose";
+  internal const string VerboseOption = "--verbose";
 
   public static ILogger CreateLogger(ref string[] args)
   {

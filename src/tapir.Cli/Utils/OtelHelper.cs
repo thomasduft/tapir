@@ -7,7 +7,7 @@ namespace tomware.Tapir.Cli.Utils;
 
 internal static class OtelHelper
 {
-  private const string OtlpOption = "--otlp";
+  internal const string OtlpOption = "--otlp";
 
   public static MeterProvider CreateMeterProvider(ref string[] args)
   {

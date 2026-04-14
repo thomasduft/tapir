@@ -9,6 +9,7 @@ internal class TestCase
   public string? Module { get; set; } = "Unkown";
   public string Type { get; set; } = string.Empty;
   public string Status { get; set; } = string.Empty;
+  public string Date { get; set; } = string.Empty;
   public IEnumerable<Table> Tables { get; set; } = [];
   public string File { get; set; } = string.Empty;
   public bool IsDefinition => !string.IsNullOrEmpty(Type) && Type == Constants.TestCaseType.Definition;

@@ -331,6 +331,7 @@ internal class MarkdownTable
       if (columnIndices.ActualResult >= 0 && cells.Count > columnIndices.ActualResult)
       {
         var actualResult = cells[columnIndices.ActualResult].Trim();
+        testStep.ActualResult = actualResult;
         testStep.IsSuccess = actualResult.Contains("✅");
       }
 

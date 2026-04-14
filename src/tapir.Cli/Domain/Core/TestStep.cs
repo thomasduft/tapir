@@ -6,5 +6,6 @@ internal class TestStep
   public string Description { get; set; } = string.Empty;
   public string TestData { get; set; } = string.Empty;
   public string ExpectedResult { get; set; } = string.Empty;
+  public string ActualResult { get; set; } = string.Empty;
   public bool IsSuccess { get; set; } = false;
 }

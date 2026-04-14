@@ -19,6 +19,8 @@ internal class TestCaseParser
     var module = FindTag(lines, "Module");
     var type = FindTag(lines, "Type");
     var status = FindTag(lines, "Status");
+    var date = FindTag(lines, "Date");
+    var domain = FindTagValue(lines, "Domain");
 
     var markdownContent = string.Join(Environment.NewLine, lines);
     var tables = GetTables(markdownContent);
@@ -26,17 +28,23 @@ internal class TestCaseParser
     var link = FindTag(lines, "Link");
     var linkedFile = GetLinkedFile(_file, link);
 
-    return new TestCase
+    var testCase = new TestCase
     {
       Id = testCaseId,
       Title = testCaseTitle,
       Module = module,
       Type = type!,
       Status = status!,
+      Date = date ?? string.Empty,
       Tables = tables,
       File = _file,
       LinkedFile = linkedFile!
     };
+
+    if (!string.IsNullOrEmpty(domain))
+      testCase.WithDomain(domain);
+
+    return testCase;
   }
 
   private (string TestCaseId, string TestCaseTitle) GetTestCaseIdAndTitle(string[] lines)
@@ -62,6 +70,19 @@ internal class TestCaseParser
     var splittedItems = line!.Split(':');
 
     return splittedItems[1].Trim();
+  }
+
+  /// <summary>
+  /// Finds a tag value that may contain colons (e.g. URLs like https://localhost:5001).
+  /// Returns everything after the first colon on the matching line.
+  /// </summary>
+  private string? FindTagValue(string[] lines, string tag)
+  {
+    var line = lines.FirstOrDefault(l => l.StartsWith($"- **{tag}**:"));
+    if (line == null) return null;
+
+    var colonIndex = line.IndexOf(':');
+    return colonIndex >= 0 ? line.Substring(colonIndex + 1).Trim() : null;
   }
 
   private IEnumerable<Table> GetTables(string markdownContent)

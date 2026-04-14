@@ -417,8 +417,8 @@ Some text between tables
     var updatedMarkdown = table.UpdateTestStepsWithResults(testResults);
 
     // Assert
-    Assert.Contains("| 1 | Step one | Data 1 | Result 1 | - |", updatedMarkdown);
-    Assert.Contains("| 2 | Step two | Data 2 | Result 2 | - |", updatedMarkdown);
+    Assert.Contains("| 1 | Step one | Data 1 | Result 1 | ✅ |", updatedMarkdown);
+    Assert.Contains("| 2 | Step two | Data 2 | Result 2 | ✅ |", updatedMarkdown);
   }
 
   [Fact]
@@ -494,7 +494,7 @@ Some text between tables
   }
 
   [Fact]
-  public void UpdateTestStepsWithResults_WithNoMatchingResults_ShouldKeepOriginal()
+  public void UpdateTestStepsWithResults_WithNoMatchingResults_ShouldMarkAsSuccess()
   {
     // Arrange
     var markdown = @"
@@ -512,7 +512,7 @@ Some text between tables
     var updatedMarkdown = table.UpdateTestStepsWithResults(testResults);
 
     // Assert
-    Assert.Contains("| 1 | Step one | Data 1 | Result 1 | - |", updatedMarkdown);
+    Assert.Contains("| 1 | Step one | Data 1 | Result 1 | ✅ |", updatedMarkdown);
   }
 
   [Fact]

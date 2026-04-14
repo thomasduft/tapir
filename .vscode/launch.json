@@ -33,6 +33,8 @@
         "--continue-on-failure",
         "-o",
         "samples/Runs",
+        "-v",
+        "FileName=empty",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"
       ],

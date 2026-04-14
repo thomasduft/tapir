@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.17] - 2026-04-14
+
+### Fixed
+
+- Treats no found failures as success
+
 ## [0.0.16] - 2026-03-18
 
 ### Added

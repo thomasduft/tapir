@@ -429,7 +429,7 @@ internal class MarkdownTable
         if (testResult == null)
         {
           // No failure found, mark as success
-          cells[actualResultIndex] = " - ";
+          cells[actualResultIndex] = " ✅ ";
         }
         else
         {

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.18] - 2026-04-14
+
+### Added
+
+- Adds a new 'tapir report' command that scans a directory of test caserun output files and generates a single self-contained HTML report.
+
 ## [0.0.17] - 2026-04-14
 
 ### Fixed

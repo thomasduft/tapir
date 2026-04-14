@@ -1,9 +1,0 @@
-{
-  "Id": "ea32da31-15f2-4853-a261-093da13a0bb7",
-  "IssueId": "",
-  "Prefix": "Fixed",
-  "Tag": "",
-  "Message": "Treats no found failures as success",
-  "CreatedAt": "2026-04-14T17:23:13.7665303+00:00",
-  "CreatedBy": "thomasduft"
-}

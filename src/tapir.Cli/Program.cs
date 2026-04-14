@@ -12,6 +12,7 @@ var services = new ServiceCollection()
     .AddCliCommand<NewTestStepCommand>()
     .AddCliCommand<ValidateCommand>().WithValidation()
     .AddCliCommand<RunCommand>().WithExecution()
+    .AddCliCommand<ReportCommand>()
     .AddSingleton<ITestCaseExecutor, TestCaseExecutor>()
     .AddSingleton<Cli>();
 

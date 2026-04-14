@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\Manual.liquid" />
+    <EmbeddedResource Include="Templates\Report.html" />
     <EmbeddedResource Include="Templates\TestCase.liquid" />
     <EmbeddedResource Include="Templates\TestCaseSimple.liquid" />
     <EmbeddedResource Include="Templates\TestStep.liquid" />

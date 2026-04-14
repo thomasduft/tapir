@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tapir — Test Run Report</title>
+  <style>
+    :root {
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --blue: #2563eb;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.5;
+    }
+    /* ── Header ── */
+    header {
+      background: var(--gray-900);
+      color: #fff;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .header-logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .header-logo span { color: #60a5fa; }
+    .header-meta { font-size: 0.82rem; color: #9ca3af; }
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    /* ── Summary cards ── */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .card-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-500);
+      margin-bottom: 0.35rem;
+    }
+    .card-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .card.passed  .card-value { color: var(--green); }
+    .card.failed  .card-value { color: var(--red); }
+    /* ── Progress bar ── */
+    .progress-wrap { margin-bottom: 2rem; }
+    .progress-label { font-size: 0.82rem; color: var(--gray-600); margin-bottom: 0.4rem; }
+    .progress-bar { height: 8px; background: var(--gray-200); border-radius: 9999px; overflow: hidden; display: flex; }
+    .progress-passed { background: var(--green); transition: width .4s; }
+    .progress-failed { background: var(--red); transition: width .4s; }
+    /* ── Section heading ── */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gray-500);
+      margin-bottom: 0.75rem;
+    }
+    /* ── Modules ── */
+    .modules { display: flex; flex-direction: column; gap: 0.75rem; }
+    .module {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .module-header {
+      padding: 0.9rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      user-select: none;
+      transition: background .15s;
+    }
+    .module-header:hover { background: var(--gray-50); }
+    .module-name { font-weight: 600; font-size: 0.95rem; flex: 1; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .pill.total  { background: var(--gray-100); color: var(--gray-600); }
+    .pill.passed { background: var(--green-bg); color: var(--green); }
+    .pill.failed { background: var(--red-bg);   color: var(--red); }
+    .chevron { color: var(--gray-400); font-size: 0.75rem; transition: transform .2s; flex-shrink: 0; }
+    .chevron.open { transform: rotate(90deg); }
+    /* ── Test case list ── */
+    .module-body { display: none; }
+    .module-body.open { display: block; border-top: 1px solid var(--gray-100); }
+    .tc-list {}
+    .tc-item { border-bottom: 1px solid var(--gray-100); }
+    .tc-item:last-child { border-bottom: none; }
+    .tc-header {
+      padding: 0.65rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .tc-header:hover { background: var(--gray-50); }
+    .status-dot { width: 9px; height: 9px; border-radius: 9999px; flex-shrink: 0; }
+    .status-dot.passed { background: var(--green); }
+    .status-dot.failed { background: var(--red); }
+    .tc-id { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; color: var(--gray-500); white-space: nowrap; }
+    .tc-title { font-size: 0.88rem; flex: 1; }
+    .tc-meta { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; flex-shrink: 0; }
+    .domain-chip {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.7rem;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tc-date { font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; }
+    /* ── Steps table ── */
+    .steps-wrap { display: none; border-top: 1px solid var(--gray-100); }
+    .steps-wrap.open { display: block; }
+    .steps-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .steps-table th {
+      background: var(--gray-50);
+      text-align: left;
+      padding: 0.45rem 1.25rem;
+      color: var(--gray-500);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .steps-table th:first-child { width: 48px; }
+    .steps-table td { padding: 0.55rem 1.25rem; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+    .steps-table tr:last-child td { border-bottom: none; }
+    .steps-table tr.step-failed { background: #fff8f8; }
+    .result-ok  { color: var(--green); }
+    .result-err { color: var(--red); font-size: 0.78rem; word-break: break-word; }
+    .step-num { color: var(--gray-400); font-family: monospace; }
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.78rem;
+      color: var(--gray-500);
+    }
+    footer strong { color: var(--gray-700); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">ta<span>pir</span></div>
+    <div id="header-subtitle" class="header-meta"></div>
+  </div>
+  <div id="header-right" class="header-meta"></div>
+</header>
+
+<div class="container">
+  <div class="summary" id="summary"></div>
+  <div class="progress-wrap" id="progress-wrap"></div>
+  <div class="section-title">Modules</div>
+  <div class="modules" id="modules"></div>
+</div>
+
+<footer>
+  Generated by <strong>tapir</strong> &mdash; %%GENERATED_AT%%
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var REPORT = %%REPORT_JSON%%;
+
+  /* ── Helpers ── */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  /* ── Header ── */
+  var domains = [];
+  REPORT.modules.forEach(function (m) {
+    m.testCases.forEach(function (tc) {
+      if (tc.domain && domains.indexOf(tc.domain) === -1) domains.push(tc.domain);
+    });
+  });
+  document.getElementById('header-subtitle').textContent =
+    'Test Run Report · ' + REPORT.date;
+  if (domains.length === 1) {
+    document.getElementById('header-right').textContent = domains[0];
+  }
+
+  /* ── Summary cards ── */
+  var summaryEl = document.getElementById('summary');
+  [
+    { label: 'Total',   value: REPORT.total,           cls: '' },
+    { label: 'Passed',  value: REPORT.passed,          cls: 'passed' },
+    { label: 'Failed',  value: REPORT.failed,          cls: 'failed' },
+    { label: 'Modules', value: REPORT.modules.length,  cls: '' }
+  ].forEach(function (s) {
+    summaryEl.innerHTML +=
+      '<div class="card ' + s.cls + '">' +
+        '<div class="card-label">' + s.label + '</div>' +
+        '<div class="card-value">' + s.value + '</div>' +
+      '</div>';
+  });
+
+  /* ── Progress bar ── */
+  if (REPORT.total > 0) {
+    var pct = function (n) { return (n / REPORT.total * 100).toFixed(1); };
+    document.getElementById('progress-wrap').innerHTML =
+      '<div class="progress-label">' +
+        pct(REPORT.passed) + '% passed &nbsp;(' + REPORT.passed + ' / ' + REPORT.total + ')' +
+      '</div>' +
+      '<div class="progress-bar">' +
+        '<div class="progress-passed" style="width:' + pct(REPORT.passed) + '%"></div>' +
+        '<div class="progress-failed" style="width:' + pct(REPORT.failed) + '%"></div>' +
+      '</div>';
+  }
+
+  /* ── Modules ── */
+  var modulesEl = document.getElementById('modules');
+  REPORT.modules.forEach(function (mod, mi) {
+    var passed = mod.testCases.filter(function (tc) { return tc.status === 'Passed'; }).length;
+    var failed = mod.testCases.filter(function (tc) { return tc.status === 'Failed'; }).length;
+
+    var modEl = el('div', { 'class': 'module' });
+
+    /* module header */
+    var hdr = el('div', { 'class': 'module-header', 'id': 'mhdr-' + mi });
+    hdr.innerHTML =
+      '<span class="module-name">' + esc(mod.name) + '</span>' +
+      '<span class="pill total">' + mod.testCases.length + ' tests</span>' +
+      (passed > 0 ? '<span class="pill passed">&#10003; ' + passed + '</span>' : '') +
+      (failed > 0 ? '<span class="pill failed">&#10007; ' + failed + '</span>' : '') +
+      '<span class="chevron' + (mi === 0 ? ' open' : '') + '" id="chev-' + mi + '">&#9654;</span>';
+    hdr.addEventListener('click', function () { toggleModule(mi); });
+    modEl.appendChild(hdr);
+
+    /* module body */
+    var body = el('div', { 'class': 'module-body' + (mi === 0 ? ' open' : ''), 'id': 'mbody-' + mi });
+    var tcList = el('div', { 'class': 'tc-list' });
+
+    mod.testCases.forEach(function (tc, tci) {
+      var allOk = tc.steps.every(function (s) { return s.isSuccess; });
+      var statusCls = (tc.status === 'Passed') ? 'passed' : 'failed';
+
+      var tcItem = el('div', { 'class': 'tc-item' });
+
+      /* test case row */
+      var tcHdr = el('div', { 'class': 'tc-header' });
+      tcHdr.innerHTML =
+        '<span class="status-dot ' + statusCls + '"></span>' +
+        '<span class="tc-id">' + esc(tc.id) + '</span>' +
+        '<span class="tc-title">' + esc(tc.title) + '</span>' +
+        '<span class="tc-meta">' +
+          (tc.domain ? '<span class="domain-chip" title="' + esc(tc.domain) + '">' + esc(tc.domain) + '</span>' : '') +
+          (tc.date ? '<span class="tc-date">' + esc(tc.date) + '</span>' : '') +
+        '</span>';
+      tcHdr.addEventListener('click', function () { toggleTc(mi, tci); });
+      tcItem.appendChild(tcHdr);
+
+      /* steps table — auto-open if test case failed */
+      var stepsWrap = el('div', {
+        'class': 'steps-wrap' + (allOk ? '' : ' open'),
+        'id': 'sw-' + mi + '-' + tci
+      });
+
+      var stepsRows = tc.steps.map(function (s) {
+        var cls = s.isSuccess ? '' : ' step-failed';
+        return '<tr class="' + cls + '">' +
+          '<td class="step-num">' + s.id + '</td>' +
+          '<td>' + esc(s.description) + '</td>' +
+          '<td>' + esc(s.expectedResult) + '</td>' +
+          '<td class="' + (s.isSuccess ? 'result-ok' : 'result-err') + '">' + esc(s.actualResult) + '</td>' +
+        '</tr>';
+      }).join('');
+
+      stepsWrap.innerHTML =
+        '<table class="steps-table">' +
+          '<thead><tr>' +
+            '<th>#</th>' +
+            '<th>Description</th>' +
+            '<th>Expected</th>' +
+            '<th>Actual Result</th>' +
+          '</tr></thead>' +
+          '<tbody>' + stepsRows + '</tbody>' +
+        '</table>';
+
+      tcItem.appendChild(stepsWrap);
+      tcList.appendChild(tcItem);
+    });
+
+    body.appendChild(tcList);
+    modEl.appendChild(body);
+    modulesEl.appendChild(modEl);
+  });
+
+  /* ── Toggle helpers ── */
+  function toggleModule(mi) {
+    var body = document.getElementById('mbody-' + mi);
+    var chev = document.getElementById('chev-' + mi);
+    var isOpen = body.classList.toggle('open');
+    chev.classList.toggle('open', isOpen);
+  }
+
+  function toggleTc(mi, tci) {
+    document.getElementById('sw-' + mi + '-' + tci).classList.toggle('open');
+  }
+
+}());
+</script>
+
+</body>
+</html>

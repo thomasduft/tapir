@@ -40,6 +40,22 @@
       "stopAtEntry": false
     },
     {
+      "name": "tapir:report",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-tapir",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
+      "args": [
+        "report",
+        "-i",
+        "samples/Runs",
+        "-o",
+        "samples/Runs/samples-report.html"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    },
+    {
       "name": "tapir:run:tc-users-001",
       "type": "coreclr",
       "request": "launch",

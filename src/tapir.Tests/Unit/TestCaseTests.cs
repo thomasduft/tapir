@@ -20,7 +20,6 @@ public class TestCaseTests
     Assert.Equal(string.Empty, testCase.Status);
     Assert.Empty(testCase.Tables);
     Assert.Equal(string.Empty, testCase.File);
-    Assert.Equal(string.Empty, testCase.LinkedFile);
     Assert.Equal(string.Empty, testCase.Domain);
     Assert.Empty(testCase.Variables);
   }
@@ -122,21 +121,6 @@ public class TestCaseTests
     // Assert
     Assert.Equal(expectedFile, testCase.File);
   }
-
-  [Fact]
-  public void LinkedFile_CanBeSetAndRetrieved()
-  {
-    // Arrange
-    var testCase = new TestCase();
-    var expectedLinkedFile = "/path/to/linked.md";
-
-    // Act
-    testCase.LinkedFile = expectedLinkedFile;
-
-    // Assert
-    Assert.Equal(expectedLinkedFile, testCase.LinkedFile);
-  }
-
   #endregion
 
   #region IsDefinition Property Tests
@@ -188,49 +172,6 @@ public class TestCaseTests
 
     // Act
     var result = testCase.IsDefinition;
-
-    // Assert
-    Assert.False(result);
-  }
-
-  #endregion
-
-  #region HasLinkedFile Property Tests
-
-  [Fact]
-  public void HasLinkedFile_ReturnsTrueWhenLinkedFileIsSet()
-  {
-    // Arrange
-    var testCase = new TestCase { LinkedFile = "/path/to/file.md" };
-
-    // Act
-    var result = testCase.HasLinkedFile;
-
-    // Assert
-    Assert.True(result);
-  }
-
-  [Fact]
-  public void HasLinkedFile_ReturnsFalseWhenLinkedFileIsEmpty()
-  {
-    // Arrange
-    var testCase = new TestCase { LinkedFile = string.Empty };
-
-    // Act
-    var result = testCase.HasLinkedFile;
-
-    // Assert
-    Assert.False(result);
-  }
-
-  [Fact]
-  public void HasLinkedFile_ReturnsFalseWhenLinkedFileIsNull()
-  {
-    // Arrange
-    var testCase = new TestCase { LinkedFile = null! };
-
-    // Act
-    var result = testCase.HasLinkedFile;
 
     // Assert
     Assert.False(result);
@@ -610,8 +551,7 @@ public class TestCaseTests
       Module = "Authentication",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Passed,
-      File = "/tests/login.md",
-      LinkedFile = "/tests/login-run.md"
+      File = "/tests/login.md"
     };
 
     // Act
@@ -634,7 +574,6 @@ public class TestCaseTests
     Assert.Equal("Authentication", testCase.Module);
     Assert.True(testCase.IsDefinition);
     Assert.Equal(Constants.TestCaseStatus.Passed, testCase.Status);
-    Assert.True(testCase.HasLinkedFile);
     Assert.True(testCase.HasDomain);
     Assert.Equal("https://api.example.com", testCase.Domain);
     Assert.True(testCase.HasVariables);

@@ -1,6 +1,6 @@
 namespace tomware.Tapir.Cli.Domain;
 
-internal static class TestCaseFileLocator
+internal static class TestCaseDefinitionFinder
 {
   internal static string[] FindFiles(string directoryPath, string testCaseId)
   {

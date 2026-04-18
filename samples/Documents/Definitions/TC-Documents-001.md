@@ -20,13 +20,13 @@ The test validates that the API returns proper HTTP status codes (201 for creati
 
 ## Steps
 
-| Step ID  | Description             | Expected Result    | Test Data                                                                                                                | Actual Result |
-| -------: | ----------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------- |
-| 01       | Add Document            | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=samples/Documents/Definitions/@@FileName@@.pdf | -             |
-| 02       | Set Document Title      | Document prepared  | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                                       | -             |
-| 03       | Upload Document         | Request successful | Action=Send Method=POST Endpoint=documents                                                                               | -             |
-| 04       | Check response code     | 201                | Action=CheckStatusCode Value=201                                                                                         | -             |
-| 05       | Retain DocumentId       | ID of new document | Action=StoreVariable JsonPath=$ Name=DocumentId                                                                          | -             |
+| Step ID  | Description             | Expected Result        | Test Data                                                                                         | Actual Result |
+| -------: | ----------------------- | ---------------------- | --------------------------------------------------------------------------------------------------| ------------- |
+| 01       | Add Document            | Document prepared      | Action=AddContent ContentType=multipart/form-data Name=file Value=empty.pdf File=@@FileName@@.pdf | -             |
+| 02       | Set Document Title      | Document prepared      | Action=AddContent ContentType=multipart/form-data Name=title Value="Test Document"                | -             |
+| 03       | Upload Document         | Request successful     | Action=Send Method=POST Endpoint=documents                                                        | -             |
+| 04       | Check response code     | 201                    | Action=CheckStatusCode Value=201                                                                  | -             |
+| 05       | Retain DocumentId       | ID of new document     | Action=StoreVariable JsonPath=$ Name=DocumentId                                                   | -             |
 
 | Step ID  | Description             | Expected Result        | Test Data                                                         | Actual Result |
 | -------: | ----------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |

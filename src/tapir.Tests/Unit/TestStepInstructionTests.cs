@@ -23,6 +23,7 @@ public class TestStepInstructionTests
     Assert.Equal(string.Empty, instruction.JsonPath);
     Assert.Equal("GET", instruction.Method);
     Assert.Equal(string.Empty, instruction.Endpoint);
+    Assert.Equal(string.Empty, instruction.TestCaseFile);
     Assert.Equal(string.Empty, instruction.Domain);
     Assert.Equal(Constants.ContentTypes.Json, instruction.ContentType);
     Assert.Equal(step, instruction.TestStep);
@@ -231,6 +232,25 @@ public class TestStepInstructionTests
 
     // Assert
     Assert.Equal("text/plain", instruction.ContentType);
+  }
+
+  [Fact]
+  public void FromTestStep_WithTestCaseFile_SetsTestCaseFile()
+  {
+    // Arrange
+    var step = new TestStep
+    {
+      Id = 1,
+      TestData = "Action=AddContent File=data.json"
+    };
+    var variables = new Dictionary<string, string>();
+    var testCaseFile = "/tmp/TC-Users-001.md";
+
+    // Act
+    var instruction = TestStepInstruction.FromTestStep(step, variables, testCaseFile);
+
+    // Assert
+    Assert.Equal(testCaseFile, instruction.TestCaseFile);
   }
 
   [Fact]

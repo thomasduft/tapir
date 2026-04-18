@@ -198,58 +198,6 @@ public class TestCaseValidatorTests
 
   #endregion
 
-  #region ValidateAsync - LinkedFile Validation
-
-  [Fact]
-  public async Task ValidateAsync_WithNoLinkedFile_ShouldReturnValidResult()
-  {
-    // Arrange
-    var testCase = new TestCase
-    {
-      Id = "TC-009",
-      Title = "Test Case 9",
-      Type = Constants.TestCaseType.Definition,
-      Status = Constants.TestCaseStatus.Unknown,
-      LinkedFile = "",
-      Tables = new List<Table>()
-    };
-    var validators = new List<IValidator>();
-    var validator = new TestCaseValidator(validators);
-
-    // Act
-    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
-
-    // Assert
-    Assert.True(result.IsValid);
-    Assert.Empty(result.Errors);
-  }
-
-  [Fact]
-  public async Task ValidateAsync_WithNonExistentLinkedFile_ShouldReturnLinkError()
-  {
-    // Arrange
-    var testCase = new TestCase
-    {
-      Id = "TC-010",
-      Title = "Test Case 10",
-      Type = Constants.TestCaseType.Definition,
-      Status = Constants.TestCaseStatus.Unknown,
-      LinkedFile = "/non/existent/file.md",
-      Tables = new List<Table>()
-    };
-    var validators = new List<IValidator>();
-    var validator = new TestCaseValidator(validators);
-
-    // Act
-    var result = await validator.ValidateAsync(testCase, CancellationToken.None);
-
-    // Assert
-    Assert.False(result.IsValid);
-    Assert.Contains("Linked file /non/existent/file.md does not exist.", result.Errors);
-  }
-
-  #endregion
-
   #region ValidateAsync - Multiple Errors
 
   [Fact]
@@ -262,8 +210,7 @@ public class TestCaseValidatorTests
       Title = "Test Case 11",
       Type = "InvalidType",
       Status = "InvalidStatus",
-      LinkedFile = "/non/existent/file.md",
-      Tables = new List<Table>()
+      Tables = []
     };
     var validators = new List<IValidator>();
     var validator = new TestCaseValidator(validators);
@@ -273,10 +220,9 @@ public class TestCaseValidatorTests
 
     // Assert
     Assert.False(result.IsValid);
-    Assert.Equal(3, result.Errors.Count());
+    Assert.Equal(2, result.Errors.Count());
     Assert.Contains("Type must be 'Definition' or 'Run'.", result.Errors);
     Assert.Contains("Status must be either 'Passed', 'Failed' or 'Unknown'.", result.Errors);
-    Assert.Contains("Linked file /non/existent/file.md does not exist.", result.Errors);
   }
 
   #endregion
@@ -293,13 +239,13 @@ public class TestCaseValidatorTests
       Title = "Test Case 12",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Unknown,
-      Tables = new List<Table>
-      {
-        new Table
+      Tables =
+      [
+        new()
         {
-          Steps = new List<TestStep>()
+          Steps = []
         }
-      }
+      ]
     };
     var validators = new List<IValidator>();
     var validator = new TestCaseValidator(validators);
@@ -322,22 +268,22 @@ public class TestCaseValidatorTests
       Title = "Test Case 13",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Unknown,
-      Tables = new List<Table>
-      {
-        new Table
+      Tables =
+      [
+        new()
         {
-          Steps = new List<TestStep>
-          {
-            new TestStep
+          Steps =
+          [
+            new()
             {
               Id = 1,
               Description = "Step 1",
               TestData = "",
               ExpectedResult = "Result"
             }
-          }
+          ]
         }
-      }
+      ]
     };
     var validators = new List<IValidator>();
     var validator = new TestCaseValidator(validators);
@@ -360,22 +306,22 @@ public class TestCaseValidatorTests
       Title = "Test Case 14",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Unknown,
-      Tables = new List<Table>
-      {
-        new Table
+      Tables =
+      [
+        new()
         {
-          Steps = new List<TestStep>
-          {
-            new TestStep
+          Steps =
+          [
+            new()
             {
               Id = 1,
               Description = "Step 1",
               TestData = "   ",
               ExpectedResult = "Result"
             }
-          }
+          ]
         }
-      }
+      ]
     };
     var validators = new List<IValidator>();
     var validator = new TestCaseValidator(validators);
@@ -398,22 +344,22 @@ public class TestCaseValidatorTests
       Title = "Test Case 15",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Unknown,
-      Tables = new List<Table>
-      {
-        new Table
+      Tables =
+      [
+        new()
         {
-          Steps = new List<TestStep>
-          {
-            new TestStep
+          Steps =
+          [
+            new()
             {
               Id = 1,
               Description = "Send request",
               TestData = "Action=Send Method=GET Endpoint=api/users",
               ExpectedResult = "Success"
             }
-          }
+          ]
         }
-      }
+      ]
     };
     var mockValidator = new MockValidator("Send", null);
     var validators = new List<IValidator> { mockValidator };
@@ -437,22 +383,22 @@ public class TestCaseValidatorTests
       Title = "Test Case 16",
       Type = Constants.TestCaseType.Definition,
       Status = Constants.TestCaseStatus.Unknown,
-      Tables = new List<Table>
-      {
-        new Table
+      Tables =
+      [
+        new()
         {
-          Steps = new List<TestStep>
-          {
-            new TestStep
+          Steps =
+          [
+            new()
             {
               Id = 1,
               Description = "Send request",
               TestData = "Action=Send Method=GET Endpoint=api/users",
               ExpectedResult = "Success"
             }
-          }
+          ]
         }
-      }
+      ]
     };
     var errors = new List<TestStepValidationError>
     {

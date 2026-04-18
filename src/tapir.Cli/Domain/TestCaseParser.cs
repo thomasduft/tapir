@@ -25,9 +25,6 @@ internal class TestCaseParser
     var markdownContent = string.Join(Environment.NewLine, lines);
     var tables = GetTables(markdownContent);
 
-    var link = FindTag(lines, "Link");
-    var linkedFile = GetLinkedFile(_file, link);
-
     var testCase = new TestCase
     {
       Id = testCaseId,
@@ -37,12 +34,13 @@ internal class TestCaseParser
       Status = status!,
       Date = date ?? string.Empty,
       Tables = tables,
-      File = _file,
-      LinkedFile = linkedFile!
+      File = _file
     };
 
     if (!string.IsNullOrEmpty(domain))
+    {
       testCase.WithDomain(domain);
+    }
 
     return testCase;
   }

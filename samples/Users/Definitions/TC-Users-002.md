@@ -23,7 +23,7 @@ In the end, it cleans up by deleting the created user.
 
 | Step ID  | Description            | Test Data                                                 | Expected Result    | Actual Result |
 | -------: | ---------------------- | --------------------------------------------------------- | ------------------ | ------------- |
-| 01       | Prepare Tom            | Action=AddContent File=samples/Users/Definitions/tom.json | User tom prepared  | -             |
+| 01       | Prepare Tom            | Action=AddContent File=tom.json                           | User tom prepared  | -             |
 | 02       | Add Test Header        | Action=AddHeader Name=X-Header-Test Value=test            | Test Header Added  | -             |
 | 03       | Get Tom details        | Action=Send Method=POST Endpoint=users                    | Request successful | -             |
 | 04       | Check response code    | Action=CheckStatusCode Value=201                          | 201                | -             |

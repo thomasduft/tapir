@@ -376,11 +376,8 @@ internal class HttpResponseMessageValidator
       return;
     }
 
-    // Read the file relative to the execution directory
-    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
     var expectedText = !string.IsNullOrEmpty(contentInstruction.File)
-      && File.Exists(relativeFilePath)
-        ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
+        ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(contentInstruction), cancellationToken)
         : contentInstruction.Value
           ?? string.Empty;
 
@@ -413,13 +410,8 @@ internal class HttpResponseMessageValidator
       return;
     }
 
-    // if File is present load from File otherwise use Value
-
-    // Read the file relative to the execution directory
-    var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), contentInstruction.File);
     var expectedJson = !string.IsNullOrEmpty(contentInstruction.File)
-      && File.Exists(relativeFilePath)
-      ? await File.ReadAllTextAsync(relativeFilePath, cancellationToken)
+      ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(contentInstruction), cancellationToken)
       : contentInstruction.Value
         ?? string.Empty;
 

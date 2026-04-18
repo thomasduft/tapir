@@ -47,13 +47,6 @@ internal class TestCaseValidator : ITestCaseValidator
       result.AddError("Status", $"Status must be either '{Constants.TestCaseStatus.Passed}', '{Constants.TestCaseStatus.Failed}' or '{Constants.TestCaseStatus.Unknown}'.");
     }
 
-    // check property Link if contains link should be a valid markdown link pointing to a file
-    //       Format: [The administrator must be authenticated](TC-001-Login.md)
-    if (testCase.HasLinkedFile && !File.Exists(testCase.LinkedFile))
-    {
-      result.AddError("Link", $"Linked file {testCase.LinkedFile} does not exist.");
-    }
-
     foreach (var step in testCase.Tables.SelectMany(t => t.Steps))
     {
       if (string.IsNullOrWhiteSpace(step.TestData))
@@ -61,7 +54,7 @@ internal class TestCaseValidator : ITestCaseValidator
 
       try
       {
-        var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables);
+        var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File);
         var validationErrors = await _validators
           .FirstOrDefault(v => v.Name == instruction.Action)!
           .ValidateAsync(instruction, cancellationToken);
@@ -101,7 +94,7 @@ internal class TestCaseValidator : ITestCaseValidator
       try
       {
         var instructions = addContentSteps
-          .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
+          .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File))
           .Where(i => i.Action == Constants.Actions.AddContent)
           .ToList();
 

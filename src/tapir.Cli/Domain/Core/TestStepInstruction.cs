@@ -13,6 +13,7 @@ internal class TestStepInstruction
   public string JsonPath { get; set; } = string.Empty;
   public string Method { get; set; } = "GET";
   public string Endpoint { get; set; } = string.Empty;
+  public string TestCaseFile { get; set; } = string.Empty;
 
   /// <summary>
   /// The domain to send the request to. Will override the global domain and be prepended to the endpoint.
@@ -27,16 +28,22 @@ internal class TestStepInstruction
     _step = step;
   }
 
+  // TODO: needs to be refactored so the test case file is not passed here, but rather access via the `TestStep.TestCase.File`-property
   public static TestStepInstruction FromTestStep(
     TestStep step,
-    Dictionary<string, string> variables
+    Dictionary<string, string> variables,
+    string testCaseFile = ""
   )
   {
     var testData = ParseTestData(step.TestData);
     if (testData.Count == 0)
       throw new InvalidDataException($"No TestData found for Test Step {step.Id}");
 
-    TestStepInstruction instruction = new(step);
+    TestStepInstruction instruction = new(step)
+    {
+      TestCaseFile = testCaseFile
+    };
+
     foreach (var parameter in testData)
     {
       switch (parameter.Key)

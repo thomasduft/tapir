@@ -379,6 +379,53 @@ public class HttpRequestMessageBuilderTests
   }
 
   [Fact]
+  public async Task BuildAsync_WithRelativeFileContent_ReadsContentFromTestCaseDirectory()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "payload.json");
+    var fileContent = "{\"name\":\"Jane\",\"age\":25}";
+
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, fileContent);
+
+    try
+    {
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.AddContent,
+          File = "payload.json",
+          TestCaseFile = testCaseFile
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/users"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      var content = await request.Content.ReadAsStringAsync();
+      Assert.Equal(fileContent, content);
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
   public async Task BuildAsync_WithNoContent_RequestContentIsNull()
   {
     // Arrange

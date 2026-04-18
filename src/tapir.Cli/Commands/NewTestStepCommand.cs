@@ -38,7 +38,7 @@ internal class NewTestStepCommand : CommandLineApplication
   private async Task<int> ExecuteAsync(CancellationToken cancellationToken)
   {
     // 1. Locate file
-    var files = TestCaseFileLocator.FindFiles(
+    var files = TestCaseDefinitionFinder.FindFiles(
       _inputDirectory.ParsedValue,
       _testCaseId.ParsedValue
     );

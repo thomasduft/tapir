@@ -230,6 +230,51 @@ public class HttpResponseMessageValidatorTests
   }
 
   [Fact]
+  public async Task ValidateAsync_WithVerifyContentFileRelativeToTestCase_ShouldReturnSuccessResult()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "expected.json");
+
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, "{\"name\":\"Alice\",\"age\":30}");
+
+    try
+    {
+      var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+      var verifyInstruction = CreateTestStepInstruction(
+        2,
+        Constants.Actions.VerifyContent,
+        file: "expected.json"
+      );
+      verifyInstruction.ContentType = Constants.ContentTypes.Json;
+      verifyInstruction.TestCaseFile = testCaseFile;
+      var instructions = new[] { sendInstruction, verifyInstruction };
+
+      var response = new HttpResponseMessage(HttpStatusCode.OK);
+      var jsonContent = new StringContent("{\"name\":\"Alice\",\"age\":30}", Encoding.UTF8, "application/json");
+
+      var validator = HttpResponseMessageValidator.Create(instructions)
+        .WithStatusCode(HttpStatusCode.OK)
+        .WithContentHeaders(response.Content.Headers)
+        .WithContent(jsonContent);
+
+      // Act
+      var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+      // Assert
+      Assert.Equal(2, results.Count);
+      Assert.All(results, r => Assert.True(r.IsSuccess));
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
   public async Task ValidateAsync_WithMultipleContentHeaders_ShouldCheckAllContentHeaders()
   {
     // Arrange

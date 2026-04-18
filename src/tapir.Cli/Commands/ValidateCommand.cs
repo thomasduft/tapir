@@ -50,7 +50,7 @@ internal class ValidateCommand : CommandLineApplication
   private async Task<int> ExecuteAsync(CancellationToken cancellationToken)
   {
     //1. Locate the Test Case definition file
-    var file = TestCaseFileLocator.FindFile(_inputDirectory.ParsedValue, _testCaseId.ParsedValue);
+    var file = TestCaseDefinitionFinder.FindFile(_inputDirectory.ParsedValue, _testCaseId.ParsedValue);
 
     // 2. Read the Test Case definition
     var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);

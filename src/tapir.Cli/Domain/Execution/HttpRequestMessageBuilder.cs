@@ -106,7 +106,7 @@ internal class HttpRequestMessageBuilder
       case Constants.ContentTypes.Text:
         var textInstruction = contentInstructions.First();
         var textContent = !string.IsNullOrEmpty(textInstruction.File)
-          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), textInstruction.File), cancellationToken)
+          ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(textInstruction), cancellationToken)
           : textInstruction.Value;
         request.Content = new StringContent(textContent!, Encoding.UTF8, "text/plain");
         break;
@@ -114,7 +114,7 @@ internal class HttpRequestMessageBuilder
       case Constants.ContentTypes.Json:
         var jsonInstruction = contentInstructions.First();
         var jsonContent = !string.IsNullOrEmpty(jsonInstruction.File)
-          ? await File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(), jsonInstruction.File), cancellationToken)
+          ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(jsonInstruction), cancellationToken)
           : jsonInstruction.Value;
         request.Content = JsonContent.Create(JsonNode.Parse(jsonContent!)!);
         break;
@@ -125,10 +125,10 @@ internal class HttpRequestMessageBuilder
         {
           if (!string.IsNullOrEmpty(instruction.File))
           {
-            var relativeFilePath = Path.Combine(Directory.GetCurrentDirectory(), instruction.File);
-            var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(relativeFilePath, cancellationToken));
-            byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(relativeFilePath));
-            multipartContent.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(relativeFilePath));
+            var resolvedFilePath = TestCaseContentFileResolver.LocateExistingFile(instruction);
+            var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(resolvedFilePath, cancellationToken));
+            byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(resolvedFilePath));
+            multipartContent.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(resolvedFilePath));
           }
           else if (!string.IsNullOrEmpty(instruction.Name) && !string.IsNullOrEmpty(instruction.Value))
           {

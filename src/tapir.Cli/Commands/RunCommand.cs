@@ -92,7 +92,7 @@ internal class RunCommand : CommandLineApplication
   private async Task<int> ExecuteAsync(CancellationToken cancellationToken)
   {
     // Locate the Test Case definition files
-    var files = TestCaseFileLocator.FindFiles(
+    var files = TestCaseDefinitionFinder.FindFiles(
       _inputDirectory.ParsedValue,
       _testCaseId.ParsedValue
     );
@@ -143,7 +143,7 @@ internal class RunCommand : CommandLineApplication
     foreach (var table in testCase.Tables)
     {
       var instructions = table.Steps
-        .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables))
+        .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File))
         .ToList();
 
       var executionResult = await _testCaseExecutor.ExecuteAsync(

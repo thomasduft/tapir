@@ -31,7 +31,8 @@ internal class VerifyContentActionValidator : IValidator
     // If File is provided it must exist and its content must not be empty
     if (!string.IsNullOrEmpty(testStepInstruction.File))
     {
-      if (!File.Exists(testStepInstruction.File))
+      var filePath = TestCaseContentFileResolver.TryLocateExistingFile(testStepInstruction);
+      if (filePath == null)
       {
         results.Add(
           new TestStepValidationError(
@@ -41,7 +42,7 @@ internal class VerifyContentActionValidator : IValidator
       }
       else
       {
-        var fileContent = File.ReadAllText(testStepInstruction.File);
+        var fileContent = File.ReadAllText(filePath);
         if (string.IsNullOrWhiteSpace(fileContent))
         {
           results.Add(

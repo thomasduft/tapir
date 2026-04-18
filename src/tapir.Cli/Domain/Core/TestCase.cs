@@ -11,14 +11,17 @@ internal class TestCase
   public string Status { get; set; } = string.Empty;
   public string Date { get; set; } = string.Empty;
   public IEnumerable<Table> Tables { get; set; } = [];
-  public string File { get; set; } = string.Empty;
   public bool IsDefinition => !string.IsNullOrEmpty(Type) && Type == Constants.TestCaseType.Definition;
-  public string LinkedFile { get; set; } = string.Empty;
-  public bool HasLinkedFile => !string.IsNullOrEmpty(LinkedFile);
   public string Domain => _domain;
   public bool HasDomain => !string.IsNullOrEmpty(_domain);
   public Dictionary<string, string> Variables { get; set; } = [];
   public bool HasVariables => Variables.Count > 0;
+
+  /// <summary>
+  /// The file path of the test case.
+  /// This is used to resolve relative paths for files referenced in the test steps.
+  /// </summary>
+  public string File { get; set; } = string.Empty;
 
   public TestCase WithDomain(string domain)
   {

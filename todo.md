@@ -1,5 +1,7 @@
 # Todo
 
+- [ ] address TODO refactorings
+  - e.g. TestCase references in TestStep
 - [ ] Use ILogger through ctor injection instead of static Log class
   - make use of LoggerFactory while setting up the DI container
 - [ ] rename JsonPath to just Path

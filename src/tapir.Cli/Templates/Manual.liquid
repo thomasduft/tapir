@@ -71,7 +71,12 @@ tapir validate TC-Example-001 -i ./tests
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
-**5. man** - Display action reference
+**5. report** - Generates a self-contained HTML report from Test Case run output files
+```bash
+tapir report -i ./results -o ./results/report.html
+```
+
+**6. man** - Display action reference
 ```bash
 tapir man
 ```

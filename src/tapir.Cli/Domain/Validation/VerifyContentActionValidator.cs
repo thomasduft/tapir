@@ -28,6 +28,42 @@ internal class VerifyContentActionValidator : IValidator
       ));
     }
 
+    // If File is provided it must exist and its content must not be empty
+    if (!string.IsNullOrEmpty(testStepInstruction.File))
+    {
+      if (!File.Exists(testStepInstruction.File))
+      {
+        results.Add(
+          new TestStepValidationError(
+            testStepInstruction.TestStep.Id,
+            $"File '{testStepInstruction.File}' does not exist."
+          ));
+      }
+      else
+      {
+        var fileContent = File.ReadAllText(testStepInstruction.File);
+        if (string.IsNullOrWhiteSpace(fileContent))
+        {
+          results.Add(
+            new TestStepValidationError(
+              testStepInstruction.TestStep.Id,
+              $"File '{testStepInstruction.File}' must not be empty or whitespace."
+            ));
+        }
+      }
+    }
+
+    // If Value is provided it must not be empty
+    if (!string.IsNullOrEmpty(testStepInstruction.Value)
+      && string.IsNullOrWhiteSpace(testStepInstruction.Value))
+    {
+      results.Add(
+        new TestStepValidationError(
+          testStepInstruction.TestStep.Id,
+          "Value must not be empty or whitespace."
+        ));
+    }
+
     return Task.FromResult(results.AsEnumerable());
   }
 }

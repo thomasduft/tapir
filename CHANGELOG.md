@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.19] - 2026-04-18
+
+### Fixed
+
+- Allows proper content file resolving
+
 ## [0.0.18] - 2026-04-14
 
 ### Added

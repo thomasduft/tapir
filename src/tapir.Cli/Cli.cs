@@ -15,13 +15,15 @@ public class Cli : CommandLineApplication
       OtelHelper.OtlpOption,
       CommandOptionType.SingleValue)
     {
-      Description = "Enable OpenTelemetry metrics export to the specified OTLP endpoint (e.g., http://localhost:4318/v1/metrics)."
+      Description = "Enable OpenTelemetry metrics export to the specified OTLP endpoint (e.g., http://localhost:4318/v1/metrics).",
+      Inherited = true
     });
     AddOption(new CommandOption(
       LogHelper.VerboseOption,
       CommandOptionType.NoValue)
     {
-      Description = "Enable verbose logging."
+      Description = "Enable verbose logging.",
+      Inherited = true
     });
 
     foreach (var cmd in commands)

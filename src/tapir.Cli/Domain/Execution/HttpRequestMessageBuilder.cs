@@ -3,6 +3,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json.Nodes;
 
+using Serilog;
+
 using tomware.Tapir.Cli.Utils;
 
 namespace tomware.Tapir.Cli.Domain;
@@ -55,6 +57,8 @@ internal class HttpRequestMessageBuilder
       if (!string.IsNullOrEmpty(headerInstruction.Name)
         && !string.IsNullOrEmpty(headerInstruction.Value))
       {
+        Log.Logger.Verbose("  - adding header: {HeaderName}: {HeaderValue}", headerInstruction.Name, headerInstruction.Value);
+
         request.Headers.Add(headerInstruction.Name, headerInstruction.Value);
       }
     }
@@ -100,6 +104,12 @@ internal class HttpRequestMessageBuilder
           .Where(i => !string.IsNullOrEmpty(i.Name) && !string.IsNullOrEmpty(i.Value))
           .Select(i => new KeyValuePair<string, string>(i.Name!, i.Value!))
           .ToList();
+
+        Log.Logger.Verbose(
+          "  - setting form URL encoded content with {FormData} key-value pairs.",
+          string.Join(", ", formData.Select(kv => $"{kv.Key}={kv.Value}"))
+        );
+
         request.Content = new FormUrlEncodedContent(formData);
         break;
 
@@ -108,6 +118,9 @@ internal class HttpRequestMessageBuilder
         var textContent = !string.IsNullOrEmpty(textInstruction.File)
           ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(textInstruction), cancellationToken)
           : textInstruction.Value;
+
+        Log.Logger.Verbose("  - setting text content: {TextContent}", textContent);
+
         request.Content = new StringContent(textContent!, Encoding.UTF8, "text/plain");
         break;
 
@@ -116,6 +129,9 @@ internal class HttpRequestMessageBuilder
         var jsonContent = !string.IsNullOrEmpty(jsonInstruction.File)
           ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(jsonInstruction), cancellationToken)
           : jsonInstruction.Value;
+
+        Log.Logger.Verbose("  - setting JSON content: {@JsonContent}", jsonContent);
+
         request.Content = JsonContent.Create(JsonNode.Parse(jsonContent!)!);
         break;
 
@@ -128,10 +144,24 @@ internal class HttpRequestMessageBuilder
             var resolvedFilePath = TestCaseContentFileResolver.LocateExistingFile(instruction);
             var byteArrayContent = new ByteArrayContent(await File.ReadAllBytesAsync(resolvedFilePath, cancellationToken));
             byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse(MimeTypeMapper.GetContentType(resolvedFilePath));
+
+            Log.Logger.Verbose(
+              "  - adding multipart file content: {FilePath} as field '{FieldName}' with filename '{FileName}'",
+              resolvedFilePath,
+              instruction.Name ?? "file",
+              instruction.Value ?? Path.GetFileName(resolvedFilePath)
+            );
+
             multipartContent.Add(byteArrayContent, instruction.Name ?? "file", instruction.Value ?? Path.GetFileName(resolvedFilePath));
           }
           else if (!string.IsNullOrEmpty(instruction.Name) && !string.IsNullOrEmpty(instruction.Value))
           {
+            Log.Logger.Verbose(
+              "  - adding multipart form data field: {FieldName}={FieldValue}",
+              instruction.Name,
+              instruction.Value
+            );
+
             var stringContent = new StringContent(instruction.Value, Encoding.UTF8);
             multipartContent.Add(stringContent, instruction.Name);
           }
@@ -151,6 +181,8 @@ internal class HttpRequestMessageBuilder
     var instruction = _instructions
       .FirstOrDefault(i => i.Action == Constants.Actions.Send)
         ?? throw new InvalidOperationException("No Send instruction found to set HTTP Method.");
+
+    Log.Logger.Verbose("  - setting HTTP method: {HttpMethod}", instruction.Method);
 
     request.Method = new HttpMethod(instruction.Method);
   }
@@ -179,6 +211,8 @@ internal class HttpRequestMessageBuilder
     var uriString = !string.IsNullOrEmpty(queryString)
       ? $"{domain}/{endpoint}?{queryString}"
       : $"{domain}/{endpoint}";
+
+    Log.Logger.Verbose("  - setting request URI: {RequestUri}", uriString);
 
     request.RequestUri = new Uri(uriString);
   }

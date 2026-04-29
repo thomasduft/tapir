@@ -14,12 +14,15 @@ internal interface ITestCaseExecutor
 internal class TestCaseExecutor : ITestCaseExecutor
 {
   private readonly IHttpClientFactory _factory;
+  private readonly IHttpRequestMessageBuilder _requestMessageBuilder;
 
   public TestCaseExecutor(
-    IHttpClientFactory factory
+    IHttpClientFactory factory,
+    IHttpRequestMessageBuilder requestMessageBuilder
   )
   {
     _factory = factory;
+    _requestMessageBuilder = requestMessageBuilder;
   }
 
   public async Task<TestCaseExecutionResult> ExecuteAsync(
@@ -30,10 +33,8 @@ internal class TestCaseExecutor : ITestCaseExecutor
   {
     using var client = _factory.CreateClient(Constants.HttpClientName);
 
-    var requestMessage = await HttpRequestMessageBuilder
-      .Create(instructions)
-      .WithDomain(domain)
-      .BuildAsync(cancellationToken);
+    var requestMessage = await _requestMessageBuilder
+      .BuildAsync(domain, instructions, cancellationToken);
 
     Log.Logger.Information("- sending request: {RequestUri} ({Method})",
       requestMessage.RequestUri,

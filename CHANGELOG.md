@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.21] - 2026-04-29
+
+### Changed
+
+- Refactored request content handlers and response validators
+
 ## [0.0.20] - 2026-04-29
 
 ### Added

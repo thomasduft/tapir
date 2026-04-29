@@ -66,7 +66,7 @@ internal class HttpRequestMessageBuilder
     return request;
   }
 
-  private static IRequestContentFactory CreateDefaultRequestContentFactory()
+  private static RequestContentFactory CreateDefaultRequestContentFactory()
   {
     return new RequestContentFactory(
     [

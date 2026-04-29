@@ -71,7 +71,7 @@ internal class VariableExtractor
         var jsonPath = JsonPath.Parse(instruction.JsonPath);
         var result = jsonPath.Evaluate(jsonNode!);
         var matches = result.Matches?.ToList();
-        if (matches == null || !matches.Any())
+        if (matches == null || matches.Count == 0)
         {
           continue;
         }

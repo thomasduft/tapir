@@ -15,14 +15,17 @@ internal class TestCaseExecutor : ITestCaseExecutor
 {
   private readonly IHttpClientFactory _factory;
   private readonly IHttpRequestMessageBuilder _requestMessageBuilder;
+  private readonly IResponseContentValidatorFactory _responseContentValidatorFactory;
 
   public TestCaseExecutor(
     IHttpClientFactory factory,
-    IHttpRequestMessageBuilder requestMessageBuilder
+    IHttpRequestMessageBuilder requestMessageBuilder,
+    IResponseContentValidatorFactory responseContentValidatorFactory
   )
   {
     _factory = factory;
     _requestMessageBuilder = requestMessageBuilder;
+    _responseContentValidatorFactory = responseContentValidatorFactory;
   }
 
   public async Task<TestCaseExecutionResult> ExecuteAsync(
@@ -43,8 +46,9 @@ internal class TestCaseExecutor : ITestCaseExecutor
     var response = await client
       .SendAsync(requestMessage, cancellationToken);
 
-    var responseValidationResult = await HttpResponseMessageValidator
-      .Create(instructions)
+    var responseValidationResult = await new HttpResponseMessageValidator(
+      _responseContentValidatorFactory,
+      instructions)
       .WithStatusCode(response.StatusCode)
       .WithReasonPhrase(response.ReasonPhrase)
       .WithContentHeaders(response.Content.Headers)

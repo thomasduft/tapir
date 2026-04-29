@@ -13,6 +13,9 @@ internal static class ExecutionServiceConfiguration
       .AddSingleton<IRequestContentHandler, JsonRequestContentHandler>()
       .AddSingleton<IRequestContentHandler, FormUrlEncodedRequestContentHandler>()
       .AddSingleton<IRequestContentHandler, MultipartFormDataRequestContentHandler>()
+      .AddSingleton<IResponseContentValidatorFactory, ResponseContentValidatorFactory>()
+      .AddSingleton<IResponseContentValidator, TextResponseContentValidator>()
+      .AddSingleton<IResponseContentValidator, JsonResponseContentValidator>()
       .AddHttpClient(Constants.HttpClientName)
       .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
       {

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.20] - 2026-04-29
+
+### Added
+
+- Added verbose logging for HTTP request construction
+
 ## [0.0.19] - 2026-04-18
 
 ### Fixed

@@ -1,7 +1,5 @@
 # Todo
 
-- [ ] address TODO refactorings
-  - e.g. TestCase references in TestStep
 - [ ] add Variables support in Content files
 - [ ] Use ILogger through ctor injection instead of static Log class
   - make use of LoggerFactory while setting up the DI container
@@ -19,3 +17,5 @@
 - [x] improved docs / man
 - [x] support colored Console Logger based on log-levels with Serilog instead of custom ConsoleHelper
   - https://github.com/serilog/serilog-sinks-console/issues/35#issuecomment-2577943657
+- [x] address TODO refactorings
+  - e.g. TestCase references in TestStep

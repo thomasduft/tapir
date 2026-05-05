@@ -18,6 +18,10 @@ internal class JsonRequestContentHandler : IRequestContentHandler
     var jsonContent = !string.IsNullOrEmpty(instruction.File)
       ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(instruction), cancellationToken)
       : instruction.Value;
+    jsonContent = VariablesHelper.ResolveVariables(
+      jsonContent!,
+      instruction.TestStep.TestCase.Variables
+    );
 
     Log.Logger.Verbose("  - setting JSON content: {@JsonContent}", jsonContent);
 

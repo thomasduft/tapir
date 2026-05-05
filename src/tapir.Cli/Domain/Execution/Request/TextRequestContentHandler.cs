@@ -20,6 +20,10 @@ internal class TextRequestContentHandler : IRequestContentHandler
           cancellationToken
         )
       : instruction.Value;
+    textContent = VariablesHelper.ResolveVariables(
+      textContent!,
+      instruction.TestStep.TestCase.Variables
+    );
 
     Log.Logger.Verbose("  - setting text content: {TextContent}", textContent);
 

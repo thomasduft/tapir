@@ -49,22 +49,22 @@ internal class TestStepInstruction
           instruction.Name = parameter.Value;
           break;
         case nameof(Value):
-          instruction.Value = ReplaceVariables(parameter.Value, variables);
+          instruction.Value = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(File):
-          instruction.File = ReplaceVariables(parameter.Value, variables);
+          instruction.File = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(JsonPath):
-          instruction.JsonPath = ReplaceVariables(parameter.Value, variables);
+          instruction.JsonPath = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(Method):
           instruction.Method = parameter.Value.ToUpperInvariant();
           break;
         case nameof(Endpoint):
-          instruction.Endpoint = ReplaceVariables(parameter.Value, variables);
+          instruction.Endpoint = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(Domain):
-          instruction.Domain = ReplaceVariables(parameter.Value, variables);
+          instruction.Domain = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(ContentType):
           instruction.ContentType = parameter.Value;
@@ -85,25 +85,6 @@ internal class TestStepInstruction
     step.TestCase.WithVariables(variables);
 
     return FromTestStep(step);
-  }
-
-  private static string ReplaceVariables(
-    string value,
-    Dictionary<string, string> variables
-  )
-  {
-    if (!value.Contains(Constants.VariablePreAndSuffix)) return value;
-
-    // Pattern: users/@@AliceId@@
-    var pattern = $@"\{Constants.VariablePreAndSuffix}([^@]+){Constants.VariablePreAndSuffix}";
-
-    return Regex.Replace(value, pattern, match =>
-    {
-      var key = match.Groups[1].Value; // Extract the variable name
-      return variables.TryGetValue(key, out var variableValue)
-        ? variableValue
-        : throw new InvalidOperationException($"Variable with key '{key}' could not be resolved!");
-    });
   }
 
   private static Dictionary<string, string> ParseTestData(

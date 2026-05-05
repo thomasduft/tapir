@@ -40,6 +40,6 @@ jobs:
     - name: Run test case TC-Documents-001
       run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -tc TC-Documents-001 -i "samples/Documents/Definitions" -o "samples/Documents/Runs" -v FileName=empty --verbose
     - name: Run all test cases
-      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -i "samples" -o "samples/Runs" -v FileName=empty
+      run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -i "samples" -o "samples/Runs" -v FileName=empty -v AgeOfTom=45
     - name: Generate test report
       run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- report -i "samples/Runs" -o "samples/Runs/samples-report.html"

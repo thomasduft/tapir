@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Refactord domain model and added TestCase reference to TestStep
+- Refactord domain model and added TestCase reference to TestStep
 
 ## [0.0.21] - 2026-04-29
 

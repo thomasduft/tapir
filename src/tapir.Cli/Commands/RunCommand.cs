@@ -143,7 +143,7 @@ internal class RunCommand : CommandLineApplication
     foreach (var table in testCase.Tables)
     {
       var instructions = table.Steps
-        .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File))
+        .Select(TestStepInstruction.FromTestStep)
         .ToList();
 
       var executionResult = await _testCaseExecutor.ExecuteAsync(

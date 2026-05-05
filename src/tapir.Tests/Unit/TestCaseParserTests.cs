@@ -71,6 +71,7 @@ Tests whether all users can be retrieved and Alice's ID can be extracted so that
       Assert.Equal("Call users api", firstTableSteps[0].Description);
       Assert.Equal("Verify response code", firstTableSteps[1].Description);
       Assert.Equal("Inspect content", firstTableSteps[2].Description);
+      Assert.All(firstTableSteps, step => Assert.Same(testCase, step.TestCase));
 
       // Verify second table has 3 steps
       var secondTable = tables[1];
@@ -79,6 +80,7 @@ Tests whether all users can be retrieved and Alice's ID can be extracted so that
       Assert.Equal("Get Alice Details", secondTableSteps[0].Description);
       Assert.Equal("Verify response code", secondTableSteps[1].Description);
       Assert.Equal("Inspect content", secondTableSteps[2].Description);
+      Assert.All(secondTableSteps, step => Assert.Same(testCase, step.TestCase));
 
       // Verify total steps across all tables is 6
       var totalSteps = tables.SelectMany(t => t.Steps).Count();

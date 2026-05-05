@@ -43,7 +43,6 @@ internal class TestCase
   )
   {
     var parser = new TestCaseParser(file);
-
     return await parser.ToTestCaseAsync(cancellationToken);
   }
 

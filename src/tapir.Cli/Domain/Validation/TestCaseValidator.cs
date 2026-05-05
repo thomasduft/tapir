@@ -47,6 +47,7 @@ internal class TestCaseValidator : ITestCaseValidator
       result.AddError("Status", $"Status must be either '{Constants.TestCaseStatus.Passed}', '{Constants.TestCaseStatus.Failed}' or '{Constants.TestCaseStatus.Unknown}'.");
     }
 
+    // Validates each test step using the appropriate validator based on the action.
     foreach (var step in testCase.Tables.SelectMany(t => t.Steps))
     {
       if (string.IsNullOrWhiteSpace(step.TestData))
@@ -54,7 +55,7 @@ internal class TestCaseValidator : ITestCaseValidator
 
       try
       {
-        var instruction = TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File);
+        var instruction = TestStepInstruction.FromTestStep(step);
         var validationErrors = await _validators
           .FirstOrDefault(v => v.Name == instruction.Action)!
           .ValidateAsync(instruction, cancellationToken);
@@ -94,7 +95,7 @@ internal class TestCaseValidator : ITestCaseValidator
       try
       {
         var instructions = addContentSteps
-          .Select(step => TestStepInstruction.FromTestStep(step, testCase.Variables, testCase.File))
+          .Select(TestStepInstruction.FromTestStep)
           .Where(i => i.Action == Constants.Actions.AddContent)
           .ToList();
 

@@ -9,7 +9,7 @@ internal static class TestCaseContentFileResolver
       return null;
     }
 
-    foreach (var candidate in GetCandidatePaths(instruction.File, instruction.TestCaseFile))
+    foreach (var candidate in GetCandidatePaths(instruction.File, instruction.TestStep.TestCase.File))
     {
       if (File.Exists(candidate))
       {
@@ -28,7 +28,7 @@ internal static class TestCaseContentFileResolver
       );
   }
 
-  internal static IEnumerable<string> GetCandidatePaths(string filePath, string testCaseFile)
+  internal static IEnumerable<string> GetCandidatePaths(string filePath, string? testCaseFile)
   {
     if (string.IsNullOrWhiteSpace(filePath))
     {

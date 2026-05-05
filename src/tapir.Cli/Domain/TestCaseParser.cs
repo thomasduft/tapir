@@ -37,6 +37,8 @@ internal class TestCaseParser
       File = _file
     };
 
+    AssignTestCaseToSteps(testCase);
+
     if (!string.IsNullOrEmpty(domain))
     {
       testCase.WithDomain(domain);
@@ -60,7 +62,7 @@ internal class TestCaseParser
     return (testCaseId, testCaseTitle);
   }
 
-  private string? FindTag(string[] lines, string tag)
+  private static string? FindTag(string[] lines, string tag)
   {
     var line = lines.FirstOrDefault(l => l.StartsWith($"- **{tag}**:"));
     if (line == null) return null;
@@ -74,7 +76,7 @@ internal class TestCaseParser
   /// Finds a tag value that may contain colons (e.g. URLs like https://localhost:5001).
   /// Returns everything after the first colon on the matching line.
   /// </summary>
-  private string? FindTagValue(string[] lines, string tag)
+  private static string? FindTagValue(string[] lines, string tag)
   {
     var line = lines.FirstOrDefault(l => l.StartsWith($"- **{tag}**:"));
     if (line == null) return null;
@@ -83,7 +85,7 @@ internal class TestCaseParser
     return colonIndex >= 0 ? line.Substring(colonIndex + 1).Trim() : null;
   }
 
-  private IEnumerable<Table> GetTables(string markdownContent)
+  private static IEnumerable<Table> GetTables(string markdownContent)
   {
     var tables = new List<Table>();
     var table = new MarkdownTable(markdownContent);
@@ -106,21 +108,11 @@ internal class TestCaseParser
     return tables;
   }
 
-  private string? GetLinkedFile(string file, string? link)
+  private static void AssignTestCaseToSteps(TestCase testCase)
   {
-    if (string.IsNullOrWhiteSpace(link)) return null;
-    if (!link.Contains('(')) return null;
-
-    // Format: [The administrator must be authenticated](TC-001-Login.md)
-    string pattern = @"\(([^)]+)\)";
-    Match match = Regex.Match(link, pattern);
-
-    if (match.Success)
+    foreach (var step in testCase.Tables.SelectMany(t => t.Steps))
     {
-      return Path.Combine(Path.GetDirectoryName(file)!, match.Groups[1].Value);
+      step.TestCase = testCase;
     }
-
-    // Return null if no match is found
-    return null;
   }
 }

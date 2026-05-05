@@ -14,7 +14,7 @@ public class TestCaseContentFileResolverTests
     try
     {
       var instruction = CreateInstruction(Constants.Actions.VerifyContent, file: "expected.json");
-      instruction.TestCaseFile = fixture.TestCaseFile;
+      instruction.TestStep.TestCase.File = fixture.TestCaseFile;
 
       var resolvedPath = TestCaseContentFileResolver.TryLocateExistingFile(instruction);
 
@@ -39,7 +39,7 @@ public class TestCaseContentFileResolverTests
         file: "payload.json",
         contentType: Constants.ContentTypes.Json
       );
-      instruction.TestCaseFile = fixture.TestCaseFile;
+      instruction.TestStep.TestCase.File = fixture.TestCaseFile;
 
       var results = (await validator.ValidateAsync(instruction, CancellationToken.None)).ToList();
 
@@ -64,7 +64,7 @@ public class TestCaseContentFileResolverTests
         file: "expected.json",
         contentType: Constants.ContentTypes.Json
       );
-      instruction.TestCaseFile = fixture.TestCaseFile;
+      instruction.TestStep.TestCase.File = fixture.TestCaseFile;
 
       var results = (await validator.ValidateAsync(instruction, CancellationToken.None)).ToList();
 
@@ -83,7 +83,7 @@ public class TestCaseContentFileResolverTests
     string contentType = "application/json"
   )
   {
-    return new TestStepInstruction(new TestStep { Id = 1 })
+    return new TestStepInstruction(new TestStep { Id = 1, TestCase = new TestCase() })
     {
       Action = action,
       File = file,

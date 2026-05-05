@@ -250,7 +250,10 @@ public class HttpResponseMessageValidatorTests
         file: "expected.json"
       );
       verifyInstruction.ContentType = Constants.ContentTypes.Json;
-      verifyInstruction.TestCaseFile = testCaseFile;
+      verifyInstruction.TestStep.TestCase = new TestCase
+      {
+        File = testCaseFile
+      };
       var instructions = new[] { sendInstruction, verifyInstruction };
 
       var response = new HttpResponseMessage(HttpStatusCode.OK);

@@ -395,11 +395,16 @@ public class HttpRequestMessageBuilderTests
     {
       var instructions = new List<TestStepInstruction>
       {
-        new TestStepInstruction(new TestStep())
+        new TestStepInstruction(new TestStep
+        {
+          TestCase = new TestCase
+          {
+            File = testCaseFile
+          }
+        })
         {
           Action = Constants.Actions.AddContent,
-          File = "payload.json",
-          TestCaseFile = testCaseFile
+          File = "payload.json"
         },
         new TestStepInstruction(new TestStep())
         {

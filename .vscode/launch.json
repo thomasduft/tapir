@@ -35,6 +35,8 @@
         "samples/Runs",
         "-v",
         "FileName=empty",
+        "-v",
+        "AgeOfTom=45",
         "--otlp",
         "http://localhost:9090/api/v1/otlp/v1/metrics"
       ],
@@ -93,6 +95,8 @@
         "samples/Users/Definitions",
         "-tc",
         "TC-Users-002",
+        "-v",
+        "AgeOfTom=45",
         "-o",
         "samples/Users/Runs",
         "--continue-on-failure",

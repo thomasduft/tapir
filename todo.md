@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] add Variables support in Content files
 - [ ] Use ILogger through ctor injection instead of static Log class
   - make use of LoggerFactory while setting up the DI container
 - [ ] rename JsonPath to just Path
@@ -19,3 +18,4 @@
   - https://github.com/serilog/serilog-sinks-console/issues/35#issuecomment-2577943657
 - [x] address TODO refactorings
   - e.g. TestCase references in TestStep
+- [x] add Variables support in Content files

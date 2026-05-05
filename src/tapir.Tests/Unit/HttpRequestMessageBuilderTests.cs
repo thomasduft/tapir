@@ -431,6 +431,217 @@ public class HttpRequestMessageBuilderTests
   }
 
   [Fact]
+  public async Task BuildAsync_WithJsonFileContentAndVariables_ResolvesVariablesInContent()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "payload.json");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, "{\"name\":\"@@UserName@@\"}");
+
+    try
+    {
+      var testCase = new TestCase
+      {
+        File = testCaseFile,
+        Variables = new Dictionary<string, string>
+        {
+          { "UserName", "Jane" }
+        }
+      };
+
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep { TestCase = testCase })
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.Json,
+          File = "payload.json"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/users"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      var content = await request.Content.ReadAsStringAsync();
+      Assert.Equal("{\"name\":\"Jane\"}", content);
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithTextFileContentAndVariables_ResolvesVariablesInContent()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "payload.txt");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, "Hello @@UserName@@!");
+
+    try
+    {
+      var testCase = new TestCase
+      {
+        File = testCaseFile,
+        Variables = new Dictionary<string, string>
+        {
+          { "UserName", "Jane" }
+        }
+      };
+
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep { TestCase = testCase })
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.Text,
+          File = "payload.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/users"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      var content = await request.Content.ReadAsStringAsync();
+      Assert.Equal("Hello Jane!", content);
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithFormUrlEncodedFileContentAndVariables_ResolvesVariablesInContent()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "username.txt");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, "@@UserName@@");
+
+    try
+    {
+      var testCase = new TestCase
+      {
+        File = testCaseFile,
+        Variables = new Dictionary<string, string>
+        {
+          { "UserName", "john_doe" }
+        }
+      };
+
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep { TestCase = testCase })
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.FormUrlEncoded,
+          Name = "username",
+          File = "username.txt"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/login"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act
+      var request = await builder.BuildAsync(CancellationToken.None);
+
+      // Assert
+      Assert.NotNull(request.Content);
+      var content = await request.Content.ReadAsStringAsync();
+      Assert.Equal("username=john_doe", content);
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
+  public async Task BuildAsync_WithUnresolvedVariableInJsonFileContent_ThrowsInvalidOperationException()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    var contentFile = Path.Combine(tempDirectory, "payload.json");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+    await File.WriteAllTextAsync(contentFile, "{\"name\":\"@@Missing@@\"}");
+
+    try
+    {
+      var testCase = new TestCase
+      {
+        File = testCaseFile,
+        Variables = []
+      };
+
+      var instructions = new List<TestStepInstruction>
+      {
+        new TestStepInstruction(new TestStep { TestCase = testCase })
+        {
+          Action = Constants.Actions.AddContent,
+          ContentType = Constants.ContentTypes.Json,
+          File = "payload.json"
+        },
+        new TestStepInstruction(new TestStep())
+        {
+          Action = Constants.Actions.Send,
+          Method = "POST",
+          Endpoint = "api/users"
+        }
+      };
+      var builder = HttpRequestMessageBuilder.Create(instructions)
+        .WithDomain("https://example.com");
+
+      // Act + Assert
+      await Assert.ThrowsAsync<InvalidOperationException>(
+        () => builder.BuildAsync(CancellationToken.None)
+      );
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
   public async Task BuildAsync_WithNoContent_RequestContentIsNull()
   {
     // Arrange

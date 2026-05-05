@@ -93,7 +93,7 @@ internal class AddContentActionValidator : IValidator
 
     if (testStepInstruction.ContentType == Constants.ContentTypes.FormUrlEncoded)
     {
-      // For FormUrlEncoded, Name and Value must be provided
+      // For FormUrlEncoded, Name and either Value or File must be provided
       if (string.IsNullOrEmpty(testStepInstruction.Name))
       {
         results.Add(
@@ -104,12 +104,13 @@ internal class AddContentActionValidator : IValidator
         );
       }
 
-      if (string.IsNullOrEmpty(testStepInstruction.Value))
+      if (string.IsNullOrEmpty(testStepInstruction.Value)
+        && string.IsNullOrEmpty(testStepInstruction.File))
       {
         results.Add(
           new TestStepValidationError(
             testStepInstruction.TestStep.Id,
-            "For FormUrlEncoded content, Value must be provided."
+            "For FormUrlEncoded content, Value or File must be provided."
           )
         );
       }

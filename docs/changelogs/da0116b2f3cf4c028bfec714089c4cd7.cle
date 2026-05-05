@@ -1,9 +1,0 @@
-{
-  "Id": "da0116b2-f3cf-4c02-8bfe-c714089c4cd7",
-  "IssueId": "",
-  "Prefix": "Changed",
-  "Tag": "",
-  "Message": "Refactord domain model and added \u0016TestCase reference to TestStep",
-  "CreatedAt": "2026-05-05T19:24:26.4154813+00:00",
-  "CreatedBy": "thomasduft"
-}

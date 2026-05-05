@@ -1,9 +1,0 @@
-{
-  "Id": "5705cfcc-ee82-4e85-a6be-03d11a05a404",
-  "IssueId": "",
-  "Prefix": "Added",
-  "Tag": "",
-  "Message": "Adds variables support in content files",
-  "CreatedAt": "2026-05-05T19:52:26.0697627+00:00",
-  "CreatedBy": "thomasduft"
-}

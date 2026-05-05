@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.22] - 2026-05-05
+
+### Added
+
+- Adds variables support in content files
+
+### Changed
+
+- Refactord domain model and added TestCase reference to TestStep
+
 ## [0.0.21] - 2026-04-29
 
 ### Changed

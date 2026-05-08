@@ -7,15 +7,33 @@ internal static class VariablesHelper
   public static Dictionary<string, string> CreateVariables(
     IReadOnlyList<string?> variables)
   {
+    // An entry with an escaped value like Token="AbcD="
+    // should be properly parsed into a key-value pair,
+    // where the key is "Token" and the value is AbcD=
+
     if (variables == null || !variables.Any())
     {
       return [];
     }
 
     return variables
-      .Select(v => v!.Split('='))
-      .Where(parts => parts.Length == 2)
-      .ToDictionary(parts => parts[0].Trim(), parts => parts[1].Trim());
+      .Select(v =>
+      {
+        var idx = v!.IndexOf('=');
+        return idx > 0
+          ? new[] { v[..idx], v[(idx + 1)..] }
+          : null;
+      })
+      .Where(parts => parts != null)
+      .ToDictionary(
+        parts => parts![0].Trim(),
+        parts =>
+        {
+          var value = parts![1].Trim();
+          if (value.StartsWith('"') && value.EndsWith('"') && value.Length >= 2)
+            value = value[1..^1];
+          return value;
+        });
   }
 
   public static string ResolveVariables(

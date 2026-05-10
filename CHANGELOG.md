@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added proper escaping input variables support
+- Added support for proper escaping input variables with double quotes
 
 ## [0.0.22] - 2026-05-05
 

@@ -95,4 +95,32 @@ public class VariablesHelperTests
     Assert.Single(result);
     Assert.Equal("ZWRvc3NpZXJfZTJlX3VzZXI6RXExc0MtkzZ0xBaS16ekh1M05mUgo=", result["Token"]);
   }
+
+  [Fact]
+  public void CreateVariables_WithDuplicateKeys_UsesLastValue()
+  {
+    // Arrange
+    var variables = new List<string?> { "key=value1", "key=value2" };
+
+    // Act
+    var result = VariablesHelper.CreateVariables(variables);
+
+    // Assert
+    Assert.Single(result);
+    Assert.Equal("value2", result["key"]);
+  }
+
+  [Fact]
+  public void CreateVariables_WithNullOrWhitespaceEntries_SkipsInvalidEntries()
+  {
+    // Arrange
+    var variables = new List<string?> { null, "  ", "key=value" };
+
+    // Act
+    var result = VariablesHelper.CreateVariables(variables);
+
+    // Assert
+    Assert.Single(result);
+    Assert.Equal("value", result["key"]);
+  }
 }

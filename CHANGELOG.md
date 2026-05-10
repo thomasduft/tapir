@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.23] - 2026-05-10
+
+### Added
+
+- Added proper escaping input variables support
+
 ## [0.0.22] - 2026-05-05
 
 ### Added

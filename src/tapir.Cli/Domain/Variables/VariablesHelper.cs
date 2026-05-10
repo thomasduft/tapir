@@ -12,29 +12,40 @@ internal static class VariablesHelper
       return [];
     }
 
-    return variables
-      .Select(v =>
+    var result = new Dictionary<string, string>(StringComparer.Ordinal);
+
+    foreach (var variable in variables)
+    {
+      if (string.IsNullOrWhiteSpace(variable))
       {
-        var idx = v!.IndexOf('=');
-        return idx > 0
-          ? new[] { v[..idx], v[(idx + 1)..] }
-          : null;
-      })
-      .Where(parts => parts != null)
-      .ToDictionary(
-        parts => parts![0].Trim(),
-        parts =>
-        {
-          var value = parts![1].Trim();
+        continue;
+      }
 
-          // Remove surrounding quotes ("") if present
-          if (value.StartsWith('"') && value.EndsWith('"') && value.Length >= 2)
-          {
-            value = value[1..^1];
-          }
+      var idx = variable.IndexOf('=');
+      if (idx <= 0)
+      {
+        continue;
+      }
 
-          return value;
-        });
+      var key = variable[..idx].Trim();
+      if (string.IsNullOrWhiteSpace(key))
+      {
+        continue;
+      }
+
+      var value = variable[(idx + 1)..].Trim();
+
+      // Remove surrounding quotes ("") if present
+      if (value.StartsWith('"') && value.EndsWith('"') && value.Length >= 2)
+      {
+        value = value[1..^1];
+      }
+
+      // Last value wins when a variable is passed multiple times.
+      result[key] = value;
+    }
+
+    return result;
   }
 
   public static string ResolveVariables(

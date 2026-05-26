@@ -1,0 +1,9 @@
+{
+  "Id": "c4af927a-3073-48c4-872b-7c39a16a944f",
+  "IssueId": "",
+  "Prefix": "Fixed",
+  "Tag": "",
+  "Message": "Does not hang for several seconds anymore when a command is cancelled or crashes.",
+  "CreatedAt": "2026-05-26T12:58:21.0533083+02:00",
+  "CreatedBy": "Thomas Duft"
+}

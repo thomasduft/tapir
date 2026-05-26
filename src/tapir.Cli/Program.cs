@@ -21,7 +21,6 @@ Log.Logger = LogHelper.CreateLogger(ref args);
 var provider = services.BuildServiceProvider();
 var cli = provider.GetRequiredService<Cli>();
 
-using var meterProvider = OtelHelper.CreateMeterProvider(ref args);
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) =>
 {
@@ -30,7 +29,24 @@ Console.CancelKeyPress += (s, e) =>
   e.Cancel = true;
 };
 
-var returnCode = await cli.ExecuteAsync(args, cts.Token);
-meterProvider.Dispose();
+var meterProvider = OtelHelper.CreateMeterProvider(ref args);
 
-return returnCode;
+try
+{
+  return await cli.ExecuteAsync(args, cts.Token);
+}
+catch (OperationCanceledException)
+{
+  Log.Logger.Warning("Execution cancelled.");
+  return 130;
+}
+catch (Exception ex)
+{
+  Log.Logger.Fatal(ex, "Unhandled exception while executing command.");
+  return 1;
+}
+finally
+{
+  meterProvider.Dispose();
+  Log.CloseAndFlush();
+}

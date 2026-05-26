@@ -28,7 +28,9 @@ internal static class OtelHelper
           {
             exporterOptions.Endpoint = new Uri(uriString);
             exporterOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+            exporterOptions.TimeoutMilliseconds = 500;
             metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 100;
+            metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportTimeoutMilliseconds = 500;
           });
 
         // Remove the --otlp and the URI from the args

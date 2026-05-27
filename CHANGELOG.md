@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.24] - 2026-05-27
+
+### Fixed
+
+- Does not hang for several seconds anymore when a command is cancelled or crashes.
+
 ## [0.0.23] - 2026-05-10
 
 ### Added

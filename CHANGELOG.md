@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.25] - 2026-06-02
+
+### Added
+
+- Added `ListTestCases`-Command
+
 ## [0.0.24] - 2026-05-27
 
 ### Fixed

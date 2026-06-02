@@ -7,6 +7,7 @@ using tomware.Tapir.Cli.Domain;
 using tomware.Tapir.Cli.Utils;
 
 var services = new ServiceCollection()
+    .AddCliCommand<ListTestCasesCommand>()
     .AddCliCommand<ManCommand>()
     .AddCliCommand<NewTestCaseCommand>()
     .AddCliCommand<NewTestStepCommand>()

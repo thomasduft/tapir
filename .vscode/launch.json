@@ -183,6 +183,19 @@
       "stopAtEntry": false
     },
     {
+      "name": "tapir:list",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-tapir",
+      "program": "${workspaceFolder}/src/tapir.Cli/bin/Debug/net10.0/tomware.Tapir.dll",
+      "args": [
+        "list",
+        "samples",
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false
+    },
+    {
       "name": "tapir:man",
       "type": "coreclr",
       "request": "launch",

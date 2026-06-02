@@ -96,11 +96,11 @@ Usage: tapir [command] [options]
 
 Options:
   -?|-h|--help  Show help information.
-  --otlp        Enable OpenTelemetry metrics export to the specified OTLP endpoint (e.g.,
-                http://localhost:4318/v1/metrics).
+  --otlp        Enable OpenTelemetry metrics export to the specified OTLP endpoint (e.g., http://localhost:4318/v1/metrics).
   --verbose     Enable verbose logging.
 
 Commands:
+  list          Lists all Test Case definitions from a given directory (e.g. ./test-cases).
   man           Displays a man page that helps writing the Test-Data syntax for a Test Case.
   new           Creates a new Test Case definition (i.e. test-case TC-Audit-001 "My TestCase Title").
   new-step      Appends a new Test Step to an existing Test Case definition (i.e. new-step TC-Audit-001).

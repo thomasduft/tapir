@@ -51,32 +51,37 @@ Parsed representation of a test step's test data.
 
 ### Available Commands
 
-**1. new** - Create a new test case definition
+**1. new** - Lists all Test Case definitions from a given directory
+```bash
+tapir list ./test-cases
+```
+
+**2. new** - Create a new test case definition
 ```bash
 tapir new TC-Example-001 "My Test Title"
 ```
 
-**2. new-step** - Appends a new test step to an existing test case definition
+**3. new-step** - Appends a new test step to an existing test case definition
 ```bash
 tapir new-step TC-Example-001
 ```
 
-**3. validate** - Validate test case syntax
+**4. validate** - Validate test case syntax
 ```bash
 tapir validate TC-Example-001 -i ./tests
 ```
 
-**4. run** - Execute test cases
+**5. run** - Execute test cases
 ```bash
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
-**5. report** - Generates a self-contained HTML report from Test Case run output files
+**6. report** - Generates a self-contained HTML report from Test Case run output files
 ```bash
 tapir report -i ./results -o ./results/report.html
 ```
 
-**6. man** - Display action reference
+**7. man** - Display action reference
 ```bash
 tapir man
 ```

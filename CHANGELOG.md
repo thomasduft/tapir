@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.26] - 2026-06-05
+
+### Added
+
+- Added tree structure for listing test cases and update manual command description
+
 ## [0.0.25] - 2026-06-02
 
 ### Added

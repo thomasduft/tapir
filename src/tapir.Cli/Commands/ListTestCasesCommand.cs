@@ -50,15 +50,64 @@ internal class ListTestCasesCommand : CommandLineApplication
       return 0;
     }
 
-    // 3. Display the list of Test Cases with its relative directory prefix to the executing
-    // directory, along with their ID and Title.
+    // 3. Build a tree from the found files grouped by directory.
+    var root = new TreeNode(Path.GetFullPath(inputDirectory));
     foreach (var file in files)
     {
       var testCase = await TestCase.FromTestCaseFileAsync(file, cancellationToken);
-      var path = Path.GetFullPath(file, Environment.CurrentDirectory);
-      Console.WriteLine($"- {testCase.Id}: {testCase.Title} ({path})");
+      var relativePath = Path.GetRelativePath(inputDirectory, file);
+      var parts = relativePath.Split(Path.DirectorySeparatorChar);
+
+      var current = root;
+      for (var i = 0; i < parts.Length - 1; i++)
+      {
+        var existing = current.Children.FirstOrDefault(c => c.Name == parts[i] && c.TestCase is null);
+        if (existing is null)
+        {
+          existing = new TreeNode(parts[i]);
+          current.Children.Add(existing);
+        }
+        current = existing;
+      }
+
+      current.Children.Add(new TreeNode(Path.GetFileNameWithoutExtension(file))
+      {
+        TestCase = (testCase.Id, testCase.Title)
+      });
     }
 
-    return await Task.FromResult(0);
+    // 4. Print the tree.
+    Console.WriteLine($"{root.Name}/");
+    PrintTree(root, string.Empty);
+
+    return 0;
+  }
+
+  private static void PrintTree(TreeNode node, string prefix)
+  {
+    for (var i = 0; i < node.Children.Count; i++)
+    {
+      var child = node.Children[i];
+      var isLast = i == node.Children.Count - 1;
+      var connector = isLast ? "└── " : "├── ";
+      var childPrefix = prefix + (isLast ? "    " : "│   ");
+
+      if (child.TestCase is var (id, title))
+      {
+        Console.WriteLine($"{prefix}{connector}{id}: {title}");
+      }
+      else
+      {
+        Console.WriteLine($"{prefix}{connector}{child.Name}/");
+        PrintTree(child, childPrefix);
+      }
+    }
+  }
+
+  private sealed class TreeNode(string name)
+  {
+    public string Name { get; } = name;
+    public (string Id, string Title)? TestCase { get; init; }
+    public List<TreeNode> Children { get; } = [];
   }
 }

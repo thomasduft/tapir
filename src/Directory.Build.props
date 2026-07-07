@@ -17,6 +17,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
 </Project>

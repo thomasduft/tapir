@@ -31,6 +31,7 @@ internal static class Constants
     public const string StoreVariable = "StoreVariable";
     public const string VerifyContent = "VerifyContent";
     public const string LogResponseContent = "LogResponseContent";
+    public const string SaveContent = "SaveContent";
   }
 
   internal static class ContentTypes

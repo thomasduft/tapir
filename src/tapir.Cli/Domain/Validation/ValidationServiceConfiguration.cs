@@ -13,6 +13,7 @@ internal static class ValidationServiceConfiguration
       .RegisterValidator<AddContentActionValidator>()
       .RegisterValidator<SendActionValidator>()
       .RegisterValidator<LogResponseContentValidator>()
+      .RegisterValidator<SaveContentActionValidator>()
       .RegisterValidator<CheckStatusCodeActionValidator>()
       .RegisterValidator<CheckReasonPhraseActionValidator>()
       .RegisterValidator<CheckContentActionValidator>()

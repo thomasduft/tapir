@@ -329,6 +329,112 @@ public class HttpResponseMessageValidatorTests
 
   #endregion
 
+  #region SaveContent Tests
+
+  [Fact]
+  public async Task ValidateAsync_WithSaveContentInstruction_ShouldSaveContentToFileAndReturnSuccess()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+
+    try
+    {
+      var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+      var saveInstruction = CreateTestStepInstruction(2, Constants.Actions.SaveContent, file: "output/response.json");
+      saveInstruction.TestStep.TestCase = new TestCase { File = testCaseFile };
+      var instructions = new[] { sendInstruction, saveInstruction };
+
+      var jsonContent = new StringContent("{\"message\":\"Hello, World!\"}", Encoding.UTF8, "application/json");
+      var validator = HttpResponseMessageValidator.Create(instructions)
+        .WithStatusCode(HttpStatusCode.OK)
+        .WithContent(jsonContent);
+
+      // Act
+      var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+      // Assert
+      var saveResult = results.FirstOrDefault(r => r.TestStepId == 2);
+      Assert.NotNull(saveResult);
+      Assert.True(saveResult.IsSuccess);
+
+      var savedFilePath = Path.Combine(tempDirectory, "output", "response.json");
+      Assert.True(File.Exists(savedFilePath));
+      Assert.Equal("{\"message\":\"Hello, World!\"}", await File.ReadAllTextAsync(savedFilePath));
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithSaveContentInstructionAndBinaryContent_ShouldPreserveBytes()
+  {
+    // Arrange
+    var tempDirectory = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempDirectory);
+    var testCaseFile = Path.Combine(tempDirectory, "TC-Users-001.md");
+    await File.WriteAllTextAsync(testCaseFile, "# TC-Users-001: Test\n- **Type**: Definition");
+
+    try
+    {
+      var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+      var saveInstruction = CreateTestStepInstruction(2, Constants.Actions.SaveContent, file: "output/report.pdf");
+      saveInstruction.TestStep.TestCase = new TestCase { File = testCaseFile };
+      var instructions = new[] { sendInstruction, saveInstruction };
+
+      // %PDF header bytes plus non-UTF8-safe byte values to prove binary round-tripping
+      var binaryBytes = new byte[] { 0x25, 0x50, 0x44, 0x46, 0x00, 0xFF, 0x10, 0x80 };
+      var binaryContent = new ByteArrayContent(binaryBytes);
+      binaryContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+
+      var validator = HttpResponseMessageValidator.Create(instructions)
+        .WithStatusCode(HttpStatusCode.OK)
+        .WithContent(binaryContent);
+
+      // Act
+      var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+      // Assert
+      var saveResult = results.FirstOrDefault(r => r.TestStepId == 2);
+      Assert.NotNull(saveResult);
+      Assert.True(saveResult.IsSuccess);
+
+      var savedFilePath = Path.Combine(tempDirectory, "output", "report.pdf");
+      Assert.True(File.Exists(savedFilePath));
+      Assert.Equal(binaryBytes, await File.ReadAllBytesAsync(savedFilePath));
+    }
+    finally
+    {
+      Directory.Delete(tempDirectory, true);
+    }
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithoutSaveContentInstruction_ShouldNotWriteAnyFile()
+  {
+    // Arrange
+    var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+    var instructions = new[] { sendInstruction };
+    var jsonContent = new StringContent("{\"message\":\"Hello, World!\"}", Encoding.UTF8, "application/json");
+
+    var validator = HttpResponseMessageValidator.Create(instructions)
+      .WithStatusCode(HttpStatusCode.OK)
+      .WithContent(jsonContent);
+
+    // Act
+    var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+    // Assert
+    Assert.Single(results);
+    Assert.DoesNotContain(results, r => r.TestStepId == 2);
+  }
+
+  #endregion
+
   #region CheckContent Tests
 
   [Fact]

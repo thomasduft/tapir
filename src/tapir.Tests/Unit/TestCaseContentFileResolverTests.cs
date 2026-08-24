@@ -76,6 +76,41 @@ public class TestCaseContentFileResolverTests
     }
   }
 
+  [Fact]
+  public void ResolveOutputFilePath_WithRelativePath_ResolvesAgainstTestCaseDirectory()
+  {
+    var directoryPath = Path.Combine(Path.GetTempPath(), $"tapir-tests-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(directoryPath);
+
+    try
+    {
+      var testCaseFile = Path.Combine(directoryPath, "TC-Users-001.md");
+      var instruction = CreateInstruction(Constants.Actions.SaveContent, file: "responses/user.json");
+      instruction.TestStep.TestCase.File = testCaseFile;
+
+      var resolvedPath = TestCaseContentFileResolver.ResolveOutputFilePath(instruction);
+
+      Assert.Equal(
+        Path.Combine(directoryPath, "responses", "user.json"),
+        resolvedPath
+      );
+    }
+    finally
+    {
+      Directory.Delete(directoryPath, true);
+    }
+  }
+
+  [Fact]
+  public void ResolveOutputFilePath_WithoutFile_ShouldThrowException()
+  {
+    var instruction = CreateInstruction(Constants.Actions.SaveContent);
+
+    Assert.Throws<InvalidOperationException>(
+      () => TestCaseContentFileResolver.ResolveOutputFilePath(instruction)
+    );
+  }
+
   private static TestStepInstruction CreateInstruction(
     string action,
     string file = "",

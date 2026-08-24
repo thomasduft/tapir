@@ -28,6 +28,22 @@ internal static class TestCaseContentFileResolver
       );
   }
 
+  /// <summary>
+  /// Resolves the destination path for a file that will be written (e.g. saved response content),
+  /// preferring the location next to the Test Case file when a relative path is given.
+  /// </summary>
+  public static string ResolveOutputFilePath(TestStepInstruction instruction)
+  {
+    if (string.IsNullOrWhiteSpace(instruction.File))
+    {
+      throw new InvalidOperationException(
+        $"File is required to resolve an output path for action '{instruction.Action}'."
+      );
+    }
+
+    return GetCandidatePaths(instruction.File, instruction.TestStep.TestCase.File).First();
+  }
+
   internal static IEnumerable<string> GetCandidatePaths(string filePath, string? testCaseFile)
   {
     if (string.IsNullOrWhiteSpace(filePath))

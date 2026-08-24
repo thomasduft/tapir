@@ -83,6 +83,7 @@ internal class HttpResponseMessageValidator
     results.AddRange(await CheckContentAsync(cancellationToken));
     results.AddRange(await VerifyContentAsync(cancellationToken));
     results.AddRange(await LogResponseContentAsync(cancellationToken));
+    results.AddRange(await SaveContentAsync(cancellationToken));
 
     return results;
   }
@@ -248,6 +249,52 @@ internal class HttpResponseMessageValidator
       Log.Logger.Information("- logging response content: {ContentString}", contentString);
 
       results.Add(TestStepResult.Success(contentInstruction.TestStep));
+    }
+
+    return results;
+  }
+
+  private async Task<IEnumerable<TestStepResult>> SaveContentAsync(
+    CancellationToken cancellationToken
+  )
+  {
+    var saveInstructions = _instructions
+      .Where(i => i.Action == Constants.Actions.SaveContent)
+      .ToList();
+    if (saveInstructions.Count == 0 || _content == null)
+    {
+      // It's okay if there's no content to save
+      return [];
+    }
+
+    var results = new List<TestStepResult>();
+    foreach (var saveInstruction in saveInstructions)
+    {
+      try
+      {
+        var filePath = TestCaseContentFileResolver.ResolveOutputFilePath(saveInstruction);
+        var directory = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+          Directory.CreateDirectory(directory);
+        }
+
+        var bytes = await _content!.ReadAsByteArrayAsync(cancellationToken);
+        await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
+
+        Log.Logger.Information("- saved response content to: {FilePath}", filePath);
+
+        results.Add(TestStepResult.Success(saveInstruction.TestStep));
+      }
+      catch (Exception ex)
+      {
+        results.Add(
+          TestStepResult.Failed(
+            saveInstruction.TestStep,
+            $"Failed to save response content: {ex.Message}"
+          )
+        );
+      }
     }
 
     return results;

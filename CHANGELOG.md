@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.27] - 2026-08-24
+
+### Added
+
+- Added SaveContent action to save HTTP response content to a file with validation and tests
+
 ## [0.0.26] - 2026-06-05
 
 ### Added

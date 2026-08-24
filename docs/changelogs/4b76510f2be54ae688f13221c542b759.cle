@@ -1,9 +1,0 @@
-{
-  "Id": "4b76510f-2be5-4ae6-88f1-3221c542b759",
-  "IssueId": "",
-  "Prefix": "Added",
-  "Tag": "",
-  "Message": "Added SaveContent action to save HTTP response content to a file with validation and tests",
-  "CreatedAt": "2026-08-24T15:22:24.8766289+02:00",
-  "CreatedBy": "Thomas Duft"
-}

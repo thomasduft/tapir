@@ -249,7 +249,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "userId",
-        JsonPath = "$.id"
+        Selector = "$.id"
       }
     };
     var jsonContent = "{\"id\":\"12345\",\"name\":\"John Doe\"}";
@@ -277,7 +277,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "city",
-        JsonPath = "$.address.city"
+        Selector = "$.address.city"
       }
     };
     var jsonContent = "{\"address\":{\"street\":\"Main St\",\"city\":\"New York\"}}";
@@ -303,7 +303,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "firstItem",
-        JsonPath = "$.items[0]"
+        Selector = "$.items[0]"
       }
     };
     var jsonContent = "{\"items\":[\"apple\",\"banana\",\"orange\"]}";
@@ -329,19 +329,19 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "userId",
-        JsonPath = "$.id"
+        Selector = "$.id"
       },
       new TestStepInstruction(new TestStep { Id = 2 })
       {
         Action = Constants.Actions.StoreVariable,
         Name = "userName",
-        JsonPath = "$.name"
+        Selector = "$.name"
       },
       new TestStepInstruction(new TestStep { Id = 3 })
       {
         Action = Constants.Actions.StoreVariable,
         Name = "userEmail",
-        JsonPath = "$.email"
+        Selector = "$.email"
       }
     };
     var jsonContent = "{\"id\":\"123\",\"name\":\"John\",\"email\":\"john@example.com\"}";
@@ -370,7 +370,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "missingValue",
-        JsonPath = "$.nonexistent"
+        Selector = "$.nonexistent"
       }
     };
     var jsonContent = "{\"id\":\"123\",\"name\":\"John\"}";
@@ -396,7 +396,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "nullValue",
-        JsonPath = "$.nullField"
+        Selector = "$.nullField"
       }
     };
     var jsonContent = "{\"id\":\"123\",\"nullField\":null}";
@@ -431,7 +431,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "jsonVar",
-        JsonPath = "$.id"
+        Selector = "$.id"
       }
     };
     var jsonContent = "{\"id\":\"123\"}";
@@ -526,7 +526,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = null!,
-        JsonPath = "$.id"
+        Selector = "$.id"
       }
     };
     var content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json");
@@ -555,13 +555,13 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "userName",
-        JsonPath = "$.user.profile.name"
+        Selector = "$.user.profile.name"
       },
       new TestStepInstruction(new TestStep { Id = 2 })
       {
         Action = Constants.Actions.StoreVariable,
         Name = "firstTag",
-        JsonPath = "$.user.tags[0]"
+        Selector = "$.user.tags[0]"
       }
     };
     var jsonContent = @"{
@@ -597,7 +597,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "age",
-        JsonPath = "$.age"
+        Selector = "$.age"
       }
     };
     var jsonContent = "{\"age\":42}";
@@ -623,7 +623,7 @@ public class VariableExtractorTests
       {
         Action = Constants.Actions.StoreVariable,
         Name = "isActive",
-        JsonPath = "$.active"
+        Selector = "$.active"
       }
     };
     var jsonContent = "{\"active\":true}";

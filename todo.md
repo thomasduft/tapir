@@ -2,11 +2,10 @@
 
 - [ ] Use ILogger through ctor injection instead of static Log class
   - make use of LoggerFactory while setting up the DI container
-- [ ] rename JsonPath to just Path
-  - when application/xml would be supported, JsonPath would be misleading
 
 ## Done
 
+- [x] rename JsonPath to Selector
 - [x] support for OpenTelemetry metrics
 - [x] at the moment only support the following based ContentTypes:
   - application/text

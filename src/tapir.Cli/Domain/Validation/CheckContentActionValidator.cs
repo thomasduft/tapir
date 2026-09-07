@@ -12,7 +12,7 @@ internal class CheckContentActionValidator : IValidator
   public IEnumerable<string> SupportedProperties =>
   [
     nameof(TestStepInstruction.ContentType) + $": Content type (e.g., {string.Join(", ", _validContentTypes)})",
-    nameof(TestStepInstruction.JsonPath) + ": JSON path to the content to check",
+    nameof(TestStepInstruction.Selector) + ": JSON or XPath for the content to check",
     nameof(TestStepInstruction.Value) + ": The content value to check",
   ];
 
@@ -56,13 +56,13 @@ internal class CheckContentActionValidator : IValidator
     }
 
     // Path is optional but if provided, requires Value to be present
-    if (!string.IsNullOrEmpty(testStepInstruction.JsonPath)
+    if (!string.IsNullOrEmpty(testStepInstruction.Selector)
       && string.IsNullOrEmpty(testStepInstruction.Value))
     {
       results.Add(
         new TestStepValidationError(
           testStepInstruction.TestStep.Id,
-          "Value must be provided when JsonPath is specified."
+          "Value must be provided when Selector is specified."
       ));
     }
 

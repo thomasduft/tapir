@@ -1,0 +1,9 @@
+{
+  "Id": "838a580b-c7da-4c74-8b3b-a192503cb413",
+  "IssueId": "",
+  "Prefix": "Changed",
+  "Tag": "",
+  "Message": "Renamed \u0060JsonPath\u0060-property name to \u0060Selector\u0060 for general usage among application/json and application/xml content types.",
+  "CreatedAt": "2026-09-07T08:14:53.8003751+02:00",
+  "CreatedBy": "Thomas Duft"
+}

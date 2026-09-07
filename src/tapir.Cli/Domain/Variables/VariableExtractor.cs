@@ -66,9 +66,9 @@ internal class VariableExtractor
         variables[instruction.Name] = instruction.Value;
       }
 
-      if (!string.IsNullOrEmpty(instruction.JsonPath))
+      if (!string.IsNullOrEmpty(instruction.Selector))
       {
-        var jsonPath = JsonPath.Parse(instruction.JsonPath);
+        var jsonPath = JsonPath.Parse(instruction.Selector);
         var result = jsonPath.Evaluate(jsonNode!);
         var matches = result.Matches?.ToList();
         if (matches == null || matches.Count == 0)

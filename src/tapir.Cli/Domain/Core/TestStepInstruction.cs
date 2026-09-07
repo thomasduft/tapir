@@ -10,7 +10,7 @@ internal class TestStepInstruction
   public string Name { get; set; } = string.Empty;
   public string Value { get; set; } = string.Empty;
   public string File { get; set; } = string.Empty;
-  public string JsonPath { get; set; } = string.Empty;
+  public string Selector { get; set; } = string.Empty;
   public string Method { get; set; } = "GET";
   public string Endpoint { get; set; } = string.Empty;
 
@@ -54,8 +54,8 @@ internal class TestStepInstruction
         case nameof(File):
           instruction.File = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
-        case nameof(JsonPath):
-          instruction.JsonPath = VariablesHelper.ResolveVariables(parameter.Value, variables);
+        case nameof(Selector):
+          instruction.Selector = VariablesHelper.ResolveVariables(parameter.Value, variables);
           break;
         case nameof(Method):
           instruction.Method = parameter.Value.ToUpperInvariant();

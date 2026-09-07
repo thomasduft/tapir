@@ -20,7 +20,7 @@ public class TestStepInstructionTests
     Assert.Equal(string.Empty, instruction.Name);
     Assert.Equal(string.Empty, instruction.Value);
     Assert.Equal(string.Empty, instruction.File);
-    Assert.Equal(string.Empty, instruction.JsonPath);
+    Assert.Equal(string.Empty, instruction.Selector);
     Assert.Equal("GET", instruction.Method);
     Assert.Equal(string.Empty, instruction.Endpoint);
     Assert.Equal(string.Empty, instruction.Domain);
@@ -125,13 +125,13 @@ public class TestStepInstructionTests
   }
 
   [Fact]
-  public void FromTestStep_WithJsonPathParameter_ParsesJsonPathCorrectly()
+  public void FromTestStep_WithSelectorParameter_ParsesSelectorCorrectly()
   {
     // Arrange
     var step = new TestStep
     {
       Id = 1,
-      TestData = "Action=StoreVariable JsonPath=$.id"
+      TestData = "Action=StoreVariable Selector=$.id"
     };
     var variables = new Dictionary<string, string>();
 
@@ -140,7 +140,7 @@ public class TestStepInstructionTests
 
     // Assert
     Assert.Equal("StoreVariable", instruction.Action);
-    Assert.Equal("$.id", instruction.JsonPath);
+    Assert.Equal("$.id", instruction.Selector);
   }
 
   [Fact]
@@ -325,13 +325,13 @@ public class TestStepInstructionTests
   }
 
   [Fact]
-  public void FromTestStep_WithVariableInJsonPath_ReplacesVariable()
+  public void FromTestStep_WithVariableInSelector_ReplacesVariable()
   {
     // Arrange
     var step = new TestStep
     {
       Id = 1,
-      TestData = "Action=StoreVariable JsonPath=$.@@PropertyName@@"
+      TestData = "Action=StoreVariable Selector=$.@@PropertyName@@"
     };
     var variables = new Dictionary<string, string>
     {
@@ -342,7 +342,7 @@ public class TestStepInstructionTests
     var instruction = TestStepInstruction.FromTestStep(step, variables);
 
     // Assert
-    Assert.Equal("$.userId", instruction.JsonPath);
+    Assert.Equal("$.userId", instruction.Selector);
   }
 
   [Fact]
@@ -569,13 +569,13 @@ public class TestStepInstructionTests
   }
 
   [Fact]
-  public void FromTestStep_WithComplexJsonPath_ParsesCorrectly()
+  public void FromTestStep_WithComplexSelector_ParsesCorrectly()
   {
     // Arrange
     var step = new TestStep
     {
       Id = 1,
-      TestData = "Action=StoreVariable JsonPath=$.data.users[0].id"
+      TestData = "Action=StoreVariable Selector=$.data.users[0].id"
     };
     var variables = new Dictionary<string, string>();
 
@@ -583,7 +583,7 @@ public class TestStepInstructionTests
     var instruction = TestStepInstruction.FromTestStep(step, variables);
 
     // Assert
-    Assert.Equal("$.data.users[0].id", instruction.JsonPath);
+    Assert.Equal("$.data.users[0].id", instruction.Selector);
   }
 
   [Fact]
@@ -595,7 +595,7 @@ public class TestStepInstructionTests
       Id = 1,
       TestData = "Action=Send Method=POST Endpoint=api/users/@@UserId@@ " +
                  "ContentType=application/json Name=TestName Value=@@TestValue@@ " +
-                 "File=test.json JsonPath=$.@@PropertyName@@"
+                 "File=test.json Selector=$.@@PropertyName@@"
     };
     var variables = new Dictionary<string, string>
     {
@@ -615,7 +615,7 @@ public class TestStepInstructionTests
     Assert.Equal("TestName", instruction.Name);
     Assert.Equal("test", instruction.Value);
     Assert.Equal("test.json", instruction.File);
-    Assert.Equal("$.result", instruction.JsonPath);
+    Assert.Equal("$.result", instruction.Selector);
   }
 
   [Fact]

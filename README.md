@@ -26,7 +26,7 @@ Traditional API testing tools like [Postman](https://www.postman.com/) and [Inso
 
 - 📝 **Markdown Test Cases** - Define your API tests in simple, readable Markdown files
 - 🔗 **Multi-Step Scenarios** - Chain multiple API calls together, extract values from responses, and use them in subsequent requests
-- 🔍 **Smart Validation** - Verify status codes, response content, and JSON values using JsonPath expressions
+- 🔍 **Smart Validation** - Verify status codes, response content, with JSON or XML values using selectors
 - 💾 **Variable Storage** - Extract and reuse data between test steps (e.g., retrieve an ID from one endpoint and use it in another)
 - 📊 **Clear Results** - Get detailed test execution reports showing exactly what passed or failed
 
@@ -61,16 +61,16 @@ It then uses Alice's ID to fetch her individual user details and validates the r
 | 01       | Call users api      | Request successful     | Action=Send Method=GET Endpoint=users                             | -             |
 | 02       | Check response code | 200                    | Action=CheckStatusCode Value=200                                  | -             |
 | 03       | Inspect content     | Should be identical    | Action=VerifyContent File=samples/Users/Definitions/users.json    | -             |
-| 04       | Check Alice         | Content contains Alice | Action=CheckContent JsonPath=$[?@.name=="Alice"].name Value=Alice | -             |
-| 05       | Retain ID of Alice  | ID of Alice stored     | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | -             |
+| 04       | Check Alice         | Content contains Alice | Action=CheckContent Selector=$[?@.name=="Alice"].name Value=Alice | -             |
+| 05       | Retain ID of Alice  | ID of Alice stored     | Action=StoreVariable Selector=$[?@.name=="Alice"].id Name=AliceId | -             |
 
 | Step ID  | Description         | Expected Result        | Test Data                                                         | Actual Result |
 | -------: | ------------------- | ---------------------- | ----------------------------------------------------------------- | ------------- |
 | 11       | Get Alice details   | Request successful     | Action=Send Method=GET Endpoint=users/@@AliceId@@                 | -             |
 | 12       | Check response code | 200                    | Action=CheckStatusCode Value=200                                  | -             |
 | 13       | Inspect content     | Should be identical    | Action=VerifyContent File=samples/Users/Definitions/alice.json    | -             |
-| 14       | Check name          | Name is Alice          | Action=CheckContent JsonPath=$.name Value=Alice                   | -             |
-| 15       | Check age           | Age is 30              | Action=CheckContent JsonPath=$.age Value=30                       | -             |
+| 14       | Check name          | Name is Alice          | Action=CheckContent Selector=$.name Value=Alice                   | -             |
+| 15       | Check age           | Age is 30              | Action=CheckContent Selector=$.age Value=30                       | -             |
 
 ## Postcondition
 

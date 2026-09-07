@@ -442,7 +442,7 @@ public class HttpResponseMessageValidatorTests
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Alice", jsonPath: "$.name");
+    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Alice", selector: "$.name");
     var instructions = new[] { sendInstruction, contentInstruction };
 
     var jsonContent = new StringContent("{\"name\":\"Alice\",\"age\":30}", Encoding.UTF8, "application/json");
@@ -465,7 +465,7 @@ public class HttpResponseMessageValidatorTests
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Bob", jsonPath: "$.name");
+    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Bob", selector: "$.name");
     var instructions = new[] { sendInstruction, contentInstruction };
 
     var jsonContent = new StringContent("{\"name\":\"Alice\",\"age\":30}", Encoding.UTF8, "application/json");
@@ -489,7 +489,7 @@ public class HttpResponseMessageValidatorTests
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Alice", jsonPath: "$.name");
+    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Alice", selector: "$.name");
     var instructions = new[] { sendInstruction, contentInstruction };
 
     var emptyContent = new StringContent("", Encoding.UTF8, "application/json");
@@ -514,7 +514,7 @@ public class HttpResponseMessageValidatorTests
   {
     // Arrange
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
-    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Developer", jsonPath: "$.users[0].role");
+    var contentInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckContent, value: "Developer", selector: "$.users[0].role");
     var instructions = new[] { sendInstruction, contentInstruction };
 
     var jsonContent = new StringContent(
@@ -647,7 +647,7 @@ public class HttpResponseMessageValidatorTests
     var statusCodeInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckStatusCode, value: "200");
     var reasonPhraseInstruction = CreateTestStepInstruction(3, Constants.Actions.CheckReasonPhrase, value: "OK");
     var headerInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckContentHeader, name: "X-API-Version", value: "v1");
-    var contentInstruction = CreateTestStepInstruction(5, Constants.Actions.CheckContent, value: "Alice", jsonPath: "$.name");
+    var contentInstruction = CreateTestStepInstruction(5, Constants.Actions.CheckContent, value: "Alice", selector: "$.name");
     var instructions = new[] { sendInstruction, statusCodeInstruction, reasonPhraseInstruction, headerInstruction, contentInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -675,7 +675,7 @@ public class HttpResponseMessageValidatorTests
     var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
     var statusCodeInstruction = CreateTestStepInstruction(2, Constants.Actions.CheckStatusCode, value: "200");
     var headerInstruction = CreateTestStepInstruction(3, Constants.Actions.CheckContentHeader, name: "X-Missing", value: "value");
-    var contentInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckContent, value: "Bob", jsonPath: "$.name");
+    var contentInstruction = CreateTestStepInstruction(4, Constants.Actions.CheckContent, value: "Bob", selector: "$.name");
     var instructions = new[] { sendInstruction, statusCodeInstruction, headerInstruction, contentInstruction };
 
     var response = new HttpResponseMessage(HttpStatusCode.OK);
@@ -721,7 +721,7 @@ public class HttpResponseMessageValidatorTests
     string action,
     string name = "",
     string value = "",
-    string jsonPath = "",
+    string selector = "",
     string file = ""
   )
   {
@@ -736,7 +736,7 @@ public class HttpResponseMessageValidatorTests
       Action = action,
       Name = name,
       Value = value,
-      JsonPath = jsonPath,
+      Selector = selector,
       File = file
     };
 

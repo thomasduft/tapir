@@ -7,7 +7,7 @@ internal class StoreVariableActionValidator : IValidator
   public IEnumerable<string> SupportedProperties =>
   [
     nameof(TestStepInstruction.Name) + ": The name of the variable to store",
-    nameof(TestStepInstruction.JsonPath) + ": The JSON path to the variable to store",
+    nameof(TestStepInstruction.Selector) + ": The JSON or XPath  for the variable to store",
   ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(
@@ -27,14 +27,14 @@ internal class StoreVariableActionValidator : IValidator
       ));
     }
 
-    // Either JsonPath or Value is required
-    if (string.IsNullOrEmpty(testStepInstruction.JsonPath)
+    // Either Selector or Value is required
+    if (string.IsNullOrEmpty(testStepInstruction.Selector)
       && string.IsNullOrEmpty(testStepInstruction.Value))
     {
       results.Add(
         new TestStepValidationError(
           testStepInstruction.TestStep.Id,
-          "Either JsonPath or Value must be provided."
+          "Either Selector or Value must be provided."
       ));
     }
 

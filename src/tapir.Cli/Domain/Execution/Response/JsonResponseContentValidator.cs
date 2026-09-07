@@ -36,7 +36,7 @@ internal class JsonResponseContentValidator : IResponseContentValidator
 
     foreach (var contentInstruction in instructions)
     {
-      var jsonPath = JsonPath.Parse(contentInstruction.JsonPath);
+      var jsonPath = JsonPath.Parse(contentInstruction.Selector);
       var evaluationResults = jsonPath.Evaluate(jsonNode);
 
       var actualValue = evaluationResults.Matches.FirstOrDefault()?.Value?.ToString();

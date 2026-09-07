@@ -46,7 +46,7 @@ Parsed representation of a test step's test data.
 - `Name`: Header/parameter name
 - `Value`: Header/parameter/content value
 - `File`: File path for content or verification
-- `JsonPath`: JSON path expression for extraction or verification
+- `Selector`: Expression (JsonPath or XPath) for extraction or verification
 - `ContentType`: Content type (application/json, text/plain, multipart/form-data)
 
 ### Available Commands
@@ -95,7 +95,7 @@ Variables enable request chaining by storing values from responses and using the
 Variables use the `@@VariableName@@` syntax:
 
 ```markdown
-| 05 | Store Alice's ID  | ID stored    | Action=StoreVariable JsonPath=$[?@.name=="Alice"].id Name=AliceId | - |
+| 05 | Store Alice's ID  | ID stored    | Action=StoreVariable Selector=$[?@.name=="Alice"].id Name=AliceId | - |
 | 06 | Get Alice details | Request sent | Action=Send Method=GET Endpoint=users/@@AliceId@@                 | - |
 ```
 
@@ -104,7 +104,7 @@ Variables use the `@@VariableName@@` syntax:
 Variables are replaced in:
 - `Value` fields
 - `File` fields
-- `JsonPath` expressions
+- `Selector` expressions
 - `Endpoint` fields
 - `Domain` fields
 
@@ -190,7 +190,7 @@ Checks content in the HTTP response.
 
 **Supported Properties:**
 - ContentType: Content type (e.g., text/plain, application/json)
-- JsonPath: JSON path to the content to check
+- Selector: Expression to select the content to check
 - Value: The content value to check
 
 ### CheckContentHeader
@@ -242,7 +242,7 @@ Stores a variable from the HTTP response. Enables request chaining.
 
 **Supported Properties:**
 - Name: The name of the variable to store
-- JsonPath: The JSON path to the variable to store
+- Selector: Expression to select the variable to store
 
 ### VerifyContent
 

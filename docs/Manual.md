@@ -242,7 +242,7 @@ Stores a variable from the HTTP response. Enables request chaining.
 
 **Supported Properties:**
 - Name: The name of the variable to store
-- Selector: Expression to select the variable to store
+- Selector: The JSON or XPath for the variable to store
 
 ### VerifyContent
 

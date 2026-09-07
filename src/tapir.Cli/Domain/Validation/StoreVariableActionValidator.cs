@@ -7,7 +7,7 @@ internal class StoreVariableActionValidator : IValidator
   public IEnumerable<string> SupportedProperties =>
   [
     nameof(TestStepInstruction.Name) + ": The name of the variable to store",
-    nameof(TestStepInstruction.Selector) + ": The JSON or XPath  for the variable to store",
+    nameof(TestStepInstruction.Selector) + ": The JSON or XPath for the variable to store",
   ];
 
   public Task<IEnumerable<TestStepValidationError>> ValidateAsync(

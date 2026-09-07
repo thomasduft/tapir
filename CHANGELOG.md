@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.28] - 2026-09-07
+
+### Changed
+
+- breaking: Renamed `JsonPath`-property name to `Selector` for general usage among application/json and application/xml content types.
+
 ## [0.0.27] - 2026-08-24
 
 ### Added

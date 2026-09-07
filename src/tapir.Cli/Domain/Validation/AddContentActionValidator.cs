@@ -141,7 +141,6 @@ internal class AddContentActionValidator : IValidator
       }
     }
 
-
     return Task.FromResult(results.AsEnumerable());
   }
 }

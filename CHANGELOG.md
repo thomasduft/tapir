@@ -4,7 +4,7 @@
 
 ### Changed
 
-- breaking: Renamed `JsonPath`-property name to `Selector` for general usage among application/json and application/xml content types.
+- breaking: Renamed `JsonPath`-property name to `Selector` for general usage among application/json and application/xml content types
 
 ## [0.0.27] - 2026-08-24
 
@@ -28,7 +28,7 @@
 
 ### Fixed
 
-- Does not hang for several seconds anymore when a command is cancelled or crashes.
+- Does not hang for several seconds anymore when a command is cancelled or crashes
 
 ## [0.0.23] - 2026-05-10
 
@@ -176,4 +176,3 @@
 ### Added
 
 - Initial version of tapir
-

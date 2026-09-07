@@ -1,3 +1,5 @@
+using System.Xml.Linq;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace tomware.Tapir.DevHost.Users;
@@ -48,6 +50,36 @@ internal static class UsersHandlers
     return Results.Created($"/users/{id}", createdUser.Id);
   }
 
+  public static IResult GetAllUsersXml(IUsersRepository repository)
+  {
+    var document = new XDocument(
+      new XElement("users", repository.GetAll()
+        .OrderBy(user => user.Name)
+        .Select(ToXml))
+    );
+
+    return Results.Content(document.ToString(), "application/xml");
+  }
+
+  public static async Task<IResult> CreateUserXml(HttpRequest request, IUsersRepository repository)
+  {
+    using var reader = new StreamReader(request.Body);
+    var content = await reader.ReadToEndAsync();
+    var document = XDocument.Parse(content);
+    var userElement = document.Root ?? throw new InvalidOperationException("A user XML element is required.");
+    var name = userElement.Element("name")?.Value;
+    var age = int.TryParse(userElement.Element("age")?.Value, out var parsedAge) ? parsedAge : 0;
+
+    if (string.IsNullOrWhiteSpace(name) || age <= 0)
+    {
+      return Results.BadRequest("Name is required and age must be a positive number.");
+    }
+
+    var user = new User { Id = Guid.NewGuid(), Name = name, Age = age };
+    repository.Add(user);
+    return Results.Content(new XDocument(ToXml(user)).ToString(), "application/xml", statusCode: StatusCodes.Status201Created);
+  }
+
   public static IResult UpdateUser(
     Guid id,
     [FromBody] UpdateUserRequest request,
@@ -90,6 +122,13 @@ internal static class UsersHandlers
     repository.Delete(id);
     return Results.NoContent();
   }
+
+  private static XElement ToXml(User user) => new(
+    "user",
+    new XElement("id", user.Id),
+    new XElement("name", user.Name),
+    new XElement("age", user.Age)
+  );
 }
 
 public record CreateUserRequest(string Name, int Age);

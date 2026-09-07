@@ -20,6 +20,18 @@ internal static class Endpoints
       .WithDescription("Creates a new user.");
 
     builder
+      .MapGet("/users/xml", UsersHandlers.GetAllUsersXml)
+      .WithTags("Users")
+      .WithDescription("Retrieves all users as XML.");
+
+    builder
+      .MapPost("/users/xml", UsersHandlers.CreateUserXml)
+      .Accepts<string>("application/xml")
+      .Produces(StatusCodes.Status201Created, typeof(string), "application/xml")
+      .WithTags("Users")
+      .WithDescription("Creates a user from XML and returns XML.");
+
+    builder
       .MapPut("/users/{id:guid}", UsersHandlers.UpdateUser)
       .WithTags("Users")
       .WithDescription("Updates an existing user.");

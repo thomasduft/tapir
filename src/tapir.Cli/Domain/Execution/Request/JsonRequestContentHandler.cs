@@ -14,7 +14,7 @@ internal class JsonRequestContentHandler : IRequestContentHandler
     CancellationToken cancellationToken
   )
   {
-    var instruction = instructions.First();
+    var instruction = instructions[0];
     var jsonContent = !string.IsNullOrEmpty(instruction.File)
       ? await File.ReadAllTextAsync(TestCaseContentFileResolver.LocateExistingFile(instruction), cancellationToken)
       : instruction.Value;

@@ -41,7 +41,8 @@ internal class HttpResponseMessageValidator
     return new ResponseContentValidatorFactory(
     [
       new TextResponseContentValidator(),
-      new JsonResponseContentValidator()
+      new JsonResponseContentValidator(),
+      new XmlResponseContentValidator()
     ]);
   }
 

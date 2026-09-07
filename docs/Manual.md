@@ -47,7 +47,7 @@ Parsed representation of a test step's test data.
 - `Value`: Header/parameter/content value
 - `File`: File path for content or verification
 - `Selector`: Expression (JsonPath or XPath) for extraction or verification
-- `ContentType`: Content type (application/json, text/plain, multipart/form-data)
+- `ContentType`: Content type (application/json, application/xml, text/plain, multipart/form-data)
 
 ### Available Commands
 
@@ -163,7 +163,7 @@ tapir run https://api.example.com -tc TC-Example-001 --otel-endpoint http://loca
 Adds content to the HTTP request.
 
 **Supported Properties:**
-- ContentType: Content type (e.g., text/plain, application/json, application/x-www-form-urlencoded, multipart/form-data)
+- ContentType: Content type (e.g., text/plain, application/json, application/xml, application/x-www-form-urlencoded, multipart/form-data)
 - File: Path to the content file
 - Name: Name for multipart/form-data content
 - Value: Direct content value or corresponding value for multipart/form-data name (aka key)
@@ -189,8 +189,8 @@ Adds query parameters to the HTTP request.
 Checks content in the HTTP response.
 
 **Supported Properties:**
-- ContentType: Content type (e.g., text/plain, application/json)
-- Selector: Expression to select the content to check
+- ContentType: Content type (e.g., text/plain, application/json, application/xml)
+- Selector: JSON or XPath for the content to check
 - Value: The content value to check
 
 ### CheckContentHeader

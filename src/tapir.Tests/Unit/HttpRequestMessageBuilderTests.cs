@@ -1154,6 +1154,38 @@ public class HttpRequestMessageBuilderTests
   }
 
   [Fact]
+  public async Task BuildAsync_WithXmlContentType_SetsXmlContent()
+  {
+    // Arrange
+    var xmlContent = "<user><name>Test</name><age>123</age></user>";
+    var instructions = new List<TestStepInstruction>
+    {
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.AddContent,
+        ContentType = Constants.ContentTypes.Xml,
+        Value = xmlContent
+      },
+      new TestStepInstruction(new TestStep())
+      {
+        Action = Constants.Actions.Send,
+        Method = "POST",
+        Endpoint = "api/xml"
+      }
+    };
+    var builder = HttpRequestMessageBuilder.Create(instructions)
+      .WithDomain("https://example.com");
+
+    // Act
+    var request = await builder.BuildAsync(CancellationToken.None);
+
+    // Assert
+    Assert.NotNull(request.Content);
+    Assert.Equal(xmlContent, await request.Content.ReadAsStringAsync());
+    Assert.Equal(Constants.ContentTypes.Xml, request.Content.Headers.ContentType?.MediaType);
+  }
+
+  [Fact]
   public async Task BuildAsync_WithUnsupportedContentType_ThrowsInvalidOperationException()
   {
     // Arrange
@@ -1162,7 +1194,7 @@ public class HttpRequestMessageBuilderTests
       new TestStepInstruction(new TestStep())
       {
         Action = Constants.Actions.AddContent,
-        ContentType = "application/xml",
+        ContentType = "application/yaml",
         Value = "<root>test</root>"
       },
       new TestStepInstruction(new TestStep())

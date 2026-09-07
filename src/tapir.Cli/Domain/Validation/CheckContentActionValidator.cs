@@ -4,7 +4,8 @@ internal class CheckContentActionValidator : IValidator
 {
   private readonly string[] _validContentTypes = [
     Constants.ContentTypes.Text,
-    Constants.ContentTypes.Json
+    Constants.ContentTypes.Json,
+    Constants.ContentTypes.Xml
   ];
 
   public string Name => Constants.Actions.CheckContent;

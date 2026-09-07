@@ -5,6 +5,7 @@ internal class AddContentActionValidator : IValidator
   private readonly string[] _validContentTypes = [
     Constants.ContentTypes.Text,
     Constants.ContentTypes.Json,
+    Constants.ContentTypes.Xml,
     Constants.ContentTypes.FormUrlEncoded,
     Constants.ContentTypes.MultipartFormData
   ];

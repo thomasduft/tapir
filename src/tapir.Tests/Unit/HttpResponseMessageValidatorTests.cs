@@ -538,6 +538,82 @@ public class HttpResponseMessageValidatorTests
 
   #endregion
 
+  #region XML Content Tests
+
+  [Fact]
+  public async Task ValidateAsync_WithMatchingXPathContent_ShouldReturnSuccessResult()
+  {
+    // Arrange
+    var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+    var contentInstruction = CreateTestStepInstruction(
+      2,
+      Constants.Actions.CheckContent,
+      value: "Alice",
+      selector: "/user/name",
+      contentType: Constants.ContentTypes.Xml
+    );
+    var xmlContent = new StringContent("<user><name>Alice</name><age>30</age></user>", Encoding.UTF8, Constants.ContentTypes.Xml);
+    var validator = HttpResponseMessageValidator.Create([sendInstruction, contentInstruction])
+      .WithStatusCode(HttpStatusCode.OK)
+      .WithContent(xmlContent);
+
+    // Act
+    var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+    // Assert
+    Assert.All(results, result => Assert.True(result.IsSuccess));
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithEquivalentXmlContent_ShouldReturnSuccessResult()
+  {
+    // Arrange
+    var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+    var verifyInstruction = CreateTestStepInstruction(
+      2,
+      Constants.Actions.VerifyContent,
+      value: "<user>\n  <name>Alice</name>\n</user>",
+      contentType: Constants.ContentTypes.Xml
+    );
+    var xmlContent = new StringContent("<user><name>Alice</name></user>", Encoding.UTF8, Constants.ContentTypes.Xml);
+    var validator = HttpResponseMessageValidator.Create([sendInstruction, verifyInstruction])
+      .WithStatusCode(HttpStatusCode.OK)
+      .WithContent(xmlContent);
+
+    // Act
+    var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+    // Assert
+    Assert.All(results, result => Assert.True(result.IsSuccess));
+  }
+
+  [Fact]
+  public async Task ValidateAsync_WithInvalidXmlResponse_ShouldReturnFailedResult()
+  {
+    // Arrange
+    var sendInstruction = CreateTestStepInstruction(1, Constants.Actions.Send);
+    var contentInstruction = CreateTestStepInstruction(
+      2,
+      Constants.Actions.CheckContent,
+      value: "Alice",
+      selector: "/user/name",
+      contentType: Constants.ContentTypes.Xml
+    );
+    var content = new StringContent("Bad request", Encoding.UTF8, "text/plain");
+    var validator = HttpResponseMessageValidator.Create([sendInstruction, contentInstruction])
+      .WithStatusCode(HttpStatusCode.BadRequest)
+      .WithContent(content);
+
+    // Act
+    var results = (await validator.ValidateAsync(CancellationToken.None)).ToList();
+
+    // Assert
+    Assert.False(results.Single(result => result.TestStepId == 2).IsSuccess);
+    Assert.Contains("Response content is not valid XML", results.Single(result => result.TestStepId == 2).Error);
+  }
+
+  #endregion
+
   #region VerifyContent Tests
 
   [Fact]
@@ -722,7 +798,8 @@ public class HttpResponseMessageValidatorTests
     string name = "",
     string value = "",
     string selector = "",
-    string file = ""
+    string file = "",
+    string contentType = ""
   )
   {
     var testStep = new TestStep
@@ -739,6 +816,11 @@ public class HttpResponseMessageValidatorTests
       Selector = selector,
       File = file
     };
+
+    if (!string.IsNullOrEmpty(contentType))
+    {
+      instruction.ContentType = contentType;
+    }
 
     return instruction;
   }

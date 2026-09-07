@@ -72,6 +72,7 @@ internal class HttpRequestMessageBuilder
     [
       new TextRequestContentHandler(),
       new JsonRequestContentHandler(),
+      new XmlRequestContentHandler(),
       new FormUrlEncodedRequestContentHandler(),
       new MultipartFormDataRequestContentHandler()
     ]);

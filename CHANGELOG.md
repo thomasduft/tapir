@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.29] - 2026-09-07
+
+### Added
+
+- Added support for application/xml
+
 ## [0.0.28] - 2026-09-07
 
 ### Changed

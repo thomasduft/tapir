@@ -1,9 +1,0 @@
-{
-  "Id": "9c14a5ce-9de8-4077-a16d-f0838989c346",
-  "IssueId": "",
-  "Prefix": "Added",
-  "Tag": "",
-  "Message": "Added support for application/xml",
-  "CreatedAt": "2026-09-07T09:04:32.8563776+02:00",
-  "CreatedBy": "Thomas Duft"
-}

@@ -76,6 +76,18 @@ tapir validate TC-Example-001 -i ./tests
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
+Omit `-tc` to run all definitions found recursively under `-i`. Execution stops
+at the first failed table or test case by default. With `--continue-on-failure`,
+remaining request tables and test cases are attempted, but the command still
+returns `1` if any fail. It returns `0` only if all cases pass. An empty test
+suite or a definition with no request tables returns `1`.
+
+Each request table is validated immediately before execution, after variables
+from earlier responses are available. Invalid tables do not send HTTP requests;
+validation errors are recorded in run output when `-o` is specified. Continuing
+after a failure may cause later tables to fail if required variables were not
+extracted. Cancellation always stops execution, even with `--continue-on-failure`.
+
 HTTPS server certificates are verified by default. Untrusted, expired, or
 hostname-mismatched certificates cause the run to fail. Prefer trusting your local
 development certificate (e.g. `dotnet dev-certs https --trust` where supported).

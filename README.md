@@ -110,3 +110,23 @@ Commands:
 
 Run 'tapir [command] -?|-h|--help' for more information about a command.
 ```
+
+### Running a test suite
+
+Omit `-tc` to run all definitions under the input directory. By default, execution
+stops at the first failed request table or test case. Use `--continue-on-failure`
+to attempt the remaining tables and test cases:
+
+```bash
+tapir run https://your-api.com -i ./test-cases -o ./results --continue-on-failure
+```
+
+The command returns `0` only when every test case passes. Any validation or test
+failure returns `1`, even when execution continues. Finding no definitions, or a
+selected definition with no request tables, also returns `1`.
+
+Each request table is validated before sending its request, with variables from
+previous responses available. Invalid tables are recorded as failures without
+sending HTTP requests and appear in run output when `-o` is specified. Continuing
+after a failed table does not guarantee that variables needed by later tables
+will be available.

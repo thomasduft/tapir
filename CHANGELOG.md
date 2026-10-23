@@ -10,6 +10,13 @@
 
 - Added `run --insecure` to explicitly disable TLS certificate verification for local development, with a warning when enabled.
 
+### Fixed
+
+- Validate each request table before execution, preserving variables extracted by earlier requests and reporting validation failures without sending invalid requests.
+- Honor `run --continue-on-failure` across test cases as well as request tables, while retaining a failing exit code if any case fails.
+- Return a failing exit code when no definitions are found or a definition has no request tables.
+- Measure each test case's duration independently instead of accumulating durations across the suite.
+
 ## [0.0.29] - 2026-09-07
 
 ### Added

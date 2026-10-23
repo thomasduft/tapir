@@ -16,8 +16,6 @@ internal class RunCommand : CommandLineApplication
   private static readonly Gauge<int> TestCaseGauge
     = TestCaseMeter.CreateGauge<int>("tapir_test_case");
 
-  private readonly Stopwatch _stopwatch = new();
-
   private readonly ITestCaseValidator _testCaseValidator;
   private readonly ITestCaseExecutor _testCaseExecutor;
 
@@ -80,7 +78,7 @@ internal class RunCommand : CommandLineApplication
 
     _continueOnFailure = Option<bool>(
       "--continue-on-failure",
-      "Continues the Test Case execution even if the Test Case fails.",
+      "Continues remaining request tables and test cases after failures; returns a non-zero exit code if any fail.",
       CommandOptionType.NoValue,
       cfg => cfg.DefaultValue = false,
       true
@@ -95,7 +93,6 @@ internal class RunCommand : CommandLineApplication
     );
 
     OnExecuteAsync(ExecuteAsync);
-    _testCaseExecutor = testCaseExecutor;
   }
 
   private async Task<int> ExecuteAsync(CancellationToken cancellationToken)
@@ -111,12 +108,21 @@ internal class RunCommand : CommandLineApplication
       _testCaseId.ParsedValue
     );
 
+    if (files.Length == 0)
+    {
+      Log.Logger.Error("No Test Case definitions found in '{InputDirectory}'.", _inputDirectory.ParsedValue);
+      return 1;
+    }
+
     var outputDirectory = _outputDirectory.HasValue()
       ? _outputDirectory.ParsedValue
       : null;
 
+    var exitCode = 0;
     foreach (var file in files)
     {
+      cancellationToken.ThrowIfCancellationRequested();
+
       var result = await RunTestCaseAsync(
         outputDirectory,
         file,
@@ -125,11 +131,15 @@ internal class RunCommand : CommandLineApplication
 
       if (result != 0)
       {
-        return result;
+        exitCode = result;
+        if (!_continueOnFailure.ParsedValue)
+        {
+          break;
+        }
       }
     }
 
-    return 0;
+    return exitCode;
   }
 
   private async Task<int> RunTestCaseAsync(
@@ -145,28 +155,58 @@ internal class RunCommand : CommandLineApplication
       .WithDomain(domain)
       .WithVariables(VariablesHelper.CreateVariables(_variables.ParsedValues));
 
+    if (!testCase.Tables.Any())
+    {
+      Log.Logger.Error("'{Title} ({TestCaseId})' has no request tables to execute.", testCase.Title, testCase.Id);
+      return 1;
+    }
+
     // Run the Test Case
     Log.Logger.Information("Starting '{TestCaseTitle} ({TestCaseId})'",
       testCase.Title,
       testCase.Id);
 
-    _stopwatch.Start();
+    var stopwatch = Stopwatch.StartNew();
 
     // for each table in the test case, execute the test steps
     var results = new List<TestCaseExecutionResult>();
     foreach (var table in testCase.Tables)
     {
-      var instructions = table.Steps
-        .Select(TestStepInstruction.FromTestStep)
-        .ToList();
+      cancellationToken.ThrowIfCancellationRequested();
 
-      var executionResult = await _testCaseExecutor.ExecuteAsync(
-        domain,
-        instructions,
-        _insecure.ParsedValue,
-        cancellationToken
+      // Validate immediately before each request, after variables from earlier
+      // responses are available. Invalid tables must never send HTTP requests.
+      var validationResult = await _testCaseValidator.ValidateAsync(
+        testCase,
+        cancellationToken,
+        [table]
       );
+      cancellationToken.ThrowIfCancellationRequested();
 
+      TestCaseExecutionResult executionResult;
+      if (!validationResult.IsValid)
+      {
+        var error = string.Join("; ", validationResult.Errors);
+        executionResult = new TestCaseExecutionResult(
+          table.Steps.Select(step => TestStepResult.Failed(step, $"Validation error: {error}")).ToList(),
+          new Dictionary<string, string>()
+        );
+      }
+      else
+      {
+        var instructions = table.Steps
+          .Select(TestStepInstruction.FromTestStep)
+          .ToList();
+
+        executionResult = await _testCaseExecutor.ExecuteAsync(
+          domain,
+          instructions,
+          _insecure.ParsedValue,
+          cancellationToken
+        );
+      }
+
+      cancellationToken.ThrowIfCancellationRequested();
       results.Add(executionResult);
 
       var success = executionResult.TestStepResults.All(r => r.IsSuccess);
@@ -189,7 +229,7 @@ internal class RunCommand : CommandLineApplication
       testCase.AddOrMergeVariables(executionResult.Variables);
     }
 
-    _stopwatch.Stop();
+    stopwatch.Stop();
 
     var overallSuccess = results.All(r => r.TestStepResults.All(tr => tr.IsSuccess));
 
@@ -205,7 +245,7 @@ internal class RunCommand : CommandLineApplication
         : string.Join(',', results.SelectMany(r => r.TestStepResults)
           .Where(r => !r.IsSuccess)
           .Select(r => r.Error))),
-      new("duration", _stopwatch.ElapsedMilliseconds),
+      new("duration", stopwatch.ElapsedMilliseconds),
       new("timestamp", DateTimeOffset.UtcNow)
     ]);
 

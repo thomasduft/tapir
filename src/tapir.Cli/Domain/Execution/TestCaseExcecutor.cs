@@ -7,6 +7,7 @@ internal interface ITestCaseExecutor
   Task<TestCaseExecutionResult> ExecuteAsync(
     string domain,
     IEnumerable<TestStepInstruction> instructions,
+    bool insecure,
     CancellationToken cancellationToken
   );
 }
@@ -31,10 +32,13 @@ internal class TestCaseExecutor : ITestCaseExecutor
   public async Task<TestCaseExecutionResult> ExecuteAsync(
     string domain,
     IEnumerable<TestStepInstruction> instructions,
+    bool insecure,
     CancellationToken cancellationToken
   )
   {
-    using var client = _factory.CreateClient(Constants.HttpClientName);
+    using var client = _factory.CreateClient(insecure
+      ? Constants.InsecureHttpClientName
+      : Constants.HttpClientName);
 
     var requestMessage = await _requestMessageBuilder
       .BuildAsync(domain, instructions, cancellationToken);

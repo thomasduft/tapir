@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **Breaking:** HTTPS requests now verify server certificates by default instead of accepting any certificate.
+
+### Added
+
+- Added `run --insecure` to explicitly disable TLS certificate verification for local development, with a warning when enabled.
+
 ## [0.0.29] - 2026-09-07
 
 ### Added

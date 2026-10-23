@@ -76,6 +76,19 @@ tapir validate TC-Example-001 -i ./tests
 tapir run https://api.example.com -tc TC-Example-001 -i ./tests -o ./results
 ```
 
+HTTPS server certificates are verified by default. Untrusted, expired, or
+hostname-mismatched certificates cause the run to fail. Prefer trusting your local
+development certificate (e.g. `dotnet dev-certs https --trust` where supported).
+
+For local development only, use `--insecure` to disable certificate verification:
+
+```bash
+tapir run https://localhost:5001 -tc TC-Example-001 -i ./tests --insecure
+```
+
+This option logs a warning and applies to all requests in the run, including
+steps with a `Domain` override. Do not use it against production systems.
+
 **6. report** - Generates a self-contained HTML report from Test Case run output files
 ```bash
 tapir report -i ./results -o ./results/report.html

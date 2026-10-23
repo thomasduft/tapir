@@ -4,7 +4,8 @@ internal interface ITestCaseValidator
 {
   public Task<TestCaseValidationResult> ValidateAsync(
     TestCase testCase,
-    CancellationToken cancellationToken
+    CancellationToken cancellationToken,
+    IEnumerable<Table>? tables = null
   );
 }
 
@@ -21,9 +22,13 @@ internal class TestCaseValidator : ITestCaseValidator
 
   public async Task<TestCaseValidationResult> ValidateAsync(
     TestCase testCase,
-    CancellationToken cancellationToken
+    CancellationToken cancellationToken,
+    IEnumerable<Table>? tables = null
   )
   {
+    // During execution, validate only the next request's tables so variables
+    // extracted by earlier requests have already been populated.
+    var tablesToValidate = (tables ?? testCase.Tables).ToList();
     var result = new TestCaseValidationResult(testCase.Id, testCase.Title);
 
     // check property Type - can be Definition or Run
@@ -48,7 +53,7 @@ internal class TestCaseValidator : ITestCaseValidator
     }
 
     // Validates each test step using the appropriate validator based on the action.
-    foreach (var step in testCase.Tables.SelectMany(t => t.Steps))
+    foreach (var step in tablesToValidate.SelectMany(t => t.Steps))
     {
       if (string.IsNullOrWhiteSpace(step.TestData))
         continue;
@@ -83,7 +88,7 @@ internal class TestCaseValidator : ITestCaseValidator
     // - Json
     // - FormUrlEncoded
     // - MultipartFormData
-    foreach (var table in testCase.Tables)
+    foreach (var table in tablesToValidate)
     {
       var addContentSteps = table.Steps
         .Where(s => !string.IsNullOrWhiteSpace(s.TestData))

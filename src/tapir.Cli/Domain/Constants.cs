@@ -4,6 +4,7 @@ internal static class Constants
 {
   public const string VariablePreAndSuffix = "@@";
   public const string HttpClientName = "TapirHttpClient";
+  public const string InsecureHttpClientName = "TapirInsecureHttpClient";
 
   internal static class TestCaseType
   {

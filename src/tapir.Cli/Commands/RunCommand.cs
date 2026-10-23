@@ -27,6 +27,7 @@ internal class RunCommand : CommandLineApplication
   private readonly CommandOption<string> _outputDirectory;
   private readonly CommandOption<string> _variables;
   private readonly CommandOption<bool> _continueOnFailure;
+  private readonly CommandOption<bool> _insecure;
 
   public RunCommand(
     ITestCaseValidator testCaseValidator,
@@ -85,12 +86,25 @@ internal class RunCommand : CommandLineApplication
       true
     );
 
+    _insecure = Option<bool>(
+      "--insecure",
+      "Disable TLS certificate verification for all requests in this run. For local development only.",
+      CommandOptionType.NoValue,
+      cfg => cfg.DefaultValue = false,
+      false
+    );
+
     OnExecuteAsync(ExecuteAsync);
     _testCaseExecutor = testCaseExecutor;
   }
 
   private async Task<int> ExecuteAsync(CancellationToken cancellationToken)
   {
+    if (_insecure.ParsedValue)
+    {
+      Log.Logger.Warning("TLS certificate verification is disabled (--insecure). Use only for local development.");
+    }
+
     // Locate the Test Case definition files
     var files = TestCaseDefinitionFinder.FindFiles(
       _inputDirectory.ParsedValue,
@@ -149,6 +163,7 @@ internal class RunCommand : CommandLineApplication
       var executionResult = await _testCaseExecutor.ExecuteAsync(
         domain,
         instructions,
+        _insecure.ParsedValue,
         cancellationToken
       );
 

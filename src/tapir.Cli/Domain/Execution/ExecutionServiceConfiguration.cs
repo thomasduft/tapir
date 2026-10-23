@@ -17,8 +17,12 @@ internal static class ExecutionServiceConfiguration
       .AddSingleton<IResponseContentValidatorFactory, ResponseContentValidatorFactory>()
       .AddSingleton<IResponseContentValidator, TextResponseContentValidator>()
       .AddSingleton<IResponseContentValidator, JsonResponseContentValidator>()
-      .AddSingleton<IResponseContentValidator, XmlResponseContentValidator>()
-      .AddHttpClient(Constants.HttpClientName)
+      .AddSingleton<IResponseContentValidator, XmlResponseContentValidator>();
+
+    // Keep the default client secure. The insecure client is selected only by an
+    // explicit run --insecure option, never by mutable global configuration.
+    services.AddHttpClient(Constants.HttpClientName);
+    services.AddHttpClient(Constants.InsecureHttpClientName)
       .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
       {
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator

@@ -2,8 +2,6 @@
 
 ## [0.1.0] - 2026-10-23
 
-## [Unreleased]
-
 ### Changed
 
 - **Breaking:** HTTPS requests now verify server certificates by default instead of accepting any certificate.

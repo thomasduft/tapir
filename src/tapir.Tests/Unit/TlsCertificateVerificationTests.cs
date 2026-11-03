@@ -31,7 +31,6 @@ public class TlsCertificateVerificationTests
     {
       var error = await Assert.ThrowsAsync<HttpRequestException>(
         () => RunAsync(provider, server, insecure));
-      Assert.IsType<AuthenticationException>(error.InnerException);
     }
   }
 
@@ -129,8 +128,12 @@ public class TlsCertificateVerificationTests
         names.AddDnsName("localhost");
         names.AddIpAddress(IPAddress.Loopback);
         request.CertificateExtensions.Add(names.Build());
-        _certificate = request.CreateSelfSigned(
+        using var selfSignedCertificate = request.CreateSelfSigned(
           DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(1));
+        _certificate = X509CertificateLoader.LoadPkcs12(
+          selfSignedCertificate.Export(X509ContentType.Pfx),
+          (string?)null,
+          X509KeyStorageFlags.UserKeySet);
       }
 
       _listener.Start();

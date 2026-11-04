@@ -17,14 +17,14 @@
 - Notes: Workflow review passed; `./build.sh test` passed (257 tests) and `./build.sh pack -rv 0.0.0` succeeded. Live trusted publication, rejected-authentication execution, and release-log inspection remain deferred.
 
 ### T-002: Documenting maintainer setup and credential retirement
-- [ ] Done
+- [x] Done
 - Covers: FR-006, FR-007, NFR-002, AC-006, AC-007, AC-010
 - Spec: External trust and operations; Design decisions
 - Depends on: T-001
 - Change: Add maintainer instructions for required GitHub/NuGet access, the login username, repository/workflow/environment policy fields, exact package scope, policy verification, and failure diagnosis. Document live-release verification and dependency assessment before deleting the `NUGET` secret and revoking the former key; make unresolved external account details explicit rather than assuming them.
 - Files: new: docs/NuGet-Publishing.md
 - Done when: Guide review confirms every FR-006 prerequisite and repository-specific value is explained; the documented trust scope is limited to the intended `thomasduft/tapir` `deploy.yaml` workflow and `tomware.tapir`; credential retirement follows successful live verification and dependency resolution.
-- Notes: Keep the guide separate from the packaged README. Actual account configuration, live release, and credential retirement are external maintainer actions.
+- Notes: Added and reviewed [NuGet-Publishing.md](../../NuGet-Publishing.md) against NuGet guidance; documented exact trust scope, setup, diagnosis, and gated retirement. `./build.sh test` passed (257 tests); `./build.sh pack -rv 0.0.0` succeeded. Account configuration, live release, and credential retirement remain external actions.
 
 ### T-003: Recording verification evidence and deferrals
 - [ ] Done

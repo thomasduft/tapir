@@ -27,14 +27,14 @@
 - Notes: Added and reviewed [NuGet-Publishing.md](../../NuGet-Publishing.md) against NuGet guidance; documented exact trust scope, setup, diagnosis, and gated retirement. `./build.sh test` passed (257 tests); `./build.sh pack -rv 0.0.0` succeeded. Account configuration, live release, and credential retirement remain external actions.
 
 ### T-003: Recording verification evidence and deferrals
-- [ ] Done
+- [x] Done
 - Covers: FR-008, AC-001, AC-005, AC-008, AC-009
 - Spec: Acceptance evidence; Risks; Assumptions
 - Depends on: T-001, T-002
 - Change: Add a verification record with the result and evidence for each repository-level check actually performed. Mark successful live publication, rejected-authentication execution, and live-log inspection as unverified/deferred when unavailable, and keep credential retirement pending until its documented conditions are met.
 - Files: new: docs/specs/001-nuget-trusted-publishing/validation.md
 - Done when: The record distinguishes performed checks from unperformed operational checks, includes evidence for each performed check, explicitly marks live publication and any unavailable log/rejection evidence as deferred, and records credential retirement as pending unless a successful live release and dependency review have been verified.
-- Notes: Run the documented test and pack commands where appropriate; repository-only checks must not be presented as proof of live publication.
+- Notes: Added [validation.md](validation.md) with evidence for `./build.sh test` (257 passed), `./build.sh pack -rv 0.0.0` (succeeded with the DevHost non-packable warning), workflow/guide review, and `git diff --check`. Live publication, rejected-authentication execution, log inspection, account configuration, dependency review, and credential retirement remain explicitly deferred or pending.
 
 ## Coverage
 | Requirement | Tasks |

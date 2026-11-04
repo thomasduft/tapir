@@ -5,6 +5,8 @@
     <RootNamespace>tapir.DevHost</RootNamespace>
 
     <Description>DevHost for testing the tapir CLI against.</Description>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

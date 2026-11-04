@@ -7,14 +7,14 @@
 ## Tasks
 
 ### T-001: Switching the release workflow to trusted publishing
-- [ ] Done
+- [x] Done
 - Covers: FR-001, FR-002, FR-003, FR-004, FR-005, NFR-001, NFR-002, AC-001, AC-002, AC-003, AC-004, AC-005, AC-009, AC-010
 - Spec: Overview; Design decisions; Workflow boundary; Acceptance evidence
 - Depends on: None
 - Change: Add deploy-job-scoped OIDC permissions and authenticate with `NuGet/login@v1` after packaging, passing only its short-lived output to the existing push. Preserve the tag trigger, version derivation, packaging, package selection, feed, and automatic release behavior; do not add a legacy-key fallback or expose credentials in logs or persisted data.
 - Files: [deploy.yaml](../../../.github/workflows/deploy.yaml)
 - Done when: Workflow review confirms the existing `v*.*.*` trigger, version expression, pack command and NuGet destination are unchanged; login succeeds before push; push consumes only the login output; no `secrets.NUGET` or credential-printing/debugging path remains; permissions are limited to the deploy job and its stated needs.
-- Notes: Live trusted publication, rejected-authentication execution, and release-log inspection are operational evidence and may remain deferred in the verification record.
+- Notes: Workflow review passed; `./build.sh test` passed (257 tests) and `./build.sh pack -rv 0.0.0` succeeded. Live trusted publication, rejected-authentication execution, and release-log inspection remain deferred.
 
 ### T-002: Documenting maintainer setup and credential retirement
 - [ ] Done

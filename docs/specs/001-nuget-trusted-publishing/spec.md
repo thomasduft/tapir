@@ -1,6 +1,6 @@
 # Spec: NuGet Trusted Publishing
 
-- Status: Draft
+- Status: Approved
 - Requirements: [requirements.md](requirements.md)
 
 ## Overview

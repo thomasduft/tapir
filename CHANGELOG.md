@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2026-11-04
+
+### Added
+
+- Supports NuGet Trusted Publishing
+
 ## [0.1.0] - 2026-10-23
 
 ### Changed

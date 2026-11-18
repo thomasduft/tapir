@@ -48,10 +48,6 @@ internal class ManCommand : CommandLineApplication
     var source = ResourceLoader.GetTemplate(templateName);
     var template = new FluidParser().Parse(source);
 
-    var options = new TemplateOptions();
-    options.MemberAccessStrategy.Register<IValidator>();
-
-    return await template
-      .RenderAsync(new TemplateContext(model, options));
+    return await template.RenderAsync(new TemplateContext(model));
   }
 }

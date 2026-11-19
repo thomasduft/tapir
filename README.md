@@ -89,6 +89,27 @@ Run it with: `tapir run https://your-api.com -tc TC-Users-001`
 
 ## Usage
 
+### AI-assisted test-case authoring
+
+The [tw-tapir agent skill](.agents/skills/tw-tapir/SKILL.md)
+helps compatible coding agents create and extend tapir Markdown definitions,
+prepare payload files, chain requests, and validate test-case syntax.
+It is stored under `.agents/skills` for agents that support that discovery path.
+To use it in another project, copy the `tw-tapir` directory into that
+project's agent skills directory. The skill is self-contained and uses only the
+global `tapir` tool; no tapir source checkout is required. It includes installation
+guidance when the tool is missing.
+
+Attach your API's OpenAPI specification (e.g., `openapi.spec.json`) to help the
+agent identify endpoints, request schemas, and expected responses:
+
+> Use the tw-tapir skill to create a test case for POST /users followed
+> by GET /users/{id}, using the attached openapi.spec.json as the API contract.
+> Ask me for any missing contract details, create the definition and payload
+> file, and validate it without sending API requests.
+
+### CLI reference
+
 ```bash
 A command-line tool for managing and executing automated api test cases.
 

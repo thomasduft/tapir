@@ -49,6 +49,4 @@ jobs:
       with:
         name: tapir-e2e-test-runs
         path: |
-          samples/Users/Runs/
-          samples/Documents/Runs/
           samples/Runs/

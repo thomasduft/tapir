@@ -43,3 +43,12 @@ jobs:
       run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- run "http://localhost:5000" -i "samples" -o "samples/Runs" -v FileName=empty -v AgeOfTom=45
     - name: Generate test report
       run: dotnet run --project src/tapir.Cli/tapir.Cli.csproj -- report -i "samples/Runs" -o "samples/Runs/samples-report.html"
+    - name: Upload test runs and report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: tapir-e2e-test-runs
+        path: |
+          samples/Users/Runs/
+          samples/Documents/Runs/
+          samples/Runs/
